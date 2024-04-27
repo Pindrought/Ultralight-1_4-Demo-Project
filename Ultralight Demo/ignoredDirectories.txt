@@ -1,0 +1,8 @@
+ThirdParty
+lua_543
+Debug_MW3DNoLib
+.vs
+.git
+MW3D_Testing
+Release
+Generated Files
