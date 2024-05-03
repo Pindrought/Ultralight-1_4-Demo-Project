@@ -25,7 +25,7 @@ bool Window::Initialize(const WindowCreationParameters& parms)
 	m_Title = parms.Title;
 	m_WindowClassName += std::to_string(m_Id);
 	m_Style = parms.Style;
-	m_Alpha = parms.WindowAlpha * 255;
+	m_DirectCompositionEnabled = parms.Style & WindowStyle::TransparencyAllowed;
 
 	static bool raw_input_initialized = false;
 	if (raw_input_initialized == false) //This just has to be done once for raw mouse move events.
@@ -43,6 +43,7 @@ bool Window::Initialize(const WindowCreationParameters& parms)
 		}
 
 		raw_input_initialized = true;
+		LOGINFO("RAW INPUT INITIALIZED.");
 	}
 
 	//Determine window x/y position
@@ -118,11 +119,7 @@ bool Window::Initialize(const WindowCreationParameters& parms)
 	DWORD extendedWindowsStyle = 0;
 	if (parms.Style & WindowStyle::TransparencyAllowed)
 	{
-		extendedWindowsStyle |= WS_EX_LAYERED;
-	}
-	else
-	{
-		m_TransparencyAllowed = false;
+		extendedWindowsStyle |= WS_EX_NOREDIRECTIONBITMAP;
 	}
 
 	if (parms.Style & WindowStyle::Topmost)
@@ -132,6 +129,7 @@ bool Window::Initialize(const WindowCreationParameters& parms)
 
 	if (m_HWND != NULL)
 	{
+		LOGINFO("WINDOW EXISTING HANDLE CLEANED UP.");
 		DestroyWindow(m_HWND);
 		UnregisterClassA(m_WindowClassName.c_str(), GetModuleHandle(NULL));
 		m_HWND = NULL;
@@ -180,28 +178,19 @@ bool Window::Initialize(const WindowCreationParameters& parms)
 			return false;
 	}*/
 	
-	if (m_Alpha < 255)
-	{
-		if (SetWindowAlpha(parms.WindowAlpha) == false)
-			return false;
-	}
-
-	/*
-	if (m_ColorRefUsed)
-	{
-		SetWindowColorKey(m_ColorRef);
-	}*/
-
-
 	if (!InitializeSwapchain())
 	{
+		LOGINFO("FAILED TO INITIALIZE WINDOW SWAPCHAIN.");
 		return false;
 	}
 
 	if (!InitializeRenderTargetContainer())
 	{
+		LOGINFO("FAILED TO INITIALIZE WINDOW RENDER TARGET CONTAINER.");
 		return false;
 	}
+
+	LOGINFO("INITIALIZED WINDOW RENDER TARGET CONTAINER.");
 
 	UltralightManager* pUltralightManager = UltralightManager::GetInstance();
 	assert(pUltralightManager != nullptr);
@@ -239,11 +228,6 @@ WindowStyle Window::GetStyle() const
 	return m_Style;
 }
 
-BYTE Window::GetAlpha() const
-{
-	return m_Alpha;
-}
-
 bool Window::ToggleClickthrough(bool clickthrough)
 {
 	LONG_PTR currentStyle = GetWindowLongPtr(m_HWND, GWL_EXSTYLE);
@@ -260,37 +244,6 @@ bool Window::ToggleClickthrough(bool clickthrough)
 	if (SetWindowLongPtr(m_HWND, GWL_EXSTYLE, currentStyle) == 0)
 		return false;
 	return true;
-}
-
-bool Window::SetWindowAlpha(float alphaFloat)
-{
-	alphaFloat = std::max(0.0f, alphaFloat);
-	alphaFloat = std::min(1.0f, alphaFloat);
-	BYTE alphaByte = 255 * alphaFloat;
-	m_Alpha = alphaByte;
-	m_TransparencyUsed = true;
-	if (m_ColorRefUsed)
-	{
-		return SetLayeredWindowAttributes(m_HWND, m_ColorRef, alphaByte, LWA_ALPHA | LWA_COLORKEY);
-	}
-	else
-	{
-		return SetLayeredWindowAttributes(m_HWND, NULL, alphaByte, LWA_ALPHA);
-	}
-}
-
-bool Window::SetWindowColorKey(COLORREF colorKey)
-{
-	m_ColorRef = colorKey;
-	m_ColorRefUsed = true;
-	if (m_TransparencyUsed)
-	{
-		return SetLayeredWindowAttributes(m_HWND, m_ColorRef, m_Alpha, LWA_ALPHA | LWA_COLORKEY);
-	}
-	else
-	{
-		return SetLayeredWindowAttributes(m_HWND, m_ColorRef, 100,  LWA_COLORKEY);
-	}
 }
 
 void Window::StartDrag()
@@ -541,6 +494,8 @@ void Window::Restore()
 
 bool Window::InitializeSwapchain()
 {
+	LOGINFO("INITIALIZING WINDOW SWAPCHAIN.");
+
 	D3DClass* pD3D = D3DClass::GetInstance();
 	ComPtr<ID3D11Device> pDevice = pD3D->m_Device.Get();
 
@@ -569,34 +524,70 @@ bool Window::InitializeSwapchain()
 	swapChainDesc.SampleDesc.Quality = 0;
 	swapChainDesc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
 	swapChainDesc.BufferCount = 2;
-	swapChainDesc.Scaling = DXGI_SCALING_NONE;
-	swapChainDesc.SwapEffect = DXGI_SWAP_EFFECT_FLIP_DISCARD; // DXGI_SWAP_EFFECT_DISCARD;
-	swapChainDesc.AlphaMode = DXGI_ALPHA_MODE_IGNORE;
 	swapChainDesc.Flags = DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH;
 	if (pD3D->IsTearingSupported())
 	{
 		swapChainDesc.Flags |= DXGI_SWAP_CHAIN_FLAG_ALLOW_TEARING; // for vsync off or this
 	}
 
-	hr = dxgiFactory->CreateSwapChainForHwnd(pDevice.Get(),
-											 m_HWND,
-											 &swapChainDesc,
-											 NULL,
-											 NULL,
-											 &m_SwapChain);
-
-	ReturnFalseIfFail(hr, "Failed to create D3D11 SwapChain for window.");
-
+	if (m_DirectCompositionEnabled)
+	{
+		swapChainDesc.Scaling = DXGI_SCALING_STRETCH;
+		swapChainDesc.SwapEffect = DXGI_SWAP_EFFECT_FLIP_SEQUENTIAL; 
+		swapChainDesc.AlphaMode = DXGI_ALPHA_MODE_PREMULTIPLIED;
+		hr = dxgiFactory->CreateSwapChainForComposition(pDevice.Get(),
+														&swapChainDesc,
+														nullptr,
+														&m_SwapChain);
+		ReturnFalseIfFail(hr, "Failed to create D3D11 SwapChain for composition.");
 #ifdef _DEBUG
-	std::string name = "WindowSwapchain_" + std::to_string(m_Id);
-	hr = m_SwapChain->SetPrivateData(WKPDID_D3DDebugObjectName, name.size(), name.c_str());
+		std::string name = "CompositionSwapchain_" + std::to_string(m_Id);
+		hr = m_SwapChain->SetPrivateData(WKPDID_D3DDebugObjectName, name.size(), name.c_str());
 #endif
+		auto pCompDevice = pD3D->m_CompositionDevice.Get();
+
+		hr = pCompDevice->CreateTargetForHwnd(m_HWND, TRUE, &m_DirectCompositionTarget);
+		ReturnFalseIfFail(hr, "Failed to create direct composition target for window.");
+
+		hr = pCompDevice->CreateVisual(&m_DirectCompositionVisual);
+		ReturnFalseIfFail(hr, "Failed to create direct composition visual for window.");
+
+		hr = m_DirectCompositionVisual->SetContent(m_SwapChain.Get());
+		ReturnFalseIfFail(hr, "Failed to set direct composition visual for window swapchain.");
+
+		hr = m_DirectCompositionTarget->SetRoot(m_DirectCompositionVisual.Get());
+		ReturnFalseIfFail(hr, "Failed to set direct composition target root to visual.");
+
+		hr = pCompDevice->Commit();
+		ReturnFalseIfFail(hr, "Failed to commit direct composition commands.");
+
+	}
+	else
+	{
+		swapChainDesc.Scaling = DXGI_SCALING_NONE;
+		swapChainDesc.SwapEffect = DXGI_SWAP_EFFECT_FLIP_DISCARD; 
+		swapChainDesc.AlphaMode = DXGI_ALPHA_MODE_IGNORE;
+		hr = dxgiFactory->CreateSwapChainForHwnd(pDevice.Get(),
+												 m_HWND,
+												 &swapChainDesc,
+												 nullptr,
+												 nullptr,
+												 &m_SwapChain);
+		ReturnFalseIfFail(hr, "Failed to create D3D11 SwapChain for window.");
+#ifdef _DEBUG
+		std::string name = "WindowSwapchain_" + std::to_string(m_Id);
+		hr = m_SwapChain->SetPrivateData(WKPDID_D3DDebugObjectName, name.size(), name.c_str());
+#endif
+	}
+	
+	LOGINFO("WINDOW SWAPCHAIN SUCCESSFULLY INITIALIZED.");
 
 	return true;
 }
 
 bool Window::InitializeRenderTargetContainer()
 {
+	LOGINFO("INITIALIZING WINDOW RENDER TARGET CONTAINER.");
 	m_RenderTargetContainer = std::make_shared<RenderTargetContainer>();
 	return m_RenderTargetContainer->InitializeWindowRenderTarget(this);
 }
@@ -646,7 +637,14 @@ LRESULT CALLBACK HandleMessageSetup(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM 
 void Window::RegisterWindowClass()
 {
 	WNDCLASSEXA wc = {}; //Our Window Class (This has to be filled before our window can be created) See: https://msdn.microsoft.com/en-us/library/windows/desktop/ms633577(v=vs.85).aspx
-	wc.style = CS_HREDRAW | CS_VREDRAW | CS_OWNDC; //Flags [Redraw on width/height change from resize/movement] See: https://msdn.microsoft.com/en-us/library/windows/desktop/ff729176(v=vs.85).aspx
+	if (m_DirectCompositionEnabled)
+	{
+		wc.style = CS_HREDRAW | CS_VREDRAW; //Flags [Redraw on width/height change from resize/movement] See: https://msdn.microsoft.com/en-us/library/windows/desktop/ff729176(v=vs.85).aspx
+	}
+	else
+	{
+		wc.style = CS_HREDRAW | CS_VREDRAW | CS_OWNDC; //Flags [Redraw on width/height change from resize/movement] See: https://msdn.microsoft.com/en-us/library/windows/desktop/ff729176(v=vs.85).aspx
+	}
 	wc.lpfnWndProc = HandleMessageSetup; //Pointer to Window Proc function for handling messages from this window
 	wc.cbClsExtra = 0; //# of extra bytes to allocate following the window-class structure. We are not currently using this.
 	wc.cbWndExtra = 0; //# of extra bytes to allocate following the window instance. We are not currently using this.
@@ -659,6 +657,7 @@ void Window::RegisterWindowClass()
 	wc.lpszClassName = m_WindowClassName.c_str(); //Pointer to null terminated string of our class name for this window.
 	wc.cbSize = sizeof(WNDCLASSEXA); //Need to fill in the size of our struct for cbSize
 	RegisterClassExA(&wc); // Register the class so that it is usable.
+	LOGINFO("REGISTERED WINDOW CLASS.");
 }
 
 bool Window::ResizeSwapChainAndRenderTargetContainer()

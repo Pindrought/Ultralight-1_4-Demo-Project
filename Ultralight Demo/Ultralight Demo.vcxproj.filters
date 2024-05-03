@@ -141,6 +141,9 @@
     <ClCompile Include="Window\WindowHelperForBorderlessResizable.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="PrecompiledHeader\MyLogger.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="PrecompiledHeader\ErrorHandler.h">
@@ -282,6 +285,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Window\WindowHelperForBorderlessResizable.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="PrecompiledHeader\MyLogger.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

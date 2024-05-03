@@ -67,52 +67,47 @@ bool Engine::Initialize(WindowCreationParameters windowParms)
 		m_UltralightMgr.SetViewToWindow(pView->GetId(), pWindow->GetId());
 
 		{
-			UltralightViewCreationParameters parms;
-			parms.Width = pWindow->GetWidth();
 			parms.Height = pWindow->GetHeight() - 24;
-			parms.IsAccelerated = true;
-			//parms.ForceMatchWindowDimensions = true;
-			parms.IsTransparent = true;
 			parms.Position.y = 24;
 
 			shared_ptr<UltralightView> pView = m_UltralightMgr.CreateUltralightView(parms);
-			pView->LoadURL("http://www.google.com");
+			//pView->LoadURL("file:///Samples/BorderlessWindow/BorderlessWindow.html");
+			pView->LoadURL("file:///Samples/TransparentWindow/TransparentWindow.html");
 			m_UltralightMgr.SetViewToWindow(pView->GetId(), pWindow->GetId());
 		}
 	}
 
-	for (int i = 0; i < 1; i++)
-	{
-		windowParms.Title = "CPU Renderer" + std::to_string(i);
-		windowParms.Style = windowParms.Style | WindowStyle::TransparencyAllowed;
-		windowParms.WindowAlpha = 0.5f;
-		shared_ptr<Window> pWindow = SpawnWindow(windowParms);
+	//for (int i = 0; i < 1; i++)
+	//{
+	//	windowParms.Title = "CPU Renderer" + std::to_string(i);
+	//	windowParms.Style = windowParms.Style;
+	//	shared_ptr<Window> pWindow = SpawnWindow(windowParms);
 
-		UltralightViewCreationParameters parms;
-		parms.Width = pWindow->GetWidth();
-		parms.Height = pWindow->GetHeight();
-		parms.IsAccelerated = false;
-		//parms.ForceMatchWindowDimensions = true;
-		parms.IsTransparent = true;
+	//	UltralightViewCreationParameters parms;
+	//	parms.Width = pWindow->GetWidth();
+	//	parms.Height = pWindow->GetHeight();
+	//	parms.IsAccelerated = false;
+	//	//parms.ForceMatchWindowDimensions = true;
+	//	parms.IsTransparent = true;
 
-		shared_ptr<UltralightView> pView = m_UltralightMgr.CreateUltralightView(parms);
-		pView->LoadURL("file:///Samples/BorderlessWindow/BorderlessWindow.html");
-		m_UltralightMgr.SetViewToWindow(pView->GetId(), pWindow->GetId());
+	//	shared_ptr<UltralightView> pView = m_UltralightMgr.CreateUltralightView(parms);
+	//	pView->LoadURL("file:///Samples/BorderlessWindow/BorderlessWindow.html");
+	//	m_UltralightMgr.SetViewToWindow(pView->GetId(), pWindow->GetId());
 
-		{
-			UltralightViewCreationParameters parms;
-			parms.Width = pWindow->GetWidth();
-			parms.Height = pWindow->GetHeight() - 24;
-			parms.IsAccelerated = true;
-			//parms.ForceMatchWindowDimensions = true;
-			parms.IsTransparent = true;
-			parms.Position.y = 24;
+	//	{
+	//		UltralightViewCreationParameters parms;
+	//		parms.Width = pWindow->GetWidth();
+	//		parms.Height = pWindow->GetHeight() - 24;
+	//		parms.IsAccelerated = true;
+	//		//parms.ForceMatchWindowDimensions = true;
+	//		parms.IsTransparent = true;
+	//		parms.Position.y = 24;
 
-			shared_ptr<UltralightView> pView = m_UltralightMgr.CreateUltralightView(parms);
-			pView->LoadURL("http://www.google.com");
-			m_UltralightMgr.SetViewToWindow(pView->GetId(), pWindow->GetId());
-		}
-	}
+	//		shared_ptr<UltralightView> pView = m_UltralightMgr.CreateUltralightView(parms);
+	//		pView->LoadURL("file:///Samples/TransparentWindow/TransparentWindow.html");
+	//		m_UltralightMgr.SetViewToWindow(pView->GetId(), pWindow->GetId());
+	//	}
+	//}
 
 	SetRunning(true);
 
@@ -322,14 +317,17 @@ EZJSParm Engine::OnEventCallbackFromUltralight(int32_t viewId,
 	{
 		auto pView = m_UltralightMgr.GetViewFromId(viewId);
 		int32_t windowId = pView->GetWindowId();
-		auto pWindow = m_WindowIdToWindowInstanceMap[windowId];
-		if (pWindow->IsMaximized())
+		auto pWindow = GetWindowFromId(windowId);
+		if (pWindow != nullptr)
 		{
-			pWindow->Restore();
-		}
-		else
-		{
-			pWindow->Maximize();
+			if (pWindow->IsMaximized())
+			{
+				pWindow->Restore();
+			}
+			else
+			{
+				pWindow->Maximize();
+			}
 		}
 	}
 

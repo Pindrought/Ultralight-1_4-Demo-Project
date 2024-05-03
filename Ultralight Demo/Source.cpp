@@ -24,7 +24,7 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance,
 	parms.Title = "Ultralight 1.4 Beta Demo 2024-04-23";
 	parms.Width = 400;
 	parms.Height = 200;
-	parms.Style = WindowStyle::NoBorder | WindowStyle::Resizable;
+	parms.Style = WindowStyle::NoBorder | WindowStyle::Resizable | WindowStyle::TransparencyAllowed;
 
 	Engine engine;
 	if (engine.Initialize(parms))

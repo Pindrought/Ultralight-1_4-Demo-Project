@@ -9,6 +9,7 @@ public:
 	bool IsTearingSupported();
 	ComPtr<ID3D11Device> m_Device;
 	ComPtr<ID3D11DeviceContext> m_Context;
+	ComPtr<IDCompositionDevice> m_CompositionDevice;
 private:
 	static D3DClass* s_Instance;
 	bool InitializeDeviceAndContext();

@@ -53,7 +53,7 @@ bool PipelineStateBuilder::BuildPipelineStatesForRenderer()
 	rtdesc.BlendOp = D3D11_BLEND_OP_ADD;
 	//Always just using 1 for the alpha since i'm not concerned with blending alpha but just the colors based on alpha
 	rtdesc.SrcBlendAlpha = D3D11_BLEND::D3D11_BLEND_ONE;
-	rtdesc.DestBlendAlpha = D3D11_BLEND::D3D11_BLEND_ZERO;
+	rtdesc.DestBlendAlpha = D3D11_BLEND::D3D11_BLEND_ONE;
 	rtdesc.BlendOpAlpha = D3D11_BLEND_OP::D3D11_BLEND_OP_ADD;
 
 	desc.RenderTarget[0] = rtdesc;

@@ -12,7 +12,6 @@ struct WindowCreationParameters
 	WindowStyle Style = WindowStyle::ExitButton;
 	int XPosition = INT_MAX;
 	int YPosition = INT_MAX;
-	float WindowAlpha = 1.0f; //Must use WindowStyle::TransparencyAllowed
 };
 
 class Window
@@ -28,10 +27,7 @@ public:
 	int32_t GetHeight() const;
 	string GetTitle() const;
 	WindowStyle GetStyle() const;
-	BYTE GetAlpha() const;
 	bool ToggleClickthrough(bool clickthrough);
-	bool SetWindowAlpha(float alpha);
-	bool SetWindowColorKey(COLORREF colorKey); //At one point this worked, but now I just have issues with it.
 	void StartDrag();
 	void StopDrag();
 	IDXGISwapChain1* GetSwapChainPtr();
@@ -56,12 +52,10 @@ private:
 	string m_WindowClassName = "UltralightDemoWindow";
 
 	bool m_IsMaximized = false;
-	bool m_TransparencyAllowed = true;
 	bool m_ClickThroughEnabled = false;
-	COLORREF m_ColorRef = RGB(0, 0, 0);
-	bool m_ColorRefUsed = false; //Color Ref is for assigning a specific color to be fully transparent.
-	BYTE m_Alpha = 255;
-	bool m_TransparencyUsed = false;
+	bool m_DirectCompositionEnabled = false;
+	ComPtr<IDCompositionTarget> m_DirectCompositionTarget = nullptr;
+	ComPtr<IDCompositionVisual> m_DirectCompositionVisual = nullptr;
 	
 	bool m_IsBorderlessResizable = false; //If borderless resizable, there is lots of extra work
 	BorderlessResizableWindowData m_BRWData;

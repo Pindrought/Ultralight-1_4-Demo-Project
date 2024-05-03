@@ -180,6 +180,10 @@ copy /Y "$(SolutionDir)ThirdParty\Ultralight\bin\WebCore.dll" "$(TargetDir)WebCo
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="PrecompiledHeader\MyLogger.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
+    </ClCompile>
     <ClCompile Include="PrecompiledHeader\PCH.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
@@ -236,6 +240,7 @@ copy /Y "$(SolutionDir)ThirdParty\Ultralight\bin\WebCore.dll" "$(TargetDir)WebCo
     <ClInclude Include="Misc\IDPoolManager.h" />
     <ClInclude Include="PrecompiledHeader\DirectoryHelper.h" />
     <ClInclude Include="PrecompiledHeader\ErrorHandler.h" />
+    <ClInclude Include="PrecompiledHeader\MyLogger.h" />
     <ClInclude Include="PrecompiledHeader\PCH.h" />
     <ClInclude Include="PrecompiledHeader\SimpleMath.h" />
     <ClInclude Include="PrecompiledHeader\StringConverter.h" />

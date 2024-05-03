@@ -6,6 +6,10 @@
 #include "DirectoryHelper.h"
 #include "SimpleMath.h" //Also SimpleMath
 
+
+#define MYLOGGER_LOG_INFO 1
+#include "MyLogger.h" 
+
 #include <fstream>
 #include <chrono>
 #include <string>
@@ -22,6 +26,10 @@
 #include <thread>
 #include <comdef.h>
 #include <Windows.h>
+
+#include <dcomp.h>
+#pragma comment(lib, "dcomp")
+
 #include <dwrite_3.h>
 #include <d3d11.h>
 #include <dxgi1_2.h>

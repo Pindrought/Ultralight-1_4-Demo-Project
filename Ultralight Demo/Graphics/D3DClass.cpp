@@ -78,5 +78,14 @@ bool D3DClass::InitializeDeviceAndContext()
 	}
 	m_IsTearingSupported = SUCCEEDED(hr) && allowTearing;
 
+	ComPtr<IDXGIDevice2> dxgiDevice;
+	hr = m_Device.As(&dxgiDevice);
+	ReturnFalseIfFail(hr, "Failed to retrieve underlying DXGI Device from D3D11 Device.");
+
+	hr = DCompositionCreateDevice(dxgiDevice.Get(),
+								  __uuidof(m_CompositionDevice),
+								  &m_CompositionDevice);
+	ReturnFalseIfFail(hr, "Failed to create direct composition device.");
+
 	return true;
 }
