@@ -40,14 +40,14 @@ bool Engine::Initialize(WindowCreationParameters windowParms)
 		return false;
 	}
 
-	for(int i=0; i<2; i++)
+	for(int i=0; i<1; i++)
 	{
 		windowParms.Title = "GPU Renderer" + std::to_string(i);
 		windowParms.Style = windowParms.Style;
-		shared_ptr<Window> window = SpawnWindow(windowParms);
+		shared_ptr<Window> pWindow = SpawnWindow(windowParms);
 		if (i == 0)
 		{
-			m_PrimaryWindow = window;
+			m_PrimaryWindow = pWindow;
 			if (m_PrimaryWindow == nullptr)
 			{
 				FatalError("Failed to initialize primary window. Program must now abort.");
@@ -56,20 +56,20 @@ bool Engine::Initialize(WindowCreationParameters windowParms)
 		}
 
 		UltralightViewCreationParameters parms;
-		parms.Width = windowParms.Width;
-		parms.Height = windowParms.Height;
+		parms.Width = pWindow->GetWidth();
+		parms.Height = pWindow->GetHeight();
 		parms.IsAccelerated = true;
 		//parms.ForceMatchWindowDimensions = true;
 		parms.IsTransparent = true;
 
 		shared_ptr<UltralightView> pView = m_UltralightMgr.CreateUltralightView(parms);
 		pView->LoadURL("file:///Samples/BorderlessWindow/BorderlessWindow.html");
-		m_UltralightMgr.SetViewToWindow(pView->GetId(), window->GetId());
+		m_UltralightMgr.SetViewToWindow(pView->GetId(), pWindow->GetId());
 
 		{
 			UltralightViewCreationParameters parms;
-			parms.Width = windowParms.Width;
-			parms.Height = windowParms.Height - 24;
+			parms.Width = pWindow->GetWidth();
+			parms.Height = pWindow->GetHeight() - 24;
 			parms.IsAccelerated = true;
 			//parms.ForceMatchWindowDimensions = true;
 			parms.IsTransparent = true;
@@ -77,48 +77,42 @@ bool Engine::Initialize(WindowCreationParameters windowParms)
 
 			shared_ptr<UltralightView> pView = m_UltralightMgr.CreateUltralightView(parms);
 			pView->LoadURL("http://www.google.com");
-			m_UltralightMgr.SetViewToWindow(pView->GetId(), window->GetId());
+			m_UltralightMgr.SetViewToWindow(pView->GetId(), pWindow->GetId());
 		}
 	}
 
 	for (int i = 0; i < 1; i++)
 	{
 		windowParms.Title = "CPU Renderer" + std::to_string(i);
-		windowParms.Style = windowParms.Style;
-		shared_ptr<Window> window = SpawnWindow(windowParms);
+		windowParms.Style = windowParms.Style | WindowStyle::TransparencyAllowed;
+		windowParms.WindowAlpha = 0.5f;
+		shared_ptr<Window> pWindow = SpawnWindow(windowParms);
 
 		UltralightViewCreationParameters parms;
-		parms.Width = windowParms.Width;
-		parms.Height = windowParms.Height;
+		parms.Width = pWindow->GetWidth();
+		parms.Height = pWindow->GetHeight();
 		parms.IsAccelerated = false;
 		//parms.ForceMatchWindowDimensions = true;
 		parms.IsTransparent = true;
 
 		shared_ptr<UltralightView> pView = m_UltralightMgr.CreateUltralightView(parms);
 		pView->LoadURL("file:///Samples/BorderlessWindow/BorderlessWindow.html");
-		m_UltralightMgr.SetViewToWindow(pView->GetId(), window->GetId());
+		m_UltralightMgr.SetViewToWindow(pView->GetId(), pWindow->GetId());
+
+		{
+			UltralightViewCreationParameters parms;
+			parms.Width = pWindow->GetWidth();
+			parms.Height = pWindow->GetHeight() - 24;
+			parms.IsAccelerated = true;
+			//parms.ForceMatchWindowDimensions = true;
+			parms.IsTransparent = true;
+			parms.Position.y = 24;
+
+			shared_ptr<UltralightView> pView = m_UltralightMgr.CreateUltralightView(parms);
+			pView->LoadURL("http://www.google.com");
+			m_UltralightMgr.SetViewToWindow(pView->GetId(), pWindow->GetId());
+		}
 	}
-
-	//{
-	//	windowParms.Title = "GPU Renderer";
-	//	std::shared_ptr<Window> window = SpawnWindow(windowParms);
-	//	if (window == nullptr)
-	//	{
-	//		FatalError("Failed to initialize window. Program must now abort.");
-	//		return false;
-	//	}
-
-	//	UltralightViewCreationParameters parms;
-	//	parms.Width = windowParms.Width;
-	//	parms.Height = windowParms.Height;
-	//	parms.IsAccelerated = true;
-	//	parms.ForceMatchWindowDimensions = true;
-
-	//	shared_ptr<UltralightView> gpuView = m_UltralightMgr.CreateUltralightView(parms);
-
-	//	gpuView->LoadURL("file:///TestFunction.html");
-	//	m_UltralightMgr.SetViewToWindow(gpuView->GetId(), window->GetId());
-	//}
 
 	SetRunning(true);
 
@@ -297,24 +291,54 @@ EZJSParm Engine::OnEventCallbackFromUltralight(int32_t viewId,
 
 	if (eventName == "BeginWindowDrag")
 	{
-		if (GetCursorPos(&m_WindowDragInfo.DragStartMousePosition))
+		auto pView = m_UltralightMgr.GetViewFromId(viewId);
+		int32_t windowId = pView->GetWindowId();
+		auto pWindow = m_WindowIdToWindowInstanceMap[windowId];
+		if (pWindow->IsMaximized() == false)
 		{
-			//TODO: Add error checking
-			auto pView = m_UltralightMgr.GetViewFromId(viewId);
-			int32_t windowId = pView->GetWindowId();
-			auto pWindow = m_WindowIdToWindowInstanceMap[windowId];
-			HWND hwnd = pWindow->GetHWND();
-			RECT rect = { NULL };
-			if (GetWindowRect(hwnd, &rect))
+			//pWindow->StartDrag();
+			if (GetCursorPos(&m_WindowDragInfo.DragStartMousePosition))
 			{
-				m_WindowDragInfo.DragStartWindowPosition.x = rect.left;
-				m_WindowDragInfo.DragStartWindowPosition.y = rect.top;
+				//TODO: Add error checking
+				auto pView = m_UltralightMgr.GetViewFromId(viewId);
+				int32_t windowId = pView->GetWindowId();
+				auto pWindow = m_WindowIdToWindowInstanceMap[windowId];
+				HWND hwnd = pWindow->GetHWND();
+				RECT rect = { NULL };
+				if (GetWindowRect(hwnd, &rect))
+				{
+					m_WindowDragInfo.DragStartWindowPosition.x = rect.left;
+					m_WindowDragInfo.DragStartWindowPosition.y = rect.top;
 
-				m_WindowDragInfo.DragInProgress = true;
-				m_WindowDragInfo.pWindowBeingDragged = pWindow;
+					m_WindowDragInfo.DragInProgress = true;
+					m_WindowDragInfo.pWindowBeingDragged = pWindow;
+				}
 			}
 		}
 		return EZJSParm();
+	}
+
+	if (eventName == "MaximizeRestore")
+	{
+		auto pView = m_UltralightMgr.GetViewFromId(viewId);
+		int32_t windowId = pView->GetWindowId();
+		auto pWindow = m_WindowIdToWindowInstanceMap[windowId];
+		if (pWindow->IsMaximized())
+		{
+			pWindow->Restore();
+		}
+		else
+		{
+			pWindow->Maximize();
+		}
+	}
+
+	if (eventName == "ResizeMe")
+	{
+		float width = parameters[0].AsDouble();
+		float height = parameters[1].AsDouble();
+		auto pView = m_UltralightMgr.GetViewFromId(viewId);
+		pView->Resize(width, height);
 	}
 
 	return EZJSParm();
@@ -325,6 +349,24 @@ void Engine::OnWindowDestroyCallback(int32_t windowId)
 	//Note: The OnWindowDestroyCallback function is called right before the actual window is destroyed.
 	//TODO: Add error checking
 	shared_ptr<Window> pWindow = m_WindowIdToWindowInstanceMap[windowId];
+}
+
+void Engine::OnWindowResizeCallback(Window* pWindow)
+{
+	OutputDebugStringA(strfmt("Window resize: %d\n", pWindow->GetId()).c_str());
+	OutputDebugStringA(strfmt("%d x %d\n", pWindow->GetWidth(), pWindow->GetHeight()).c_str());
+	for (auto view : pWindow->GetSortedUltralightViews())
+	{
+		EZJSParm rtnVal;
+		string exception;
+		view->Resize(pWindow->GetWidth() - view->GetPosition().x, pWindow->GetHeight() - view->GetPosition().y);
+		//ShowWindow(pWindow->GetHWND(), SW_SHOWMAXIMIZED);
+		/*if (!view->CallJSFnc("UpdateDimensions", { pWindow->GetWidth(), pWindow->GetHeight() }, rtnVal, exception))
+		{
+			
+			DebugBreak();
+		}*/
+	}
 }
 
 void Engine::RenderFrame()

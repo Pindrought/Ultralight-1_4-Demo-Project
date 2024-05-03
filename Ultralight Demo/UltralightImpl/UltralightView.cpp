@@ -284,7 +284,23 @@ bool UltralightView::Resize(uint32_t width, uint32_t height)
 	}
 	else
 	{
+		D3D11_TEXTURE2D_DESC textureDesc = { 0 };
+		textureDesc.Width = m_Width;
+		textureDesc.Height = m_Height;
+		textureDesc.MipLevels = 1;
+		textureDesc.ArraySize = 1;
+		textureDesc.Format = DXGI_FORMAT_B8G8R8A8_UNORM;
+		textureDesc.SampleDesc.Count = 1;
+		textureDesc.Usage = D3D11_USAGE_DYNAMIC;
+		textureDesc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
+		textureDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
+		textureDesc.MiscFlags = 0;
 
+		m_StorageTexture = std::make_shared<Texture>();
+		if (!m_StorageTexture->Initialize(textureDesc, false))
+		{
+			return false;
+		}
 	}
 	m_NativeView->Resize(width, height);
 	return true;
@@ -293,6 +309,12 @@ bool UltralightView::Resize(uint32_t width, uint32_t height)
 void UltralightView::SetPosition(DirectX::XMFLOAT3 pos)
 {
 	m_Position = pos;
+}
+
+bool UltralightView::CallJSFnc(std::string inFunctionName, std::initializer_list<EZJSParm> inParmList, EZJSParm& outReturnValue, std::string& outException)
+{
+	vector<EZJSParm> vecArgs = inParmList;
+	return CallJSFnc(inFunctionName, vecArgs, outReturnValue, outException);
 }
 
 bool UltralightView::CallJSFnc(std::string inFunctionName, 

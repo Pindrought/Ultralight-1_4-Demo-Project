@@ -32,6 +32,14 @@
 #include <wrl.h>
 #include <wrl/client.h>
 
+#include <windowsx.h>
+#include <shellapi.h>
+#include <uxtheme.h>
+#include <dwmapi.h>
+#include <versionhelpers.h>
+#include <stdlib.h>
+#include <stdbool.h>
+
 #include <Ultralight/Ultralight.h>
 #include <Ultralight/MouseEvent.h>
 #include <Ultralight/KeyEvent.h>
@@ -54,6 +62,7 @@ class ScrollEvent;
 class UltralightManager;
 class UltralightView;
 class Window;
+class WindowHelperForBorderlessResizable;
 
 using std::list;
 using std::map;

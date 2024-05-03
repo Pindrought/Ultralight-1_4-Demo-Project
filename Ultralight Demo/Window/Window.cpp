@@ -11,7 +11,6 @@ static IDPoolManager<int32_t> s_WindowsIDManager;
 
 Window::~Window()
 {
-	DebugBreak();
 }
 
 bool Window::Initialize(const WindowCreationParameters& parms)
@@ -26,6 +25,7 @@ bool Window::Initialize(const WindowCreationParameters& parms)
 	m_Title = parms.Title;
 	m_WindowClassName += std::to_string(m_Id);
 	m_Style = parms.Style;
+	m_Alpha = parms.WindowAlpha * 255;
 
 	static bool raw_input_initialized = false;
 	if (raw_input_initialized == false) //This just has to be done once for raw mouse move events.
@@ -91,12 +91,20 @@ bool Window::Initialize(const WindowCreationParameters& parms)
 	if (parms.Style & WindowStyle::Resizable)
 	{
 		styleWinAPI |= WS_SIZEBOX;
+		if (parms.Style & WindowStyle::NoBorder) //See WindowHelperForBorderlessResizable class... When combining the two, it's a lot of extra work.
+		{
+			styleWinAPI |= WS_OVERLAPPED;
+			m_IsBorderlessResizable = true;
+		}
 	}
-	if (parms.Style & WindowStyle::NoBorder)
+	else
 	{
-		UINT styleFix = WS_SYSMENU | WS_CAPTION | WS_MINIMIZEBOX | WS_MAXIMIZEBOX; //For NoBorder we must exclude these
-		styleFix = ~styleFix; //bit flip
-		styleWinAPI &= styleFix; //and with flipped bit to remove those unwanted flags
+		if (parms.Style & WindowStyle::NoBorder)
+		{
+			UINT styleFix = WS_SYSMENU | WS_CAPTION | WS_MINIMIZEBOX | WS_MAXIMIZEBOX; //For NoBorder we must exclude these
+			styleFix = ~styleFix; //bit flip
+			styleWinAPI &= styleFix; //and with flipped bit to remove those unwanted flags
+		}
 	}
 
 	BOOL result = AdjustWindowRect(&wr, styleWinAPI, FALSE);
@@ -150,27 +158,40 @@ bool Window::Initialize(const WindowCreationParameters& parms)
 		DWORD error = GetLastError();
 		return false;
 	}
+
+	if (m_IsBorderlessResizable)
+	{
+		m_BRWData.Width = m_Width;
+		m_BRWData.Height = m_Height;
+		m_BRWData.Hwnd = m_HWND;
+		WindowHelperForBorderlessResizable::HandleCompositionChanged(this);
+		WindowHelperForBorderlessResizable::HandleThemeChanged(this);
+
+	}
+
 	//Show/focus Window
 	ShowWindow(m_HWND, SW_SHOW);
 	SetForegroundWindow(m_HWND);
 	SetFocus(m_HWND);
 
-	if (m_ClickThroughEnabled)
+	/*if (m_ClickThroughEnabled)
 	{
 		if (ToggleClickthrough(m_ClickThroughEnabled) == false)
 			return false;
-	}
-
-	if (m_TransparencyUsed)
+	}*/
+	
+	if (m_Alpha < 255)
 	{
 		if (SetWindowAlpha(parms.WindowAlpha) == false)
 			return false;
 	}
 
+	/*
 	if (m_ColorRefUsed)
 	{
 		SetWindowColorKey(m_ColorRef);
-	}
+	}*/
+
 
 	if (!InitializeSwapchain())
 	{
@@ -272,6 +293,17 @@ bool Window::SetWindowColorKey(COLORREF colorKey)
 	}
 }
 
+void Window::StartDrag()
+{
+	ReleaseCapture();
+	SendMessageW(m_HWND, WM_NCLBUTTONDOWN, HTCAPTION, 0);
+}
+
+void Window::StopDrag()
+{
+	SendMessageW(m_HWND, WM_NCLBUTTONUP, HTCAPTION, 0);
+}
+
 IDXGISwapChain1* Window::GetSwapChainPtr()
 {
 	return m_SwapChain.Get();
@@ -327,6 +359,56 @@ LRESULT Window::WindowProcA(HWND hwnd,
 		pUltralightManager->RemoveWindowId(m_Id);
 		return 0;
 	}
+	case WM_DWMCOMPOSITIONCHANGED:
+		if (m_IsBorderlessResizable)
+		{
+			WindowHelperForBorderlessResizable::HandleCompositionChanged(this);
+			return 0;
+		}
+		return DefWindowProcA(hwnd, uMsg, wParam, lParam);
+	case WM_NCACTIVATE:
+		if (m_IsBorderlessResizable)
+		{
+			/* DefWindowProc won't repaint the window border if lParam (normally a
+		   HRGN) is -1. This is recommended in:
+		   https://blogs.msdn.microsoft.com/wpfsdk/2008/09/08/custom-window-chrome-in-wpf/ */
+			return DefWindowProcA(hwnd, uMsg, wParam, -1);
+		}
+		return DefWindowProcA(hwnd, uMsg, wParam, lParam);
+	case WM_NCCALCSIZE:
+		if (m_IsBorderlessResizable)
+		{
+			WindowHelperForBorderlessResizable::HandleNCCalcSize(this, wParam, lParam);
+			return 0;
+		}
+		return DefWindowProcA(hwnd, uMsg, wParam, lParam);
+	case WM_NCHITTEST:
+		if (m_IsBorderlessResizable)
+		{
+			return WindowHelperForBorderlessResizable::HandleNCHitTest(this, GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
+		}
+		return DefWindowProcA(hwnd, uMsg, wParam, lParam);
+	case WM_NCPAINT:
+		/* Only block WM_NCPAINT when composition is disabled. If it's blocked
+		   when composition is enabled, the window shadow won't be drawn. */
+		if (m_IsBorderlessResizable)
+		{
+			if (m_BRWData.CompositionEnabled == false)
+				return 0;
+		}
+		return DefWindowProcA(hwnd, uMsg, wParam, lParam);
+
+	case WM_NCUAHDRAWCAPTION:
+	case WM_NCUAHDRAWFRAME:
+		if (m_IsBorderlessResizable)
+			return 0;
+		/* These undocumented messages are sent to draw themed window borders.
+		   Block them to prevent drawing borders over the client area. */
+		return 0;
+
+
+
+
 	//Mouse Messages
 	case WM_MOUSEMOVE:
 		mouse.OnWindowsMouseMessage(m_Id, uMsg, wParam, lParam);
@@ -414,7 +496,11 @@ LRESULT Window::WindowProcA(HWND hwnd,
 		{
 			m_Width = LOWORD(lParam);
 			m_Height = HIWORD(lParam);
-			if (!ResizeSwapChainAndRenderTargetContainer())
+			if (ResizeSwapChainAndRenderTargetContainer())
+			{
+				pEngine->OnWindowResizeCallback(this);
+			}
+			else
 			{
 				CriticalError("Failed to resize swapchain and render target container on WM_SIZE."); //Not really sure what to do if this happens
 			}
@@ -434,6 +520,23 @@ LRESULT Window::WindowProcA(HWND hwnd,
 const list<shared_ptr<UltralightView>>& Window::GetSortedUltralightViews()
 {
 	return m_UltralightViewsSorted;
+}
+
+bool Window::IsMaximized() const
+{
+	return m_IsMaximized;
+}
+
+void Window::Maximize()
+{
+	m_IsMaximized = true;
+	ShowWindow(m_HWND, SW_SHOWMAXIMIZED);
+}
+
+void Window::Restore()
+{
+	m_IsMaximized = false;
+	ShowWindow(m_HWND, SW_RESTORE);
 }
 
 bool Window::InitializeSwapchain()
@@ -560,6 +663,9 @@ void Window::RegisterWindowClass()
 
 bool Window::ResizeSwapChainAndRenderTargetContainer()
 {
+	if (m_RenderTargetContainer == nullptr)
+		return true;
+
 	m_RenderTargetContainer->ResetRenderTargetsForResize();
 
 	DXGI_SWAP_CHAIN_DESC1 desc;

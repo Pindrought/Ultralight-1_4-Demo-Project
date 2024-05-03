@@ -270,7 +270,6 @@ void RenderTargetContainer::SetUpdateInterval(float ms)
 
 RenderTargetContainer::~RenderTargetContainer()
 {
-    DebugBreak();
 }
 
 void RenderTargetContainer::SetBackgroundColor(float r, float g, float b, float a)

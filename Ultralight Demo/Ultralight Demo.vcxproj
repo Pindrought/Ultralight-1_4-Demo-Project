@@ -121,7 +121,7 @@
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>d3d11.lib;D3DCompiler.lib;Dwrite.lib;dxguid.lib;DXGI.lib;AppCore.lib;Ultralight.lib;UltralightCore.lib;WebCore.lib;Shlwapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>d3d11.lib;D3DCompiler.lib;Dwrite.lib;dxguid.lib;DXGI.lib;AppCore.lib;Ultralight.lib;UltralightCore.lib;WebCore.lib;Shlwapi.lib;Dwmapi.lib;UxTheme.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
       <Command>copy /Y "$(SolutionDir)ThirdParty\Ultralight\bin\Ultralight.dll" "$(TargetDir)Ultralight.dll"
@@ -147,7 +147,7 @@ copy /Y "$(SolutionDir)ThirdParty\Ultralight\bin\WebCore.dll" "$(TargetDir)WebCo
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>d3d11.lib;D3DCompiler.lib;Dwrite.lib;dxguid.lib;DXGI.lib;AppCore.lib;Ultralight.lib;UltralightCore.lib;WebCore.lib;Shlwapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>d3d11.lib;D3DCompiler.lib;Dwrite.lib;dxguid.lib;DXGI.lib;AppCore.lib;Ultralight.lib;UltralightCore.lib;WebCore.lib;Shlwapi.lib;Dwmapi.lib;UxTheme.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
       <Command>copy /Y "$(SolutionDir)ThirdParty\Ultralight\bin\Ultralight.dll" "$(TargetDir)Ultralight.dll"
@@ -211,6 +211,7 @@ copy /Y "$(SolutionDir)ThirdParty\Ultralight\bin\WebCore.dll" "$(TargetDir)WebCo
     <ClCompile Include="Window\InputController\MouseEvent.cpp" />
     <ClCompile Include="Window\InputController\ScrollEvent.cpp" />
     <ClCompile Include="Window\Window.cpp" />
+    <ClCompile Include="Window\WindowHelperForBorderlessResizable.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Engine.h" />
@@ -258,6 +259,7 @@ copy /Y "$(SolutionDir)ThirdParty\Ultralight\bin\WebCore.dll" "$(TargetDir)WebCo
     <ClInclude Include="Window\InputController\MousePoint.h" />
     <ClInclude Include="Window\InputController\ScrollEvent.h" />
     <ClInclude Include="Window\Window.h" />
+    <ClInclude Include="Window\WindowHelperForBorderlessResizable.h" />
     <ClInclude Include="Window\WindowStyle.h" />
   </ItemGroup>
   <ItemGroup>

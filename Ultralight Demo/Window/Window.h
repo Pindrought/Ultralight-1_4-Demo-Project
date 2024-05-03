@@ -2,6 +2,7 @@
 #include <PCH.h>
 #include "WindowStyle.h"
 #include "../Graphics/RenderTarget/RenderTargetContainer.h"
+#include "WindowHelperForBorderlessResizable.h"
 
 struct WindowCreationParameters
 {
@@ -17,6 +18,7 @@ struct WindowCreationParameters
 class Window
 {
 	friend class UltralightManager;
+	friend class WindowHelperForBorderlessResizable;
 public:
 	~Window();
 	bool Initialize(const WindowCreationParameters& parms);
@@ -30,10 +32,15 @@ public:
 	bool ToggleClickthrough(bool clickthrough);
 	bool SetWindowAlpha(float alpha);
 	bool SetWindowColorKey(COLORREF colorKey); //At one point this worked, but now I just have issues with it.
+	void StartDrag();
+	void StopDrag();
 	IDXGISwapChain1* GetSwapChainPtr();
 	RenderTargetContainer* GetRenderTargetContainer();
 	LRESULT WindowProcA(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam); //This probably shouldn't be public since it should not be called outside of Window.cpp, but I don't have a great solution to hide this.
 	const list<shared_ptr<UltralightView>>& GetSortedUltralightViews();
+	bool IsMaximized() const;
+	void Maximize();
+	void Restore();
 private:
 	bool InitializeSwapchain();
 	bool InitializeRenderTargetContainer();
@@ -48,6 +55,7 @@ private:
 	WindowStyle m_Style = WindowStyle::None;
 	string m_WindowClassName = "UltralightDemoWindow";
 
+	bool m_IsMaximized = false;
 	bool m_TransparencyAllowed = true;
 	bool m_ClickThroughEnabled = false;
 	COLORREF m_ColorRef = RGB(0, 0, 0);
@@ -55,6 +63,9 @@ private:
 	BYTE m_Alpha = 255;
 	bool m_TransparencyUsed = false;
 	
+	bool m_IsBorderlessResizable = false; //If borderless resizable, there is lots of extra work
+	BorderlessResizableWindowData m_BRWData;
+
 	bool m_ResizeOrMoveInProgress = false;
 	ComPtr<IDXGISwapChain1> m_SwapChain = nullptr;
 	shared_ptr<RenderTargetContainer> m_RenderTargetContainer = nullptr;

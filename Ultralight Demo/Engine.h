@@ -29,6 +29,7 @@ public:
 	Window* GetWindowFromId(int32_t windowId);
 	EZJSParm OnEventCallbackFromUltralight(int32_t viewId, string eventName, vector<EZJSParm> parameters);
 	void OnWindowDestroyCallback(int32_t windowId);
+	void OnWindowResizeCallback(Window* pWindow);
 private:
 	void RenderFrame();
 	static Engine* s_Instance; //There will only ever be one engine instance

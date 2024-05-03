@@ -185,7 +185,11 @@ void GPUDriverD3D11::UpdateTexture(uint32_t textureId, ul::RefPtr<ul::Bitmap> bi
 
     auto& entry = iter->second;
     D3D11_MAPPED_SUBRESOURCE res;
-    m_D3DPtr->m_Context->Map(entry.texture.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &res);
+    HRESULT hr = m_D3DPtr->m_Context->Map(entry.texture.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &res);
+    if (FAILED(hr))
+    {
+        DebugBreak();
+    }
 
     if (res.RowPitch == bitmap->row_bytes())
     {
@@ -328,11 +332,19 @@ void GPUDriverD3D11::UpdateGeometry(uint32_t geometryId,
     auto& entry = iter->second;
     D3D11_MAPPED_SUBRESOURCE res;
 
-    m_D3DPtr->m_Context->Map(entry.vertexBuffer.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &res);
+    HRESULT hr = m_D3DPtr->m_Context->Map(entry.vertexBuffer.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &res);
+    if (FAILED(hr))
+    {
+        DebugBreak();
+    }
     memcpy(res.pData, vertices.data, vertices.size);
     m_D3DPtr->m_Context->Unmap(entry.vertexBuffer.Get(), 0);
 
-    m_D3DPtr->m_Context->Map(entry.indexBuffer.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &res);
+    hr = m_D3DPtr->m_Context->Map(entry.indexBuffer.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &res);
+    if (FAILED(hr))
+    {
+        DebugBreak();
+    }
     memcpy(res.pData, indices.data, indices.size);
     m_D3DPtr->m_Context->Unmap(entry.indexBuffer.Get(), 0);
 }

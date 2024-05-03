@@ -138,6 +138,9 @@
     <ClCompile Include="UltralightImpl\GPUimpl\GPUDriverD3D11.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Window\WindowHelperForBorderlessResizable.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="PrecompiledHeader\ErrorHandler.h">
@@ -276,6 +279,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Graphics\InputLayoutDescriptions.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Window\WindowHelperForBorderlessResizable.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
