@@ -10,6 +10,8 @@
 #include "ErrorHandler.h"
 #include "Engine.h"
 
+#include "Demos/Demos.h"
+
 int WINAPI wWinMain(_In_ HINSTANCE hInstance,
 					_In_opt_ HINSTANCE hPrevInstance,
 					_In_ PWSTR pCmdLine,
@@ -19,15 +21,8 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance,
 								COINIT_MULTITHREADED);
 	FatalErrorIfFail(hr, "Failed to Initialize the COM Library. Program will now abort.");
 
-
-	WindowCreationParameters parms;
-	parms.Title = "Ultralight 1.4 Beta Demo 2024-04-23";
-	parms.Width = 400;
-	parms.Height = 200;
-	parms.Style = WindowStyle::NoBorder | WindowStyle::Resizable | WindowStyle::TransparencyAllowed;
-
-	Engine engine;
-	if (engine.Initialize(parms))
+	DemoInspector engine;
+	if (engine.Initialize())
 	{
 		while (engine.IsRunning())
 		{

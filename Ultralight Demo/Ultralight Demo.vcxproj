@@ -156,6 +156,8 @@ copy /Y "$(SolutionDir)ThirdParty\Ultralight\bin\WebCore.dll" "$(TargetDir)WebCo
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Demos\DemoBasic.cpp" />
+    <ClCompile Include="Demos\DemoInspector.cpp" />
     <ClCompile Include="Engine.cpp" />
     <ClCompile Include="Graphics\Buffer\ConstantBuffer.cpp" />
     <ClCompile Include="Graphics\Buffer\IndexBuffer.cpp" />
@@ -218,6 +220,9 @@ copy /Y "$(SolutionDir)ThirdParty\Ultralight\bin\WebCore.dll" "$(TargetDir)WebCo
     <ClCompile Include="Window\WindowHelperForBorderlessResizable.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Demos\DemoBasic.h" />
+    <ClInclude Include="Demos\DemoInspector.h" />
+    <ClInclude Include="Demos\Demos.h" />
     <ClInclude Include="Engine.h" />
     <ClInclude Include="Graphics\Buffer\ConstantBuffer.h" />
     <ClInclude Include="Graphics\Buffer\ConstantBufferType.h" />

@@ -22,6 +22,7 @@ public:
 	void RemoveWindowId(int32_t windowId);
 	//GPUDriverD3D11* GetGPUDriverPtr();
 	std::shared_ptr<UltralightView> CreateUltralightView(UltralightViewCreationParameters parms);
+	void DestroyView(shared_ptr<UltralightView> pView);
 	static UltralightManager* GetInstance();
 	std::vector<std::shared_ptr<UltralightView>> GetViewsForWindow(int32_t windowId);
 	std::shared_ptr<UltralightView> GetViewFromId(int32_t viewId);
@@ -32,6 +33,7 @@ public:
 	bool FireKeyboardEvent(KeyboardEvent* keyboardEvent);
 	bool FireMouseEvent(MouseEvent* mouseEvent);
 	bool FireScrollEvent(ScrollEvent* scrollEvent);
+	shared_ptr<UltralightView> GetUltralightViewFromNativeViewPtr(ul::View* pNativeView);
 
 	~UltralightManager();
 private:

@@ -19,18 +19,20 @@ public:
 	static Engine* GetInstance();
 	InputController* GetInputController();
 
-	bool Initialize(WindowCreationParameters windowParms);
+	bool Initialize();
 	bool IsRunning();
 	void ProcessWindowsMessages();
-	void Tick();
+	virtual bool Startup();
+	virtual bool Tick();
+	virtual EZJSParm OnEventCallbackFromUltralight(int32_t viewId, string eventName, vector<EZJSParm> parameters) = 0;
+	virtual void OnWindowDestroyCallback(int32_t windowId) = 0;
+	virtual void OnWindowResizeCallback(Window* pWindow) = 0;
 	void SetRunning(bool running);
 	std::shared_ptr<Window> SpawnWindow(const WindowCreationParameters& parms);
 	bool CleanupWindow(int32_t windowId);
 	Window* GetWindowFromId(int32_t windowId);
-	EZJSParm OnEventCallbackFromUltralight(int32_t viewId, string eventName, vector<EZJSParm> parameters);
-	void OnWindowDestroyCallback(int32_t windowId);
-	void OnWindowResizeCallback(Window* pWindow);
-private:
+	
+protected:
 	void RenderFrame();
 	static Engine* s_Instance; //There will only ever be one engine instance
 	InputController m_InputController; //Only one engine instance = only ever one input controller
@@ -40,7 +42,4 @@ private:
 	UltralightManager m_UltralightMgr;
 	bool m_IsRunning = false;
 	bool m_VSync = true;
-	shared_ptr<UltralightView> m_UltralightTestView = nullptr;
-
-	WindowDragInfo m_WindowDragInfo;
 };

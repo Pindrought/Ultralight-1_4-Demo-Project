@@ -144,6 +144,12 @@
     <ClCompile Include="PrecompiledHeader\MyLogger.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Demos\DemoBasic.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Demos\DemoInspector.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="PrecompiledHeader\ErrorHandler.h">
@@ -288,6 +294,15 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="PrecompiledHeader\MyLogger.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Demos\DemoBasic.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Demos\Demos.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Demos\DemoInspector.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

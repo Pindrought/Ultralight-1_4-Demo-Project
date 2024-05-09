@@ -152,14 +152,62 @@ void UltralightManager::RemoveWindowId(int32_t windowId)
 
 std::shared_ptr<UltralightView> UltralightManager::CreateUltralightView(UltralightViewCreationParameters parms)
 {
+	if (parms.InspectionTarget != nullptr)
+	{
+		if (parms.InspectionTarget->IsInspectorView())
+		{
+			ErrorHandler::LogCriticalError("Attempted to create inspector view over another inspector view.");
+			return nullptr;
+		}
+		if (parms.InspectionTarget->HasInspectorView())
+		{
+			ErrorHandler::LogCriticalError("Attempted to create inspector view for view that already contains an inspector view.");
+			return nullptr;
+		}
+	}
 	std::shared_ptr<UltralightView> pView = std::make_shared<UltralightView>();
 	if (!pView->Initialize(parms))
 	{
 		ErrorHandler::LogCriticalError("Failed to create Ultralight View.");
 		return nullptr;
 	}
+
+	if (parms.InspectionTarget != nullptr)
+	{
+		parms.InspectionTarget->m_InspectorView = pView;
+		parms.InspectionTarget->GetView()->CreateLocalInspectorView();
+	}
+
 	m_ViewsMap.insert(std::make_pair(pView->GetId(), pView));
 	return pView;
+}
+
+void UltralightManager::DestroyView(shared_ptr<UltralightView> pView)
+{
+	//Need to remove all references to this view
+	int32_t windowId = pView->GetWindowId();
+	if (pView->IsInspectorView())
+	{
+		if (pView->m_InspectionTarget->m_InspectorView == pView) //This should always be true
+		{
+			pView->m_InspectionTarget->m_InspectorView = nullptr;
+		}
+		else
+		{
+			DebugBreak();
+			FatalError("Hmm.. DestroyView called for an inspector view but the inspection target did not reference it as the inspector view?");
+		}
+	}
+	if (windowId != -1)
+	{
+		auto windowPair = m_WindowIdToViewIdMap.find(windowId);
+		if (windowPair == m_WindowIdToViewIdMap.end())
+		{
+			FatalError("Failed to find window entry in window map.");
+		}
+		windowPair->second.erase(pView->GetId());
+	}
+	m_ViewsMap.erase(pView->GetId());
 }
 
 UltralightManager* UltralightManager::GetInstance()
@@ -331,6 +379,22 @@ bool UltralightManager::FireScrollEvent(ScrollEvent* scrollEvent)
 	}
 
 	return false;
+}
+
+shared_ptr<UltralightView> UltralightManager::GetUltralightViewFromNativeViewPtr(ul::View* pNativeView)
+{
+	//TODO: Inefficient lookup, maybe add another map for this lookup?
+	for (auto mapPair : m_ViewsMap)
+	{
+		auto pView = mapPair.second;
+		ul::View* pULView = pView->GetView();
+		if (pULView == pNativeView)
+		{
+			return pView;
+		}
+	}
+	ErrorHandler::LogCriticalError("UltralightManager::GetUltralightViewFromNativeViewPtr() failed.");
+	return nullptr;
 }
 
 UltralightManager::~UltralightManager()

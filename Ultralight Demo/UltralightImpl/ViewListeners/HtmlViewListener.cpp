@@ -1,6 +1,7 @@
 #include <PCH.h>
 #include "HtmlViewListener.h"
 #include "../../Misc/CursorManager.h"
+#include "../UltralightManager.h"
 
 HtmlViewListener::HtmlViewListener()
 {
@@ -56,4 +57,11 @@ void HtmlViewListener::OnAddConsoleMessage(ul::View* caller,
                                    message.source_id().utf8().data(),
                                    message.message().utf8().data());
     OutputDebugStringA(msg.c_str());
+}
+
+ul::RefPtr<ul::View> HtmlViewListener::OnCreateInspectorView(ul::View* caller, bool is_local, const ul::String& inspected_url)
+{
+    UltralightManager* pManager = UltralightManager::GetInstance();
+    shared_ptr<UltralightView> targetView = pManager->GetUltralightViewFromNativeViewPtr(caller);
+    return targetView->GetInspectorView()->GetViewRefPtr();
 }

@@ -387,6 +387,10 @@ LRESULT Window::WindowProcA(HWND hwnd,
 	case WM_SYSKEYDOWN:
 	case WM_SYSKEYUP:
 	case WM_CHAR:
+		if (uMsg == WM_KEYUP)
+		{
+			OutputDebugStringA("KEYUP?\n");
+		}
 		keyboard.OnWindowsKeyboardMessage(m_Id, uMsg, wParam, lParam);
 		return 0;
 	case WM_INPUT:

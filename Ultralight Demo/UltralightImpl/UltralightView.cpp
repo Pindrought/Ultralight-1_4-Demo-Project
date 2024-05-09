@@ -12,6 +12,11 @@ ul::View* UltralightView::GetView()
     return m_NativeView.get();
 }
 
+ul::RefPtr<ul::View> UltralightView::GetViewRefPtr()
+{
+	return m_NativeView;
+}
+
 void UltralightView::LoadHTML(std::string html)
 {
 	m_NativeView->LoadHTML(ul::String8(html.c_str()));
@@ -100,6 +105,11 @@ ID3D11ShaderResourceView* UltralightView::GetTextureSRV()
 	{
 		return m_StorageTexture->GetTextureResourceView();
 	}
+}
+
+shared_ptr<UltralightView> UltralightView::GetInspectorView()
+{
+	return m_InspectorView;
 }
 
 uint32_t UltralightView::GetWidth() const
@@ -219,9 +229,19 @@ bool UltralightView::IsInputEnabled() const
 	return m_InputEnabled;
 }
 
+bool UltralightView::IsInspectorView() const
+{
+	return m_IsInspectorView;
+}
+
 bool UltralightView::IsVisible() const
 {
 	return m_IsVisible;
+}
+
+bool UltralightView::HasInspectorView() const
+{
+	return m_HasInspectorView;
 }
 
 void UltralightView::SetInputEnabled(bool enabled)
@@ -411,6 +431,9 @@ UltralightView::~UltralightView()
 	{
 		s_UltralightViewIDPoolManager.StoreId(m_Id);
 	}
+	OutputDebugStringA("~UltralightView() --");
+	OutputDebugStringA(m_Name.c_str());
+	OutputDebugStringA("\n");
 }
 
 bool UltralightView::Initialize(UltralightViewCreationParameters params)
@@ -420,6 +443,7 @@ bool UltralightView::Initialize(UltralightViewCreationParameters params)
 		ErrorHandler::LogCriticalError("Attempted to initialize an Ultralight View that has already been initialized.");
 		return false;
 	}
+	m_Name = params.Name;
 	m_Width = params.Width;
 	m_Height = params.Height;
 	m_IsAccelerated = params.IsAccelerated;
@@ -427,6 +451,12 @@ bool UltralightView::Initialize(UltralightViewCreationParameters params)
 	m_IsTransparent = params.IsTransparent;
 	m_ForceMatchWindowDimensions = params.ForceMatchWindowDimensions;
 	m_Id = s_UltralightViewIDPoolManager.GetNextId();
+	m_InspectionTarget = params.InspectionTarget;
+	if (m_InspectionTarget != nullptr)
+	{
+		m_IsInspectorView = true;
+		m_InspectionTarget->m_HasInspectorView = true;
+	}
 
 	ultralight::ViewConfig config;
 
