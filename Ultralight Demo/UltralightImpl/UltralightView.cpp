@@ -85,7 +85,7 @@ ID3D11ShaderResourceView* UltralightView::GetTextureSRV()
 {
 	if (m_IsAccelerated) //GPU Renderer
 	{
-		GPUDriverD3D11* pGPUDriver = UltralightManager::GetInstance()->GetGPUDriver();
+		IGPUDriverD3D11* pGPUDriver = UltralightManager::GetInstance()->GetGPUDriver();
 		ID3D11ShaderResourceView* pSRV = pGPUDriver->GetShaderResourceView(m_NativeView.get());
 		if (pSRV == nullptr)
 		{
@@ -153,7 +153,7 @@ PixelColor UltralightView::GetPixelColor(int x, int y)
 		
 		ID3D11DeviceContext* pContext = pD3D->m_Context.Get();
 
-		GPUDriverD3D11* pGPUDriver = UltralightManager::GetInstance()->GetGPUDriver();
+		IGPUDriverD3D11* pGPUDriver = UltralightManager::GetInstance()->GetGPUDriver();
 		ID3D11Texture2D* pViewTexture = pGPUDriver->GetTexture(m_NativeView.get());
 
 		if (pViewTexture == nullptr)
@@ -274,7 +274,7 @@ bool UltralightView::Resize(uint32_t width, uint32_t height)
 
 	if (m_IsAccelerated)
 	{
-		GPUDriverD3D11* pGPUDriver = UltralightManager::GetInstance()->GetGPUDriver();
+		IGPUDriverD3D11* pGPUDriver = UltralightManager::GetInstance()->GetGPUDriver();
 		assert(pGPUDriver != nullptr);
 
 		auto pTexture = pGPUDriver->GetTexture(m_NativeView.get());
@@ -410,6 +410,12 @@ bool UltralightView::CallJSFnc(std::string inFunctionName,
 
 void UltralightView::SetToWindow(int32_t windowId)
 {
+	if (windowId == -1) //-1 = clearing view from window
+	{
+		m_WindowId = windowId;
+		return;
+	}
+
 	Engine* pEngine = Engine::GetInstance();
 	Window* pWindow = pEngine->GetWindowFromId(windowId);
 	assert(pWindow != nullptr);
@@ -431,9 +437,11 @@ UltralightView::~UltralightView()
 	{
 		s_UltralightViewIDPoolManager.StoreId(m_Id);
 	}
-	OutputDebugStringA("~UltralightView() --");
-	OutputDebugStringA(m_Name.c_str());
-	OutputDebugStringA("\n");
+
+	m_NativeView->Release(); //I don't think this should be necessary, but for some reason it is when using the inspector view.
+	LOGINFO("~UltralightView() --");
+	LOGINFO(m_Name.c_str());
+	LOGINFO("\n");
 }
 
 bool UltralightView::Initialize(UltralightViewCreationParameters params)

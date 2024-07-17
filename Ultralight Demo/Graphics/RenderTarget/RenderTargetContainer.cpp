@@ -112,6 +112,19 @@ ID3D11Resource* RenderTargetContainer::GetTextureResource()
     return nullptr;
 }
 
+shared_ptr<Texture> RenderTargetContainer::GetTextureSharedPtr()
+{
+    if (m_MSAARenderTarget != nullptr)
+    {
+        return m_MSAARenderTarget->GetSharedTexturePtr();
+    }
+    if (m_RenderTarget != nullptr)
+    {
+        return m_RenderTarget->GetSharedTexturePtr();
+    }
+    return nullptr;
+}
+
 ID3D11DepthStencilView* RenderTargetContainer::GetDepthStencilView()
 {
     if (m_MSAARenderTarget != nullptr)

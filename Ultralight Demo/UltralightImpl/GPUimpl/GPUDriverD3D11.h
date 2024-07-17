@@ -1,5 +1,6 @@
 #pragma once
 #include <PCH.h>
+#include "IGPUDriverD3D11.h"
 #include "../../Graphics/Shader/PixelShader.h"
 #include "../../Graphics/Shader/VertexShader.h"
 #include "../../Graphics/Buffer/ConstantBuffer.h"
@@ -28,7 +29,7 @@ struct RenderTargetEntry
     uint32_t renderTargetTextureId;
 };
 
-class GPUDriverD3D11 : public ul::GPUDriver
+class GPUDriverD3D11 : public IGPUDriverD3D11
 {
 public:
     //Inherited from GPUDriver
@@ -49,11 +50,11 @@ public:
     virtual void UpdateGeometry(uint32_t geometryId, const ul::VertexBuffer& vertices, const ul::IndexBuffer& indices) override;
     virtual void DestroyGeometry(uint32_t geometryId) override;
 
-    void DrawCommandList();
+    void DrawCommandList() override;
     virtual void DrawGeometry(uint32_t geometryId, uint32_t indexCount, uint32_t indexOffset, const ul::GPUState& state);
     virtual void ClearRenderBuffer(uint32_t renderBufferId);
-    ID3D11ShaderResourceView* GetShaderResourceView(ul::View* pView);
-    ID3D11Texture2D* GetTexture(ul::View* view);
+    ID3D11ShaderResourceView* GetShaderResourceView(ul::View* pView) override;
+    ID3D11Texture2D* GetTexture(ul::View* view) override;
 
 private:
     uint32_t m_NextTextureId = 1;
@@ -61,8 +62,6 @@ private:
     uint32_t m_NextGeometryId = 1;
     std::vector<ul::Command> m_CommandList;
 
-
-    std::vector<ID3D11ShaderResourceView*> GetSRVs();
 private:
     void LoadShaders();
     void InitializeSamplerState();

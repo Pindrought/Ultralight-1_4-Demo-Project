@@ -17,7 +17,7 @@
 
 using namespace ultralight;
 
-static bool getFindData(LPCWSTR path, WIN32_FIND_DATAW& findData) {
+bool getFindData(LPCWSTR path, WIN32_FIND_DATAW& findData) {
     HANDLE handle = FindFirstFileW(path, &findData);
     if (handle == INVALID_HANDLE_VALUE)
         return false;
@@ -154,7 +154,7 @@ std::unique_ptr<WCHAR[]> FileSystemWin::GetRelative(const ul::String& path) {
     return relPath;
 }
 
-// Called from Platform.cpp
+// Called from Platform.cpp -- Maybe never called actually?
 ultralight::FileSystem* CreatePlatformFileSystem(const ul::String& baseDir) {
     std::wstring baseDirWStr(baseDir.utf16().data());
 

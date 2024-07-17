@@ -144,10 +144,37 @@
     <ClCompile Include="PrecompiledHeader\MyLogger.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Demos\DemoBasic.cpp">
+    <ClCompile Include="Demos\DemoBasic\DemoBasic.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Demos\DemoInspector.cpp">
+    <ClCompile Include="Demos\DemoInspector\DemoInspector.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Window\InputController\InputController.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Demos\DemoBorderlessResizable\DemoBorderlessResizable.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Demos\DemoTransparent\DemoTransparent.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Demos\DemoBorderlessResizableMovable\DemoBorderlessResizableMovable.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Demos\DemoFileBrowser\DemoFileBrowser.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Demos\DemoCPPTextureInBrowser\DemoCPPTextureInBrowser.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Demos\DemoCPPTextureInBrowser\CustomGPUImpl\CustomGPUImpl.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Demos\DemoCPPTextureInBrowser\CustomFileSystem\CustomFileSystem.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Demos\DemoOpenFileDialog\DemoOpenFileDialog.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -296,13 +323,40 @@
     <ClInclude Include="PrecompiledHeader\MyLogger.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Demos\DemoBasic.h">
+    <ClInclude Include="Demos\DemoBasic\DemoBasic.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Demos\Demos.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Demos\DemoInspector.h">
+    <ClInclude Include="Demos\DemoInspector\DemoInspector.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Demos\DemoBorderlessResizable\DemoBorderlessResizable.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Demos\DemoTransparent\DemoTransparent.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Demos\DemoBorderlessResizableMovable\DemoBorderlessResizableMovable.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Demos\DemoFileBrowser\DemoFileBrowser.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Demos\DemoCPPTextureInBrowser\DemoCPPTextureInBrowser.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="UltralightImpl\GPUimpl\IGPUDriverD3D11.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Demos\DemoCPPTextureInBrowser\CustomGPUImpl\CustomGPUImpl.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Demos\DemoCPPTextureInBrowser\CustomFileSystem\CustomFileSystem.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Demos\DemoOpenFileDialog\DemoOpenFileDialog.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

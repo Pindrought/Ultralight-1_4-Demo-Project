@@ -47,18 +47,146 @@ bool Texture::Initialize(D3D11_TEXTURE2D_DESC desc,
 	return true;
 }
 
+bool Texture::Initialize(const string& filePath, bool forceSRGB)
+{
+	D3DClass* pD3D = D3DClass::GetInstance();
+	ID3D11Device* pDevice = pD3D->m_Device.Get();
+	std::string fullFilePath = DirectoryHelper::GetExecutableDirectoryA() + filePath;
+	std::string ext = filePath.substr(filePath.find_last_of(".") + 1);
+	if (ext == "dds")
+	{
+		HRESULT hr = E_FAIL;
+		DirectX::ScratchImage scratch;
+		hr = DirectX::LoadFromDDSFile(StringConverter::s2ws(fullFilePath).c_str(),
+									  DirectX::DDS_FLAGS::DDS_FLAGS_NONE,
+									  nullptr,
+									  scratch);
+		if (FAILED(hr))
+			return false;
+
+		const DirectX::Image* image = scratch.GetImage(0, 0, 0);
+		assert(image);
+
+		CD3D11_TEXTURE2D_DESC textureDesc(image->format, image->width, image->height);
+		textureDesc.MipLevels = 1;
+		ID3D11Texture2D* p2DTexture = nullptr;
+		D3D11_SUBRESOURCE_DATA initialData{};
+		initialData.pSysMem = image->pixels;
+		initialData.SysMemPitch = (UINT)image->rowPitch;
+		hr = pDevice->CreateTexture2D(&textureDesc, &initialData, &p2DTexture);
+		if (FAILED(hr))
+			return false;
+
+		m_Texture = static_cast<ID3D11Texture2D*>(p2DTexture);
+		CD3D11_SHADER_RESOURCE_VIEW_DESC srvDesc(D3D11_SRV_DIMENSION_TEXTURE2D, textureDesc.Format);
+		hr = pDevice->CreateShaderResourceView(m_Texture.Get(),
+											   &srvDesc,
+											   &m_TextureView);
+		if (FAILED(hr))
+			return false;
+
+		return true;
+
+	}
+	else if (ext == "tga")
+	{
+		HRESULT hr = E_FAIL;
+		DirectX::ScratchImage scratch;
+		hr = DirectX::LoadFromTGAFile(StringConverter::s2ws(fullFilePath).c_str(),
+									  nullptr,
+									  scratch);
+		if (FAILED(hr))
+			return false;
+
+		const DirectX::Image* image = scratch.GetImage(0, 0, 0);
+		assert(image);
+
+		CD3D11_TEXTURE2D_DESC textureDesc(image->format, image->width, image->height);
+		textureDesc.MipLevels = 1;
+		ID3D11Texture2D* p2DTexture = nullptr;
+		D3D11_SUBRESOURCE_DATA initialData{};
+		initialData.pSysMem = image->pixels;
+		initialData.SysMemPitch = (UINT)image->rowPitch;
+		hr = pDevice->CreateTexture2D(&textureDesc, &initialData, &p2DTexture);
+		if (FAILED(hr))
+			return false;
+
+		m_Texture = static_cast<ID3D11Texture2D*>(p2DTexture);
+		CD3D11_SHADER_RESOURCE_VIEW_DESC srvDesc(D3D11_SRV_DIMENSION_TEXTURE2D, textureDesc.Format);
+		hr = pDevice->CreateShaderResourceView(m_Texture.Get(),
+											   &srvDesc,
+											   &m_TextureView);
+		if (FAILED(hr))
+			return false;
+
+		return true;
+	}
+	else
+	{
+		HRESULT hr = E_FAIL;
+
+		DirectX::ScratchImage scratch;
+		DirectX::TexMetadata metadata;
+		hr = DirectX::LoadFromWICFile(StringConverter::s2ws(fullFilePath).c_str(),
+									  DirectX::WIC_FLAGS::WIC_FLAGS_FORCE_SRGB,
+									  &metadata, scratch);
+		if (FAILED(hr))
+			return false;
+
+		const DirectX::Image* image = scratch.GetImage(0, 0, 0);
+		assert(image);
+
+		CD3D11_TEXTURE2D_DESC textureDesc(image->format, image->width, image->height);
+		textureDesc.MipLevels = 0;
+		textureDesc.BindFlags = D3D11_BIND_SHADER_RESOURCE | D3D11_BIND_RENDER_TARGET;
+		textureDesc.MiscFlags = D3D11_RESOURCE_MISC_GENERATE_MIPS;
+		ID3D11Texture2D* p2DTexture = nullptr;
+		hr = pDevice->CreateTexture2D(&textureDesc, nullptr, &p2DTexture);
+		if (FAILED(hr))
+			return false;
+
+		m_Texture = static_cast<ID3D11Texture2D*>(p2DTexture);
+
+		ID3D11DeviceContext* pDeviceContext = pD3D->m_Context.Get();
+		pDeviceContext->UpdateSubresource(m_Texture.Get(), 0u,
+										  nullptr,
+										  image->pixels,
+										  image->rowPitch, 0);
+
+		CD3D11_SHADER_RESOURCE_VIEW_DESC srvDesc(D3D11_SRV_DIMENSION_TEXTURE2D, textureDesc.Format);
+		hr = pDevice->CreateShaderResourceView(m_Texture.Get(),
+											   &srvDesc,
+											   &m_TextureView);
+		if (FAILED(hr))
+			return false;
+
+		pDeviceContext->GenerateMips(m_TextureView.Get());
+
+		if (FAILED(hr))
+			return false;
+
+		return true;
+	}
+	return false;
+}
+
 Texture::~Texture()
 {
 	m_Texture.Reset();
 	m_TextureView.Reset();
 }
 
-ComPtr<ID3D11Resource> Texture::GetTextureResourceComPtr()
+ComPtr<ID3D11Texture2D> Texture::GetTextureResourceComPtr()
 {
 	return m_Texture;
 }
 
-ID3D11Resource* Texture::GetTextureResource()
+ComPtr<ID3D11ShaderResourceView> Texture::GetTextureResourceViewComPtr()
+{
+	return m_TextureView;
+}
+
+ID3D11Texture2D* Texture::GetTextureResource()
 {
 	return m_Texture.Get();
 }

@@ -25,8 +25,16 @@ EZJSParm::EZJSParm(double value)
 }
 
 EZJSParm::EZJSParm(const char* value)
-	:EZJSParm(std::string(value))
 {
+	if (value == nullptr)
+	{
+		m_Type = Type::Null;
+	}
+	else //c string?
+	{
+		m_Type =Type::String;
+		m_ValueData = std::make_shared<string>(value);
+	}
 }
 
 EZJSParm::EZJSParm(string value)

@@ -110,7 +110,7 @@ RenderTarget::~RenderTarget()
 	m_DepthStencilView.Reset();
 	long cnt = m_DepthBufferTexture.use_count();
 	m_TexturePtr = nullptr;
-	OutputDebugStringA("~RenderTarget()");
+	LOGINFO("~RenderTarget()");
 }
 
 bool RenderTarget::RebuildTexture()

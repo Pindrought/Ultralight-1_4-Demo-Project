@@ -25,6 +25,14 @@ bool D3DClass::Initialize()
 	return true;
 }
 
+D3DClass::~D3DClass()
+{
+	if (s_Instance == this)
+	{
+		s_Instance = nullptr;
+	}
+}
+
 bool D3DClass::IsTearingSupported()
 {
 	return m_IsTearingSupported;

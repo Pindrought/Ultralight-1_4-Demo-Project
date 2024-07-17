@@ -96,8 +96,6 @@ GPUDriverD3D11::GPUDriverD3D11()
 
 void GPUDriverD3D11::CreateTexture(uint32_t textureId, ul::RefPtr<ul::Bitmap> bitmap)
 {
-
-
     auto i = m_TextureMap.find(textureId);
     if (i != m_TextureMap.end())
         FatalError("GPUDriverD3D11::CreateTexture, texture id already exists.");
@@ -467,16 +465,6 @@ ID3D11Texture2D* GPUDriverD3D11::GetTexture(ul::View* view)
     if (iter == m_TextureMap.end())
         return nullptr;
     return iter->second.texture.Get();
-}
-
-std::vector<ID3D11ShaderResourceView*> GPUDriverD3D11::GetSRVs()
-{
-    std::vector<ID3D11ShaderResourceView*> srvs;
-    for (auto& t : m_TextureMap)
-    {
-        srvs.push_back(t.second.textureSRV.Get());
-    }
-    return srvs;
 }
 
 void GPUDriverD3D11::LoadShaders()

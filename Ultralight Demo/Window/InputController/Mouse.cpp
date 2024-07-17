@@ -59,6 +59,7 @@ void Mouse::OnWindowsMouseMessage(uint32_t windowId,
 								  WPARAM wParam, 
 								  LPARAM lParam)
 {
+	//LOGINFO(strfmt("MouseMessage Window: %d", (int)windowId).c_str());
 	MouseEvent mouseEvent(windowId, uMsg, wParam, lParam);
 	switch (mouseEvent.m_Type)
 	{
@@ -80,6 +81,7 @@ void Mouse::OnWindowsScrollMessage(uint32_t windowId,
 								  WPARAM wParam,
 								  LPARAM lParam)
 {
+	//LOGINFO(strfmt("MouseScroll Window: %d", (int)windowId).c_str());
 	int16_t x = LOWORD(wParam);
 	int16_t y = HIWORD(wParam);
 	ScrollEvent scrollEvent(windowId, x, y);
@@ -89,6 +91,7 @@ void Mouse::OnWindowsScrollMessage(uint32_t windowId,
 
 void Mouse::OnMouseMoveRaw(uint32_t windowId, int x, int y)
 {
+	//LOGINFO(strfmt("MouseMoveRaw Window: %d", (int)windowId).c_str());
 	MouseEvent ev;
 	ev.m_Type = MouseEvent::Type::MouseMoveRaw;
 	ev.m_Button = m_LastPressedButton;

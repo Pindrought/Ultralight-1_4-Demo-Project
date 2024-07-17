@@ -20,6 +20,7 @@ public:
 	InputController* GetInputController();
 
 	bool Initialize();
+	virtual bool InitializeUltralight();
 	bool IsRunning();
 	void ProcessWindowsMessages();
 	virtual bool Startup();
@@ -31,7 +32,7 @@ public:
 	std::shared_ptr<Window> SpawnWindow(const WindowCreationParameters& parms);
 	bool CleanupWindow(int32_t windowId);
 	Window* GetWindowFromId(int32_t windowId);
-	
+	~Engine();
 protected:
 	void RenderFrame();
 	static Engine* s_Instance; //There will only ever be one engine instance

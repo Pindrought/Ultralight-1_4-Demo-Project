@@ -6,6 +6,7 @@
 class InputController
 {
 public:
+	void ClearEventsForWindow(int32_t windowId);
 	Mouse m_Mouse;
 	Keyboard m_Keyboard;
 };

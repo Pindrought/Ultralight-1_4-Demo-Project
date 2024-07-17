@@ -21,13 +21,15 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance,
 								COINIT_MULTITHREADED);
 	FatalErrorIfFail(hr, "Failed to Initialize the COM Library. Program will now abort.");
 
-	DemoInspector engine;
-	if (engine.Initialize())
 	{
-		while (engine.IsRunning())
+		DemoOpenFileDialog engine;
+		if (engine.Initialize())
 		{
-			engine.ProcessWindowsMessages();
-			engine.Tick();
+			while (engine.IsRunning())
+			{
+				engine.ProcessWindowsMessages();
+				engine.Tick();
+			}
 		}
 	}
 

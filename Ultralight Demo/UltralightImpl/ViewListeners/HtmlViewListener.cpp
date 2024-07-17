@@ -56,7 +56,7 @@ void HtmlViewListener::OnAddConsoleMessage(ul::View* caller,
                                    message.column_number(),
                                    message.source_id().utf8().data(),
                                    message.message().utf8().data());
-    OutputDebugStringA(msg.c_str());
+    LOGINFO(msg.c_str());
 }
 
 ul::RefPtr<ul::View> HtmlViewListener::OnCreateInspectorView(ul::View* caller, bool is_local, const ul::String& inspected_url)

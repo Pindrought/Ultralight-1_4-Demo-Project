@@ -1,6 +1,10 @@
 #pragma once
 #include <PCH.h>
 
+bool getFindData(LPCWSTR path, WIN32_FIND_DATAW& findData);
+
+std::wstring GetMimeType(const std::wstring& szExtension);
+
 class FileSystemWin : public ul::FileSystem {
 public:
 	// Construct FileSystemWin instance.

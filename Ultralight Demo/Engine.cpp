@@ -34,9 +34,9 @@ bool Engine::Initialize()
 		return false;
 	}
 
-	if (!m_UltralightMgr.Initialize())
+	if (!InitializeUltralight())
 	{
-		FatalError("Failed to initialize Ultralight. Program must now abort.");
+		FatalError("Ultralight initialization failed.");
 		return false;
 	}
 
@@ -48,6 +48,16 @@ bool Engine::Initialize()
 	SetRunning(true);
 
     return true;
+}
+
+bool Engine::InitializeUltralight()
+{
+	if (!m_UltralightMgr.Initialize())
+	{
+		FatalError("Failed to initialize Ultralight. Program must now abort.");
+		return false;
+	}
+	return true;
 }
 
 bool Engine::IsRunning()
@@ -178,6 +188,17 @@ Window* Engine::GetWindowFromId(int32_t windowId)
 	}
 	FatalError("Window not found in call to GetWindowFromId()");
 	return nullptr;
+}
+
+Engine::~Engine()
+{
+	if (s_Instance == this)
+	{
+		s_Instance = nullptr;
+	}
+	m_PrimaryWindow = nullptr;
+	m_WindowIdToWindowInstanceMap.clear();
+	m_UltralightMgr.Shutdown();
 }
 
 void Engine::RenderFrame()

@@ -230,6 +230,10 @@ void Renderer::RenderUltralightView(UltralightView* pUltralightView)
 
 Renderer::~Renderer()
 {
+	if (s_Instance == this)
+	{
+		s_Instance = nullptr;
+	}
 }
 
 bool Renderer::BuildQuadMeshForUltralightView()

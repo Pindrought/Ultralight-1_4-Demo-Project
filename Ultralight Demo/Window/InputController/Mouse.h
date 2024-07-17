@@ -5,6 +5,7 @@
 class Mouse
 {
 	friend class Window;
+	friend class InputController;
 public:
 	int GetPosX();
 	int GetPosY();

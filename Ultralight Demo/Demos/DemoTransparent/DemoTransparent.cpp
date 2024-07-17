@@ -1,13 +1,13 @@
 #include "PCH.h"
-#include "DemoBasic.h"
+#include "DemoTransparent.h"
 #include "../Misc/CursorManager.h"
 
-bool DemoBasic::Startup()
+bool DemoTransparent::Startup()
 {
 	WindowCreationParameters windowParms;
 	windowParms.Width = 800;
 	windowParms.Height = 600;
-	windowParms.Style = WindowStyle::Resizable | WindowStyle::ExitButton | WindowStyle::MaximizeAvailable;
+	windowParms.Style = WindowStyle::Resizable | WindowStyle::ExitButton | WindowStyle::MaximizeAvailable | WindowStyle::TransparencyAllowed;
 	windowParms.Title = "Default Title";
 	shared_ptr<Window> pWindow = SpawnWindow(windowParms);
 	m_PrimaryWindow = pWindow;
@@ -25,11 +25,11 @@ bool DemoBasic::Startup()
 	parms.IsTransparent = true;
 
 	shared_ptr<UltralightView> pView = m_UltralightMgr.CreateUltralightView(parms);
-	pView->LoadURL("http://www.google.com");
+	pView->LoadURL("file:///Samples/TransparentWindow/TransparentWindow.html");
 	m_UltralightMgr.SetViewToWindow(pView->GetId(), pWindow->GetId());
 }
 
-bool DemoBasic::Tick()
+bool DemoTransparent::Tick()
 {
 	//Process Input Events
 	auto& keyboard = m_InputController.m_Keyboard;
@@ -73,16 +73,21 @@ bool DemoBasic::Tick()
 	return true;
 }
 
-EZJSParm DemoBasic::OnEventCallbackFromUltralight(int32_t viewId, string eventName, vector<EZJSParm> parameters)
-{	
+EZJSParm DemoTransparent::OnEventCallbackFromUltralight(int32_t viewId, string eventName, vector<EZJSParm> parameters)
+{
 	return EZJSParm();
 }
 
-void DemoBasic::OnWindowDestroyCallback(int32_t windowId)
+void DemoTransparent::OnWindowDestroyCallback(int32_t windowId)
 {
+	Window* pWindow = GetWindowFromId(windowId);
+	auto pViews = pWindow->GetSortedUltralightViews();
+	for (auto pView : pViews)
+	{
+		m_UltralightMgr.DestroyView(pView);
+	}
 }
 
-void DemoBasic::OnWindowResizeCallback(Window* pWindow)
+void DemoTransparent::OnWindowResizeCallback(Window* pWindow)
 {
 }
-

@@ -7,8 +7,11 @@
 #include "SimpleMath.h" //Also SimpleMath
 
 
+#ifdef _DEBUG
 #define MYLOGGER_LOG_INFO 1
+#endif
 #include "MyLogger.h" 
+
 
 #include <fstream>
 #include <chrono>
@@ -55,6 +58,8 @@
 #include <Ultralight/platform/Clipboard.h>
 #include <JavaScriptCore/JSRetainPtr.h>
 #include <JavaScriptCore/JSObjectRef.h>
+
+#include <DirectXTex/DirectXTex.h>
 
 class D3DClass;
 class Engine;

@@ -14,6 +14,7 @@ public:
 	ID3D11RenderTargetView* GetRenderTargetView();
 	ID3D11RenderTargetView* const* GetRenderTargetViewAddressOf();
 	ID3D11Resource* GetTextureResource();
+	shared_ptr<Texture> GetTextureSharedPtr();
 
 	ID3D11DepthStencilView* GetDepthStencilView();
 	bool IsActive();

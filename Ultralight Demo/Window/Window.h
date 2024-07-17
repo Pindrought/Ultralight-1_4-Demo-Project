@@ -12,6 +12,7 @@ struct WindowCreationParameters
 	WindowStyle Style = WindowStyle::ExitButton;
 	int XPosition = INT_MAX;
 	int YPosition = INT_MAX;
+	HWND ParentWindow = NULL;
 };
 
 class Window
@@ -34,9 +35,11 @@ public:
 	RenderTargetContainer* GetRenderTargetContainer();
 	LRESULT WindowProcA(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam); //This probably shouldn't be public since it should not be called outside of Window.cpp, but I don't have a great solution to hide this.
 	const list<shared_ptr<UltralightView>>& GetSortedUltralightViews();
-	bool IsMaximized() const;
+	bool IsWindowMaximized() const;
 	void Maximize();
 	void Restore();
+	void Show();
+	void Hide();
 private:
 	bool InitializeSwapchain();
 	bool InitializeRenderTargetContainer();

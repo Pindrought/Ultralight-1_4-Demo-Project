@@ -5,6 +5,7 @@
 class Keyboard
 {
 	friend class Window;
+	friend class InputController;
 public:
 	Keyboard();
 	bool KeyIsPressed(const unsigned char keycode);

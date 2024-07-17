@@ -35,7 +35,7 @@ void LoggerDefault::LogMessage(ul::LogLevel logLevel, const ul::String& message)
 		}
 		else
 		{
-			OutputDebugStringA("Failed to open log file.\n");
+			LOGINFO("Failed to open log file.\n");
 		}
 	}
 

@@ -146,7 +146,7 @@ bool Window::Initialize(const WindowCreationParameters& parms)
 							 wr.top, //Window Y Position
 							 wr.right - wr.left, //Window Width
 							 wr.bottom - wr.top, //Window Height
-							 NULL, //Handle to parent of this window. Since this is the first window, it has no parent window.
+							 parms.ParentWindow, //Handle to parent of this window.
 							 NULL, //Handle to menu or child window identifier. Can be set to NULL and use menu in WindowClassEx if a menu is desired to be used.
 							 GetModuleHandle(NULL), //Handle to the instance of module to be used with this window
 							 this); //Parameter passed to create window 'WM_NCCREATE'
@@ -273,6 +273,7 @@ LRESULT Window::WindowProcA(HWND hwnd,
 							WPARAM wParam,
 							LPARAM lParam)
 {
+	//LOGINFO(strfmt("%d -- %d", (int)hwnd, uMsg).c_str());
 	Engine* pEngine = Engine::GetInstance();
 	assert(pEngine != nullptr);
 
@@ -303,6 +304,8 @@ LRESULT Window::WindowProcA(HWND hwnd,
 			pEngine->SetRunning(false);
 		}
 		pEngine->OnWindowDestroyCallback(m_Id);
+
+		pEngine->GetInputController()->ClearEventsForWindow(m_Id);
 
 		DestroyWindow(hwnd);
 		s_WindowsIDManager.StoreId(GetId());
@@ -387,10 +390,6 @@ LRESULT Window::WindowProcA(HWND hwnd,
 	case WM_SYSKEYDOWN:
 	case WM_SYSKEYUP:
 	case WM_CHAR:
-		if (uMsg == WM_KEYUP)
-		{
-			OutputDebugStringA("KEYUP?\n");
-		}
 		keyboard.OnWindowsKeyboardMessage(m_Id, uMsg, wParam, lParam);
 		return 0;
 	case WM_INPUT:
@@ -479,7 +478,7 @@ const list<shared_ptr<UltralightView>>& Window::GetSortedUltralightViews()
 	return m_UltralightViewsSorted;
 }
 
-bool Window::IsMaximized() const
+bool Window::IsWindowMaximized() const
 {
 	return m_IsMaximized;
 }
@@ -494,6 +493,16 @@ void Window::Restore()
 {
 	m_IsMaximized = false;
 	ShowWindow(m_HWND, SW_RESTORE);
+}
+
+void Window::Show()
+{
+	ShowWindow(m_HWND, SW_SHOW);
+}
+
+void Window::Hide()
+{
+	ShowWindow(m_HWND, SW_HIDE);
 }
 
 bool Window::InitializeSwapchain()

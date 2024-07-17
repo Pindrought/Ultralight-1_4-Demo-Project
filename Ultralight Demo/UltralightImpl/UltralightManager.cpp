@@ -4,8 +4,14 @@
 #include "../Graphics/Misc/PixelColor.h"
 UltralightManager* UltralightManager::s_Instance = nullptr;
 
-bool UltralightManager::Initialize()
+bool UltralightManager::Initialize(UltralightOverrides* ultralightOverrides)
 {
+	UltralightOverrides ulOverrides;
+	if (ultralightOverrides != nullptr)
+	{
+		ulOverrides = *ultralightOverrides;
+	}
+
 	if (s_Instance != nullptr)
 	{
 		FatalError("UltralightManager attempted to be initialized more than once. UltralightManager is a singleton.");
@@ -30,10 +36,24 @@ bool UltralightManager::Initialize()
 	m_FontLoader = std::make_unique<FontLoaderWin>();
 	ul::Platform::instance().set_font_loader(m_FontLoader.get());
 
-	m_FileSystem = std::make_unique<FileSystemWin>((DirectoryHelper::GetWebDirectory()).c_str());
+	if (ulOverrides.FileSystem == nullptr)
+	{
+		m_FileSystem = std::make_shared<FileSystemWin>((DirectoryHelper::GetWebDirectory()).c_str());
+	}
+	else
+	{
+		m_FileSystem = ulOverrides.FileSystem;
+	}
 	ul::Platform::instance().set_file_system(m_FileSystem.get());
 
-	m_GPUDriver = std::make_unique<GPUDriverD3D11>();
+	if (ulOverrides.GPUDriver == nullptr) //Default behavior, no gpu driver override
+	{
+		m_GPUDriver = std::make_shared<GPUDriverD3D11>();
+	}
+	else
+	{
+		m_GPUDriver = ulOverrides.GPUDriver;
+	}
 	ul::Platform::instance().set_gpu_driver(m_GPUDriver.get());
 
 	m_Clipboard = std::make_unique<ClipboardWin>();
@@ -51,14 +71,23 @@ bool UltralightManager::Initialize()
 
 void UltralightManager::Shutdown()
 {
+	m_WindowIdToViewIdMap.clear();
+	m_ViewsMap.clear();
+	m_WindowIdToWindowPtrMap.clear();
+
 	m_UltralightRenderer = nullptr;
+	s_Instance = nullptr;
 }
 
 void UltralightManager::UpdateViews()
 {
+	//LOGINFO("Ultralight->Update()");
 	m_UltralightRenderer->Update();
+	//LOGINFO("Ultralight->Render()");
 	m_UltralightRenderer->Render();
+	//LOGINFO("GPUDriver->DrawCommandList() Start");
 	m_GPUDriver->DrawCommandList();
+	//LOGINFO("GPUDriver->DrawCommandList() Finished");
 }
 
 ul::Renderer* UltralightManager::GetRendererPtr()
@@ -237,10 +266,15 @@ vector<shared_ptr<UltralightView>> UltralightManager::GetViewsForWindow(int32_t 
 std::shared_ptr<UltralightView> UltralightManager::GetViewFromId(int32_t viewId)
 {
 	//TODO: Error checking
-	return m_ViewsMap[viewId];
+	auto iter = m_ViewsMap.find(viewId);
+	if (iter == m_ViewsMap.end())
+	{
+		return nullptr;
+	}
+	return iter->second;
 }
 
-GPUDriverD3D11* UltralightManager::GetGPUDriver()
+IGPUDriverD3D11* UltralightManager::GetGPUDriver()
 {
 	return m_GPUDriver.get();
 }
@@ -254,6 +288,7 @@ void UltralightManager::RefreshViewDisplaysForAnimations()
 {
 	for (auto view : m_ViewsMap)
 	{
+		//LOGINFO("Ultralight display refresh");
 		m_UltralightRenderer->RefreshDisplay(view.second->GetView()->display_id());
 	}
 }
@@ -261,7 +296,8 @@ void UltralightManager::RefreshViewDisplaysForAnimations()
 bool UltralightManager::FireKeyboardEvent(KeyboardEvent* keyboardEvent)
 {
 	int32_t windowId = keyboardEvent->GetWindowId();
-	std::shared_ptr<Window> pWindow = m_WindowIdToWindowPtrMap[windowId];
+	Engine* pEngine = Engine::GetInstance();
+	Window* pWindow = pEngine->GetWindowFromId(keyboardEvent->GetWindowId());
 
 	if (pWindow->m_FocusedUltralightView != nullptr)
 	{
@@ -278,9 +314,10 @@ bool UltralightManager::FireMouseEvent(MouseEvent* mouseEvent)
 		return false;
 
 	int32_t windowId = mouseEvent->GetWindowId();
-	std::shared_ptr<Window> pWindow = m_WindowIdToWindowPtrMap[windowId];
+	Engine* pEngine = Engine::GetInstance();
+	Window* pWindow = pEngine->GetWindowFromId(mouseEvent->GetWindowId());
 
-	if (mouseEvent->GetType() == MouseEvent::Type::MouseUp)
+	if (mouseEvent->GetType() == MouseEvent::Type::MouseUp) //Mouse up events will always get redirected to the focused view (if one is focused)
 	{
 		if (pWindow->m_FocusedUltralightView != nullptr)
 		{
@@ -370,7 +407,8 @@ bool UltralightManager::FireMouseEvent(MouseEvent* mouseEvent)
 bool UltralightManager::FireScrollEvent(ScrollEvent* scrollEvent)
 {
 	int32_t windowId = scrollEvent->GetWindowId();
-	std::shared_ptr<Window> pWindow = m_WindowIdToWindowPtrMap[windowId];
+	Engine* pEngine = Engine::GetInstance();
+	Window* pWindow = pEngine->GetWindowFromId(scrollEvent->GetWindowId());
 
 	if (pWindow->m_FocusedUltralightView != nullptr)
 	{
