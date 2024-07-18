@@ -226,10 +226,12 @@ bool EZJSParm::CreateFromJSValue(JSContextRef inContext, JSValueRef inJSValueRef
 					EZJSParm parm;
 					if (!EZJSParm::CreateFromJSValue(inContext, val, parm, outException))
 					{
+						JSPropertyNameArrayRelease(nameArray);
 						return false;
 					}
 					kvp.push_back(make_pair(propertyNameStr, parm));
 				}
+				JSPropertyNameArrayRelease(nameArray);
 				outParm = EZJSParm(kvp);
 				return true;
 			}
