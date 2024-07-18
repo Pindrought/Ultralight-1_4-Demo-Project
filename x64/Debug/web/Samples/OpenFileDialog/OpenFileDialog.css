@@ -1,0 +1,179 @@
+img, span, div, .unselectable 
+{
+    -webkit-touch-callout: none; /* iOS Safari */
+    -webkit-user-select: none; /* Safari */
+     -khtml-user-select: none; /* Konqueror HTML */
+       -moz-user-select: none; /* Old versions of Firefox */
+        -ms-user-select: none; /* Internet Explorer/Edge */
+            user-select: none; /* Non-prefixed version, currently
+                                  supported by Chrome, Opera and Firefox */
+                                  cursor: default;
+}
+
+span, input {
+    font-family: monospace;
+}
+
+body {
+    margin: 0px;
+    height: 100%;
+    display: grid;
+    grid-template-rows: 40px minmax(0,1fr) 40px; /*First row is 50px 2nd row takes up filler 3rd row is 90px*/
+}
+
+#div_currentDirectory {
+    background-color: rgb(75, 75, 75);
+}
+
+#img_upDirectoryButton {
+    height: 28px; 
+    padding:0px;
+    margin: 4px; 
+    display: block; 
+    float: left;
+    opacity: 0.5;
+}
+
+#input_currentDirectory {
+    width: calc(75% - 28px); 
+    margin-left: 4px; 
+    margin-top: 4px;
+}
+
+#input_filterResults {
+    width: calc(24% - 28px); 
+    margin-left: 4px; 
+    margin-top: 4px;
+}
+
+#img_upDirectoryButton:hover {
+    opacity: 0.8;
+}
+
+input {
+    color: white;
+    background-color: rgba(0, 0, 0, 0.5);
+    outline: none;
+    border-color: rgb(100, 100, 100);
+    border-radius: 10px;
+    padding-left: 10px;
+    font-weight: bold;
+    font-size: 16px;
+    height: 31px;
+}
+
+span {
+    color: white;
+    font-weight: bold;
+    font-size: 16px;
+    height: 31px;
+    white-space: nowrap;
+}
+
+.divClass_quickAccessElement {
+    width: 100%;
+    height: 20px;
+    background-color: rgba(0, 0, 0, 0);
+    margin: 5px;
+    padding: 5px;
+}
+
+.divClass_quickAccessElement:hover {
+    background-color: rgba(255, 255, 255, 0.35)
+}
+
+#div_primaryContainer {
+    background-color: blue;
+    display: grid;
+    grid-template-columns: 210px 1fr;
+}
+
+#div_quickAccess {
+    background-color: rgb(51, 51, 51);
+    display: grid;
+    grid-template-rows: repeat(auto-fill, 30px);
+    overflow-y: auto;
+    overflow-x: hidden;
+    min-width: 0;
+    min-height: 0;
+    max-height: 100%;
+    max-width: 100%;
+}
+
+#div_fileView {
+    display: grid;
+    grid-auto-rows: 24px;
+    background-color: rgb(44,44,44);
+    overflow-y: auto;
+    min-width: 0;
+    min-height: 0;
+    max-height: 100%;
+    max-width: 100%;
+}
+
+.divClass_directoryEntry {
+    width: calc(100% - 15px);
+}
+
+.divClass_directoryEntry.selected {
+    background-color: rgba(255, 255, 255, 0.15) !important;
+}
+
+.divClass_directoryEntry:hover {
+    background-color: rgba(255, 255, 255, 0.3);
+}
+
+#div_footerSection {
+    background-color: rgb(68, 68, 68);
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 80px;
+}
+
+/* ::-webkit-scrollbar-track
+{
+  -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3);
+  border-radius: 10px;
+  background-color: #F5F5F5;
+  overflow-x: auto;
+} */
+
+::-webkit-scrollbar
+{
+  width: 15px;
+  height: 15px;
+  background-color: #363636;
+  overflow-x: auto; 
+}
+
+::-webkit-scrollbar-thumb
+{
+  border-radius: 2px;
+  -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,.3);
+  background-color: #a1a1a1;
+  overflow-x: auto;
+}
+
+::-webkit-scrollbar-thumb:hover
+{
+  background-color: #c1c0c0;
+}
+
+button {
+    margin-top: 4px;
+    margin-right: 4px;
+    margin-bottom: 6px;
+    margin-left: 8px;    
+    background-color: rgb(86, 128, 194);
+    border: none;
+    color: white;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    border-radius: 8px;
+    font-family: monospace;
+    font-size: 16px;
+}
+
+button:hover {
+    background-color: rgb(138, 163, 202);
+}

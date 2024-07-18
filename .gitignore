@@ -17,11 +17,11 @@
 mono_crash.*
 
 # Build results
-[Dd]ebug/
+Ultralight Demo/x64
+x64/Debug/resources/default
 [Dd]ebugPublic/
 [Rr]elease/
 [Rr]eleases/
-x64/
 x86/
 [Ww][Ii][Nn]32/
 [Aa][Rr][Mm]/

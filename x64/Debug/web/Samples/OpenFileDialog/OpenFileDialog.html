@@ -1,0 +1,22 @@
+<html>
+    <head>
+        <link rel="stylesheet" href="OpenFileDialog.css">
+    </head>
+    <body style="background-color: grey;">
+        <div id="div_currentDirectory">
+            <img id="img_upDirectoryButton" onclick="TryToGoUpADirectory()" src="images/back-buttons-multimedia-svgrepo-com.png"/>
+            <input id="input_currentDirectory"/>
+            <input id="input_filterResults" onchange="OnFilterResultsChanged()" onkeyup="OnFilterResultsChanged()" placeholder="&#128270;"/>  <!-- Placeholder = magnifying glass icon -->
+        </div>
+        <div id="div_primaryContainer">
+            <div id="div_quickAccess"><span style="padding-left: 10px; padding-top: 10px;">Quick Access</span></div>
+            <div id="div_fileView">
+            </div>
+        </div>
+        <div id="div_footerSection">
+            <input id="input_selectedFile" style="width: 100%; margin-left: 4px; margin-top: 4px;"/>
+            <button onclick="OpenDirectoryEntry()">Open</button>
+        </div>
+    </body>
+    <script src="OpenFileDialog.js"></script>
+</html>
