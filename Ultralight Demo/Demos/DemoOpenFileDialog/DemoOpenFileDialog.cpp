@@ -10,7 +10,7 @@ bool DemoOpenFileDialog::Startup()
 {
 	WindowCreationParameters windowParms;
 	windowParms.Width = 800;
-	windowParms.Height = 600;
+	windowParms.Height = 200;
 	windowParms.Style = WindowStyle::Resizable | WindowStyle::ExitButton | WindowStyle::MaximizeAvailable;
 	windowParms.Title = "OpenFileDialog Demo Main Window";
 	shared_ptr<Window> pWindow = SpawnWindow(windowParms);
@@ -31,6 +31,8 @@ bool DemoOpenFileDialog::Startup()
 	m_PrimaryView = m_UltralightMgr.CreateUltralightView(parms);
 	m_PrimaryView->LoadURL("file:///Samples/OpenFileDialog/Startup.html");
 	m_UltralightMgr.SetViewToWindow(m_PrimaryView->GetId(), m_PrimaryWindow->GetId());
+
+	m_LastDirectoryAccessed = DirectoryHelper::GetExecutableDirectoryA();
 }
 
 bool DemoOpenFileDialog::Tick()
@@ -77,27 +79,76 @@ bool DemoOpenFileDialog::Tick()
 	return true;
 }
 
+std::vector<std::string> getListOfDrives() 
+{
+	std::vector<std::string> arrayOfDrives;
+	char* szDrives = new char[MAX_PATH]();
+	if (GetLogicalDriveStringsA(MAX_PATH, szDrives));
+	for (int i = 0; i < 100; i += 4)
+		if (szDrives[i] != (char)0)
+			arrayOfDrives.push_back(std::string{ szDrives[i],szDrives[i + 1],szDrives[i + 2] });
+	delete[] szDrives;
+	return arrayOfDrives;
+}
+
 EZJSParm DemoOpenFileDialog::OnEventCallbackFromUltralight(int32_t viewId, string eventName, vector<EZJSParm> parameters)
 {
 	if (eventName == "OpenFileDialogLoaded")
 	{
-		CHAR my_documents[MAX_PATH];
-		HRESULT result = SHGetFolderPathA(NULL, CSIDL_PERSONAL, NULL, SHGFP_TYPE_CURRENT, my_documents);
-		if (result == S_OK)
+		shared_ptr<UltralightView> pView = m_UltralightMgr.GetViewFromId(viewId);
+			
+		auto AddQuickAccessPath = [](UltralightView* pView, string displayPath, int directoryID, string appendedPath = "")
 		{
-			std::string path(my_documents);
-			shared_ptr<UltralightView> pView = m_UltralightMgr.GetViewFromId(viewId);
+			CHAR directoryPathLong[MAX_PATH];
+
+			HRESULT resultFolderPath = SHGetFolderPathA(NULL, directoryID, NULL, SHGFP_TYPE_CURRENT, directoryPathLong);
+			if (FAILED(resultFolderPath))
+			{
+				return;
+			}
+			
+			std::string pathLongString(directoryPathLong);
+			pathLongString += appendedPath;
+
 			EZJSParm outReturnVal;
 			string outException;
 			bool result = pView->CallJSFnc("AddQuickAccessLocation",
-											{ "My Documents", path},
+											{ displayPath, pathLongString },
 											outReturnVal,
 											outException);
 			if (result == false)
 			{
 				ErrorHandler::LogCriticalError("Failed to add quick access path to open file dialog.");
 			}
+		};
+		
+		for (auto& drive : getListOfDrives())
+		{
+			EZJSParm outReturnVal;
+			string outException;
+			bool result = pView->CallJSFnc("AddQuickAccessLocation",
+										   { drive, drive },
+										   outReturnVal,
+										   outException);
+			if (result == false)
+			{
+				ErrorHandler::LogCriticalError("Failed to add quick access path for drive to open file dialog.");
+			}
 		}
+
+		AddQuickAccessPath(pView.get(), "User", CSIDL_PROFILE);
+		AddQuickAccessPath(pView.get(), "Downloads", CSIDL_PROFILE, "\\Downloads");
+		AddQuickAccessPath(pView.get(), "My Documents", CSIDL_PERSONAL);
+		AddQuickAccessPath(pView.get(), "My Music", CSIDL_MYMUSIC);
+		AddQuickAccessPath(pView.get(), "My Videos", CSIDL_MYVIDEO);
+		AddQuickAccessPath(pView.get(), "Desktop", CSIDL_DESKTOP);
+
+		{
+			EZJSParm outReturnValue;
+			string outException;
+			pView->CallJSFnc("SetCurrentDirectory", { m_LastDirectoryAccessed }, outReturnValue, outException);
+		}
+
 		return EZJSParm();
 	}
 	if (eventName == "OpenFileDialog_OpenFolder")
@@ -106,40 +157,87 @@ EZJSParm DemoOpenFileDialog::OnEventCallbackFromUltralight(int32_t viewId, strin
 		{
 			if (parameters[0].GetType() == EZJSParm::String)
 			{
-				string path = parameters[0].AsString();
-				vector<EZJSParm> directoryEntries;
-				for (const auto& entry : fs::directory_iterator(path))
+				try
 				{
-					directoryEntries.push_back(entry.path().string());
-					OutputDebugStringA(strfmt("Directory: %s\n", entry.path().string().c_str()).c_str());
+					string path = parameters[0].AsString();
+					vector<EZJSParm> directoryEntries_Files;
+					vector<EZJSParm> directoryEntries_Subdirectories;
+					if (fs::is_directory(path) == false) {
+						return false;
+					}
+
+					for (const auto& entry : fs::directory_iterator(path))
+					{
+						string path_utf8((char*)entry.path().generic_u8string().c_str()); //Idk if this is even valid, but it seems to be working?
+						if (fs::is_directory(entry.path()))
+						{
+							directoryEntries_Subdirectories.push_back(path_utf8);
+						}
+						else
+						{
+							directoryEntries_Files.push_back(path_utf8);
+						}
+					}
+
+
+					shared_ptr<UltralightView> pView = m_UltralightMgr.GetViewFromId(viewId);
+					EZJSParm outReturnVal;
+					string outException;
+					bool result = pView->CallJSFnc("UpdateDirectoryLocationAndEntries",
+												   { path, directoryEntries_Subdirectories, directoryEntries_Files },
+												   outReturnVal,
+												   outException);
+					if (result == false)
+					{
+						ErrorHandler::LogCriticalError("Failed to update directory location and entries.");
+					}
+
+					m_LastDirectoryAccessed = path;
+					return true;
 				}
-
-
-				shared_ptr<UltralightView> pView = m_UltralightMgr.GetViewFromId(viewId);
-				EZJSParm outReturnVal;
+				catch (std::exception ex)
+				{
+					ErrorHandler::LogCriticalError(ex.what());
+					return false;
+				}
+			}
+		}
+		return false;
+	}
+	
+	if (eventName == "OpenFileDialog_FilePicked")
+	{
+		if (parameters.size() == 1)
+		{
+			if (parameters[0].GetType() == EZJSParm::String)
+			{
+				string filePath = parameters[0].AsString();
+				SendMessageA(m_OpenFileDialogWindow->GetHWND(), WM_CLOSE, NULL, NULL); //Close the window for file picker
+				EZJSParm outReturnValue;
 				string outException;
-				bool result = pView->CallJSFnc("UpdateDirectoryLocationAndEntries",
-											   { path, directoryEntries },
-											   outReturnVal,
-											   outException);
+				bool result = m_PrimaryView->CallJSFnc("UpdatePickedFilePath", 
+														{ filePath }, 
+														outReturnValue, 
+														outException);
 				if (result == false)
 				{
-					ErrorHandler::LogCriticalError("Failed to update directory location and entries.");
+					ErrorHandler::LogCriticalError("Issue dispatching picked file to primary view from open file dialog.");
 				}
-
-				OutputDebugStringA("Opening folder...");
-				OutputDebugStringA(path.c_str());
 			}
 		}
 		return EZJSParm();
 	}
+	
 	if (eventName == "OpenFileDialog")
 	{
 		if (m_OpenFileDialogWindow == nullptr)
 		{
+			int monitorWidth = GetSystemMetrics(SM_CXSCREEN);
+			int monitorHeight = GetSystemMetrics(SM_CYSCREEN);
+
 			WindowCreationParameters windowParms;
-			windowParms.Width = 800;
-			windowParms.Height = 600;
+			windowParms.Width = monitorWidth * 3 / 4;
+			windowParms.Height = monitorHeight * 3 / 4;
 			windowParms.Style = WindowStyle::Resizable | WindowStyle::ExitButton | WindowStyle::MaximizeAvailable;
 			windowParms.Title = "OpenFileDialog File Selection";
 			windowParms.ParentWindow = m_PrimaryWindow->GetHWND(); //By setting the parent, this window will always be on top.

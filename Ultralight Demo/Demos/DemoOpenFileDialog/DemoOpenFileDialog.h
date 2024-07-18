@@ -14,4 +14,5 @@ private:
 	shared_ptr<UltralightView> m_PrimaryView = nullptr;
 	shared_ptr<UltralightView> m_OpenFileDialogView = nullptr;
 	shared_ptr<Window> m_OpenFileDialogWindow = nullptr;
+	string m_LastDirectoryAccessed = "";
 };
