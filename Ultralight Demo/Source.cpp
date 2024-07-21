@@ -22,7 +22,7 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance,
 	FatalErrorIfFail(hr, "Failed to Initialize the COM Library. Program will now abort.");
 
 	{
-		DemoOpenFileDialog engine;
+		DemoBasic engine;
 		if (engine.Initialize())
 		{
 			while (engine.IsRunning())
