@@ -158,6 +158,7 @@ bool EZJSParm::CreateFromJSValue(JSContextRef inContext, JSValueRef inJSValueRef
 	switch (valueType)
 	{
 	case JSType::kJSTypeNull:
+	case JSType::kJSTypeUndefined: //Maybe should set up a custom type for undefined but for now just treating same as null
 		outParm = EZJSParm();
 		return true;
 	case JSType::kJSTypeBoolean:

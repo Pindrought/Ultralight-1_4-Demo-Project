@@ -164,6 +164,7 @@ copy /Y "$(SolutionDir)ThirdParty\Ultralight\bin\WebCore.dll" "$(TargetDir)WebCo
     <ClCompile Include="Demos\DemoCPPTextureInBrowser\DemoCPPTextureInBrowser.cpp" />
     <ClCompile Include="Demos\DemoFileBrowser\DemoFileBrowser.cpp" />
     <ClCompile Include="Demos\DemoInspector\DemoInspector.cpp" />
+    <ClCompile Include="Demos\DemoJSCppCommunication\DemoJSCPPCommunication.cpp" />
     <ClCompile Include="Demos\DemoOpenFileDialog\DemoOpenFileDialog.cpp" />
     <ClCompile Include="Demos\DemoTransparent\DemoTransparent.cpp" />
     <ClCompile Include="Engine.cpp" />
@@ -237,6 +238,7 @@ copy /Y "$(SolutionDir)ThirdParty\Ultralight\bin\WebCore.dll" "$(TargetDir)WebCo
     <ClInclude Include="Demos\DemoCPPTextureInBrowser\DemoCPPTextureInBrowser.h" />
     <ClInclude Include="Demos\DemoFileBrowser\DemoFileBrowser.h" />
     <ClInclude Include="Demos\DemoInspector\DemoInspector.h" />
+    <ClInclude Include="Demos\DemoJSCppCommunication\DemoJSCPPCommunication.h" />
     <ClInclude Include="Demos\DemoOpenFileDialog\DemoOpenFileDialog.h" />
     <ClInclude Include="Demos\Demos.h" />
     <ClInclude Include="Demos\DemoTransparent\DemoTransparent.h" />

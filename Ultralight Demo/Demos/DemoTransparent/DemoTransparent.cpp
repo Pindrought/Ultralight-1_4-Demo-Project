@@ -68,8 +68,6 @@ bool DemoTransparent::Tick()
 		bool dispatchedtoHtml = m_UltralightMgr.FireKeyboardEvent(&keyboardEvent);
 	}
 
-	RenderFrame();
-
 	return true;
 }
 

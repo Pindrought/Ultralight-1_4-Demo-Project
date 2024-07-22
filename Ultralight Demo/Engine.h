@@ -24,7 +24,7 @@ public:
 	bool IsRunning();
 	void ProcessWindowsMessages();
 	virtual bool Startup();
-	virtual bool Tick();
+	virtual bool Tick(); //Tick is called once per frame before RenderFrame() and is where mouse/keyboard processing/redirection should occur.
 	virtual EZJSParm OnEventCallbackFromUltralight(int32_t viewId, string eventName, vector<EZJSParm> parameters) = 0;
 	virtual void OnWindowDestroyCallback(int32_t windowId) = 0;
 	virtual void OnWindowResizeCallback(Window* pWindow) = 0;
@@ -32,9 +32,9 @@ public:
 	std::shared_ptr<Window> SpawnWindow(const WindowCreationParameters& parms);
 	bool CleanupWindow(int32_t windowId);
 	Window* GetWindowFromId(int32_t windowId);
+	void RenderFrame();
 	~Engine();
 protected:
-	void RenderFrame();
 	static Engine* s_Instance; //There will only ever be one engine instance
 	InputController m_InputController; //Only one engine instance = only ever one input controller
 	Renderer m_Renderer; //Only one engine instance = only ever one renderer

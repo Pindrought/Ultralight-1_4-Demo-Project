@@ -177,6 +177,9 @@
     <ClCompile Include="Demos\DemoOpenFileDialog\DemoOpenFileDialog.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Demos\DemoJSCppCommunication\DemoJSCPPCommunication.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="PrecompiledHeader\ErrorHandler.h">
@@ -357,6 +360,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Demos\DemoOpenFileDialog\DemoOpenFileDialog.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Demos\DemoJSCppCommunication\DemoJSCPPCommunication.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

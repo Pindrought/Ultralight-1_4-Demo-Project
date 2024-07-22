@@ -22,13 +22,14 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance,
 	FatalErrorIfFail(hr, "Failed to Initialize the COM Library. Program will now abort.");
 
 	{
-		DemoBasic engine;
+		DemoJSCPPCommunication engine;
 		if (engine.Initialize())
 		{
 			while (engine.IsRunning())
 			{
 				engine.ProcessWindowsMessages();
 				engine.Tick();
+				engine.RenderFrame();
 			}
 		}
 	}
