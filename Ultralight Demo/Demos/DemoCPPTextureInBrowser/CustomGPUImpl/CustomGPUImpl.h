@@ -65,6 +65,9 @@ public:
     ID3D11ShaderResourceView* GetShaderResourceView(ul::View* pView) override;
     ID3D11Texture2D* GetTexture(ul::View* view) override;
 
+    virtual OldReservedEntries GetOutstandingReservedIds();
+    virtual void RegisterOldReservedIds(OldReservedEntries& entries);
+
     void QueueCPPTextureOverwrite(TextureOverwriteData data);
 
 private:

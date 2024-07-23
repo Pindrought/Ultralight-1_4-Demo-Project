@@ -124,3 +124,13 @@ ID3D11Texture2D* RetargetableGPUDriverD3D11::GetTexture(ul::View* pView)
 	assert(m_CurrentGPUDriverImpl != nullptr);
 	return m_CurrentGPUDriverImpl->GetTexture(pView);
 }
+
+IGPUDriverD3D11::OldReservedEntries RetargetableGPUDriverD3D11::GetOutstandingReservedIds()
+{
+	return m_CurrentGPUDriverImpl->GetOutstandingReservedIds();
+}
+
+void RetargetableGPUDriverD3D11::RegisterOldReservedIds(OldReservedEntries& entries)
+{
+	m_CurrentGPUDriverImpl->RegisterOldReservedIds(entries);
+}

@@ -29,4 +29,23 @@ public:
     virtual void DrawCommandList() = 0;
     virtual ID3D11ShaderResourceView* GetShaderResourceView(ul::View* pView) = 0;
     virtual ID3D11Texture2D* GetTexture(ul::View* pView) = 0;
+
+
+    //I wanted the ability to swap between gpu drivers when closing/restarting the engine class for the different demos
+    //This introduced an issue though where sometimes geometry or render targets or textures were not being "destroyed" according to ultralight
+    //Even though the gpu driver was technically a completely different instance and those assets had already actually been deallocated
+    //Because of this, i'm storing the id's it thinks are still out there so I can validate against them for error checking when destroying a texture/renderarget/geometry that doesn't exist
+    //I hate this solution and if I didn't need the option of switching between different gpu driver impl's during runtime I wouldn't have done this
+    struct OldReservedEntries {
+        std::set<uint32_t> GeometryIds;
+        std::set<uint32_t> RenderTargetIds;
+        std::set<uint32_t> TextureIds;
+    };
+
+
+    virtual OldReservedEntries GetOutstandingReservedIds() = 0;
+    virtual void RegisterOldReservedIds(OldReservedEntries& entries) = 0;
+
+protected:
+    OldReservedEntries m_OldReservedEntries;
 };

@@ -56,6 +56,8 @@ public:
     ID3D11ShaderResourceView* GetShaderResourceView(ul::View* pView) override;
     ID3D11Texture2D* GetTexture(ul::View* view) override;
 
+    virtual OldReservedEntries GetOutstandingReservedIds();
+    virtual void RegisterOldReservedIds(OldReservedEntries& entries);
 private:
     uint32_t m_NextTextureId = 1;
     uint32_t m_NextRenderBufferId = 1;

@@ -33,6 +33,10 @@ public:
     void DrawCommandList() override;
     ID3D11ShaderResourceView* GetShaderResourceView(ul::View* pView) override;
     ID3D11Texture2D* GetTexture(ul::View* pView) override;
-private:
+
+    virtual OldReservedEntries GetOutstandingReservedIds();
+    virtual void RegisterOldReservedIds(OldReservedEntries& entries);
+
     shared_ptr<IGPUDriverD3D11> m_CurrentGPUDriverImpl = nullptr;
+private:
 };

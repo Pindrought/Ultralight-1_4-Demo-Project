@@ -16,14 +16,17 @@ bool UltralightManager::Initialize(UltralightOverrides* ultralightOverrides)
 
 	if (m_UltralightRenderer.get() != nullptr) //Already initialized?
 	{
+		IGPUDriverD3D11::OldReservedEntries oldEntries = m_GPUDriver->GetOutstandingReservedIds();
 		//Need to create new gpu driver and retarget to our new instance
 		if (ulOverrides.GPUDriver == nullptr) //Default behavior, no gpu driver override
 		{
 			shared_ptr<GPUDriverD3D11> impl = make_shared<GPUDriverD3D11>();
+			impl->RegisterOldReservedIds(oldEntries);
 			m_GPUDriver->SetGPUImpl(impl);
 		}
 		else
 		{
+			ulOverrides.GPUDriver->RegisterOldReservedIds(oldEntries);
 			m_GPUDriver->SetGPUImpl(ulOverrides.GPUDriver);
 		}
 

@@ -502,6 +502,29 @@ ID3D11Texture2D* CustomGPUImpl::GetTexture(ul::View* view)
     return iter->second.texture.Get();
 }
 
+IGPUDriverD3D11::OldReservedEntries CustomGPUImpl::GetOutstandingReservedIds()
+{
+    OldReservedEntries entries;
+    for (auto& geo : m_GeometryMap)
+    {
+        entries.GeometryIds.insert(geo.first);
+    }
+    for (auto& texture : m_TextureMap)
+    {
+        entries.TextureIds.insert(texture.first);
+    }
+    for (auto& rt : m_RenderTargetMap)
+    {
+        entries.RenderTargetIds.insert(rt.first);
+    }
+    return entries;
+}
+
+void CustomGPUImpl::RegisterOldReservedIds(OldReservedEntries& entries)
+{
+    m_OldReservedEntries = entries;
+}
+
 void CustomGPUImpl::QueueCPPTextureOverwrite(TextureOverwriteData data)
 {
     m_TextureOverwriteData[data.PixelUID] = data;
