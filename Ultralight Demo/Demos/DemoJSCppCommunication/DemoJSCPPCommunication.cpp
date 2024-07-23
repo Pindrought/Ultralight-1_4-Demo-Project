@@ -24,9 +24,9 @@ bool DemoJSCPPCommunication::Startup()
 	parms.ForceMatchWindowDimensions = true;
 	parms.IsTransparent = true;
 
-	shared_ptr<UltralightView> pView = m_UltralightMgr.CreateUltralightView(parms);
+	shared_ptr<UltralightView> pView = m_UltralightMgr->CreateUltralightView(parms);
 	pView->LoadURL("file:///Samples/JSCPPCommunication/JSCPPCommunication.html");
-	m_UltralightMgr.SetViewToWindow(pView->GetId(), pWindow->GetId());
+	m_UltralightMgr->SetViewToWindow(pView->GetId(), pWindow->GetId());
 }
 
 bool DemoJSCPPCommunication::Tick()
@@ -37,7 +37,7 @@ bool DemoJSCPPCommunication::Tick()
 	while (mouse.EventBufferIsEmpty() == false)
 	{
 		MouseEvent mouseEvent = mouse.ReadEvent();
-		bool dispatchedToHtml = m_UltralightMgr.FireMouseEvent(&mouseEvent);
+		bool dispatchedToHtml = m_UltralightMgr->FireMouseEvent(&mouseEvent);
 		if (dispatchedToHtml == false) //Because of the way the window is being initialized (without a default cursor), it is
 		{							   //possible to have the cursor state changed ex. resize border on window and have it not be
 									   //changed back to normal if not hovering over an Ultralight View to reset it
@@ -60,12 +60,12 @@ bool DemoJSCPPCommunication::Tick()
 	while (mouse.ScrollEventBufferIsEmpty() == false)
 	{
 		ScrollEvent scrollEvent = mouse.ReadScrollEvent();
-		bool dispatchedToHtml = m_UltralightMgr.FireScrollEvent(&scrollEvent);
+		bool dispatchedToHtml = m_UltralightMgr->FireScrollEvent(&scrollEvent);
 	}
 	while (keyboard.EventBufferIsEmpty() == false)
 	{
 		KeyboardEvent keyboardEvent = keyboard.ReadEvent();
-		bool dispatchedtoHtml = m_UltralightMgr.FireKeyboardEvent(&keyboardEvent);
+		bool dispatchedtoHtml = m_UltralightMgr->FireKeyboardEvent(&keyboardEvent);
 	}
 
 	return true;
@@ -210,7 +210,7 @@ EZJSParm DemoJSCPPCommunication::OnEventCallbackFromUltralight(int32_t viewId, s
 	}
 	/////////////////
 	//For these below events, we'll need to CallJSFnc on the view, so go ahead and get the view ptr from the view id
-	shared_ptr<UltralightView> pView = m_UltralightMgr.GetViewFromId(viewId);
+	shared_ptr<UltralightView> pView = m_UltralightMgr->GetViewFromId(viewId);
 
 	if (eventName == "CPP_JS1")
 	{ //Send a string
@@ -260,13 +260,21 @@ EZJSParm DemoJSCPPCommunication::OnEventCallbackFromUltralight(int32_t viewId, s
 	return EZJSParm();
 }
 
-void DemoJSCPPCommunication::OnWindowDestroyCallback(int32_t windowId)
+void DemoJSCPPCommunication::OnWindowDestroyStartCallback(int32_t windowId)
 {
 	Window* pWindow = GetWindowFromId(windowId);
 	auto pViews = pWindow->GetSortedUltralightViews();
 	for (auto pView : pViews)
 	{
-		m_UltralightMgr.DestroyView(pView);
+		m_UltralightMgr->DestroyView(pView);
+	}
+}
+
+void DemoJSCPPCommunication::OnWindowDestroyEndCallback(int32_t windowId)
+{
+	if (m_WindowIdToWindowInstanceMap.size() == 0)
+	{
+		SetRunning(false);
 	}
 }
 

@@ -87,6 +87,7 @@ using std::shared_ptr;
 using std::unique_ptr;
 using std::unordered_map;
 using std::make_pair;
+using std::make_shared;
 using Microsoft::WRL::ComPtr;
 
 namespace ul = ultralight;

@@ -28,5 +28,5 @@ public:
     //Ex. for the demo when using the cpp textures in ultralight the functionality is different
     virtual void DrawCommandList() = 0;
     virtual ID3D11ShaderResourceView* GetShaderResourceView(ul::View* pView) = 0;
-    virtual ID3D11Texture2D* GetTexture(ul::View* view) = 0;
+    virtual ID3D11Texture2D* GetTexture(ul::View* pView) = 0;
 };

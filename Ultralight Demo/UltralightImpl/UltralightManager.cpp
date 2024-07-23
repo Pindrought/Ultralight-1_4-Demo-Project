@@ -2,7 +2,9 @@
 #include "UltralightManager.h"
 #include "../Engine.h"
 #include "../Graphics/Misc/PixelColor.h"
-UltralightManager* UltralightManager::s_Instance = nullptr;
+#include "GPUimpl/GPUDriverD3D11.h"
+
+shared_ptr<UltralightManager> UltralightManager::s_Instance = nullptr;
 
 bool UltralightManager::Initialize(UltralightOverrides* ultralightOverrides)
 {
@@ -12,13 +14,21 @@ bool UltralightManager::Initialize(UltralightOverrides* ultralightOverrides)
 		ulOverrides = *ultralightOverrides;
 	}
 
-	if (s_Instance != nullptr)
+	if (m_UltralightRenderer.get() != nullptr) //Already initialized?
 	{
-		FatalError("UltralightManager attempted to be initialized more than once. UltralightManager is a singleton.");
-		return false;
-	}
+		//Need to create new gpu driver and retarget to our new instance
+		if (ulOverrides.GPUDriver == nullptr) //Default behavior, no gpu driver override
+		{
+			shared_ptr<GPUDriverD3D11> impl = make_shared<GPUDriverD3D11>();
+			m_GPUDriver->SetGPUImpl(impl);
+		}
+		else
+		{
+			m_GPUDriver->SetGPUImpl(ulOverrides.GPUDriver);
+		}
 
-	s_Instance = this;
+		return true;
+	}
 
 	//Ultralight instance initialization
 	ul::Config config;
@@ -46,13 +56,17 @@ bool UltralightManager::Initialize(UltralightOverrides* ultralightOverrides)
 	}
 	ul::Platform::instance().set_file_system(m_FileSystem.get());
 
+
+	m_GPUDriver = std::make_shared<RetargetableGPUDriverD3D11>();
+
 	if (ulOverrides.GPUDriver == nullptr) //Default behavior, no gpu driver override
 	{
-		m_GPUDriver = std::make_shared<GPUDriverD3D11>();
+		shared_ptr<GPUDriverD3D11> impl = make_shared<GPUDriverD3D11>();
+		m_GPUDriver->SetGPUImpl(impl);
 	}
 	else
 	{
-		m_GPUDriver = ulOverrides.GPUDriver;
+		m_GPUDriver->SetGPUImpl(ulOverrides.GPUDriver);
 	}
 	ul::Platform::instance().set_gpu_driver(m_GPUDriver.get());
 
@@ -74,9 +88,6 @@ void UltralightManager::Shutdown()
 	m_WindowIdToViewIdMap.clear();
 	m_ViewsMap.clear();
 	m_WindowIdToWindowPtrMap.clear();
-
-	m_UltralightRenderer = nullptr;
-	s_Instance = nullptr;
 }
 
 void UltralightManager::UpdateViews()
@@ -241,6 +252,23 @@ void UltralightManager::DestroyView(shared_ptr<UltralightView> pView)
 
 UltralightManager* UltralightManager::GetInstance()
 {
+	if (s_Instance == nullptr)
+	{
+		return GetInstanceShared().get();
+	}
+	return s_Instance.get();
+}
+
+shared_ptr<UltralightManager> UltralightManager::GetInstanceShared()
+{
+	if (s_Instance == nullptr)
+	{
+		//Workaround to pass private constructor into make_shared from https://stackoverflow.com/a/25069711
+		struct make_shared_enabler : public UltralightManager {};
+
+		s_Instance = make_shared<make_shared_enabler>();
+		//s_Instance = make_shared<UltralightManager>();
+	}
 	return s_Instance;
 }
 
@@ -438,4 +466,9 @@ shared_ptr<UltralightView> UltralightManager::GetUltralightViewFromNativeViewPtr
 UltralightManager::~UltralightManager()
 {
 	m_UltralightRenderer = nullptr;
+}
+
+UltralightManager::UltralightManager()
+{
+	OutputDebugStringA("Ultralight Constructor!!");
 }

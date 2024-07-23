@@ -10,8 +10,7 @@ bool DemoBorderlessResizableMovable::Startup()
 	windowParms.Style = WindowStyle::Resizable | WindowStyle::NoBorder;
 	windowParms.Title = "Default Title";
 	shared_ptr<Window> pWindow = SpawnWindow(windowParms);
-	m_PrimaryWindow = pWindow;
-	if (m_PrimaryWindow == nullptr)
+	if (pWindow == nullptr)
 	{
 		FatalError("Failed to initialize primary window. Program must now abort.");
 		return false;
@@ -24,9 +23,9 @@ bool DemoBorderlessResizableMovable::Startup()
 	parms.ForceMatchWindowDimensions = true;
 	parms.IsTransparent = true;
 
-	shared_ptr<UltralightView> pView = m_UltralightMgr.CreateUltralightView(parms);
+	shared_ptr<UltralightView> pView = m_UltralightMgr->CreateUltralightView(parms);
 	pView->LoadURL("file:///Samples/BorderlessWindow/BorderlessWindow.html");
-	m_UltralightMgr.SetViewToWindow(pView->GetId(), pWindow->GetId());
+	m_UltralightMgr->SetViewToWindow(pView->GetId(), pWindow->GetId());
 }
 
 bool DemoBorderlessResizableMovable::Tick()
@@ -62,7 +61,7 @@ bool DemoBorderlessResizableMovable::Tick()
 			}
 		}
 
-		bool dispatchedToHtml = m_UltralightMgr.FireMouseEvent(&mouseEvent);
+		bool dispatchedToHtml = m_UltralightMgr->FireMouseEvent(&mouseEvent);
 		if (dispatchedToHtml == false) //Because of the way the window is being initialized (without a default cursor), it is
 		{							   //possible to have the cursor state changed ex. resize border on window and have it not be
 									   //changed back to normal if not hovering over an Ultralight View to reset it
@@ -85,12 +84,12 @@ bool DemoBorderlessResizableMovable::Tick()
 	while (mouse.ScrollEventBufferIsEmpty() == false)
 	{
 		ScrollEvent scrollEvent = mouse.ReadScrollEvent();
-		bool dispatchedToHtml = m_UltralightMgr.FireScrollEvent(&scrollEvent);
+		bool dispatchedToHtml = m_UltralightMgr->FireScrollEvent(&scrollEvent);
 	}
 	while (keyboard.EventBufferIsEmpty() == false)
 	{
 		KeyboardEvent keyboardEvent = keyboard.ReadEvent();
-		bool dispatchedtoHtml = m_UltralightMgr.FireKeyboardEvent(&keyboardEvent);
+		bool dispatchedtoHtml = m_UltralightMgr->FireKeyboardEvent(&keyboardEvent);
 	}
 
 	return true;
@@ -98,7 +97,7 @@ bool DemoBorderlessResizableMovable::Tick()
 
 EZJSParm DemoBorderlessResizableMovable::OnEventCallbackFromUltralight(int32_t viewId, string eventName, vector<EZJSParm> parameters)
 {
-	shared_ptr<UltralightView> pView = m_UltralightMgr.GetViewFromId(viewId);
+	shared_ptr<UltralightView> pView = m_UltralightMgr->GetViewFromId(viewId);
 	assert(pView != nullptr);
 
 	if (eventName == "RequestTitle") //BorderlessWindow.html calls this on load to fill span for title
@@ -111,7 +110,7 @@ EZJSParm DemoBorderlessResizableMovable::OnEventCallbackFromUltralight(int32_t v
 		int32_t windowId = pView->GetWindowId();
 		assert(windowId != -1);
 		Window* pWindow = GetWindowFromId(windowId);
-		PostMessage(pWindow->GetHWND(), WM_CLOSE, NULL, NULL);
+		pWindow->Close();
 		return nullptr;
 	}
 
@@ -133,7 +132,7 @@ EZJSParm DemoBorderlessResizableMovable::OnEventCallbackFromUltralight(int32_t v
 
 	if (eventName == "BeginWindowDrag")
 	{
-		auto pView = m_UltralightMgr.GetViewFromId(viewId);
+		auto pView = m_UltralightMgr->GetViewFromId(viewId);
 		int32_t windowId = pView->GetWindowId();
 		auto pWindow = m_WindowIdToWindowInstanceMap[windowId];
 		if (pWindow->IsWindowMaximized() == false)
@@ -142,7 +141,7 @@ EZJSParm DemoBorderlessResizableMovable::OnEventCallbackFromUltralight(int32_t v
 			if (GetCursorPos(&m_WindowDragInfo.DragStartMousePosition))
 			{
 				//TODO: Add error checking
-				auto pView = m_UltralightMgr.GetViewFromId(viewId);
+				auto pView = m_UltralightMgr->GetViewFromId(viewId);
 				int32_t windowId = pView->GetWindowId();
 				auto pWindow = m_WindowIdToWindowInstanceMap[windowId];
 				HWND hwnd = pWindow->GetHWND();
@@ -163,25 +162,34 @@ EZJSParm DemoBorderlessResizableMovable::OnEventCallbackFromUltralight(int32_t v
 	return EZJSParm();
 }
 
-void DemoBorderlessResizableMovable::OnWindowDestroyCallback(int32_t windowId)
+void DemoBorderlessResizableMovable::OnWindowDestroyStartCallback(int32_t windowId)
 {
 	Window* pWindow = GetWindowFromId(windowId);
 	auto pViews = pWindow->GetSortedUltralightViews();
 	for (auto pView : pViews)
 	{
-		m_UltralightMgr.DestroyView(pView);
+		m_UltralightMgr->DestroyView(pView);
+	}
+}
+
+void DemoBorderlessResizableMovable::OnWindowDestroyEndCallback(int32_t windowId)
+{
+	if (m_WindowIdToWindowInstanceMap.size() == 0)
+	{
+		SetRunning(false);
 	}
 }
 
 void DemoBorderlessResizableMovable::OnWindowResizeCallback(Window* pWindow)
 {
-	for (auto ulView : pWindow->GetSortedUltralightViews())
+	/*for (auto ulView : pWindow->GetSortedUltralightViews())
 	{
 		EZJSParm outReturnVal;
 		string outException;
-		ulView->CallJSFnc("UpdateDimensions",
-						  { pWindow->GetWidth(), pWindow->GetHeight() },
-						  outReturnVal,
-						  outException);
-	}
+		bool success = ulView->CallJSFnc("UpdateDimensions",
+										  { pWindow->GetWidth(), pWindow->GetHeight() },
+										  outReturnVal,
+										  outException);
+		assert(success == true);
+	}*/
 }

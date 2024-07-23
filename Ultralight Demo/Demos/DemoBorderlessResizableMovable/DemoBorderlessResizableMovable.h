@@ -8,7 +8,9 @@ public:
 	bool Startup() override;
 	bool Tick() override;
 	virtual EZJSParm OnEventCallbackFromUltralight(int32_t viewId, string eventName, vector<EZJSParm> parameters);
-	void OnWindowDestroyCallback(int32_t windowId) override;
+	void OnWindowDestroyStartCallback(int32_t windowId) override;
+	void OnWindowDestroyEndCallback(int32_t windowId) override;
+
 	void OnWindowResizeCallback(Window* pWindow) override;
 
 	struct WindowDragInfo

@@ -1,34 +1,34 @@
 #include "PCH.h"
-#include "DemoTransparent.h"
+#include "DemoSelector.h"
 #include "../Misc/CursorManager.h"
 
-bool DemoTransparent::Startup()
+bool DemoSelector::Startup()
 {
 	WindowCreationParameters windowParms;
 	windowParms.Width = 800;
 	windowParms.Height = 600;
-	windowParms.Style = WindowStyle::Resizable | WindowStyle::ExitButton | WindowStyle::MaximizeAvailable | WindowStyle::TransparencyAllowed;
-	windowParms.Title = "Default Title";
-	shared_ptr<Window> pWindow = SpawnWindow(windowParms);
-	if (pWindow == nullptr)
+	windowParms.Style = WindowStyle::Resizable | WindowStyle::ExitButton | WindowStyle::MaximizeAvailable;
+	windowParms.Title = "Demo Selector";
+	m_PrimaryWindow = SpawnWindow(windowParms);
+	if (m_PrimaryWindow == nullptr)
 	{
 		FatalError("Failed to initialize primary window. Program must now abort.");
 		return false;
 	}
 
 	UltralightViewCreationParameters parms;
-	parms.Width = pWindow->GetWidth();
-	parms.Height = pWindow->GetHeight();
+	parms.Width = m_PrimaryWindow->GetWidth();
+	parms.Height = m_PrimaryWindow->GetHeight();
 	parms.IsAccelerated = false;
 	parms.ForceMatchWindowDimensions = true;
 	parms.IsTransparent = true;
 
 	shared_ptr<UltralightView> pView = m_UltralightMgr->CreateUltralightView(parms);
-	pView->LoadURL("file:///Samples/TransparentWindow/TransparentWindow.html");
-	m_UltralightMgr->SetViewToWindow(pView->GetId(), pWindow->GetId());
+	pView->LoadURL("file:///Samples/DemoSelector/DemoSelector.html");
+	m_UltralightMgr->SetViewToWindow(pView->GetId(), m_PrimaryWindow->GetId());
 }
 
-bool DemoTransparent::Tick()
+bool DemoSelector::Tick()
 {
 	//Process Input Events
 	auto& keyboard = m_InputController.m_Keyboard;
@@ -70,12 +70,54 @@ bool DemoTransparent::Tick()
 	return true;
 }
 
-EZJSParm DemoTransparent::OnEventCallbackFromUltralight(int32_t viewId, string eventName, vector<EZJSParm> parameters)
+EZJSParm DemoSelector::OnEventCallbackFromUltralight(int32_t viewId, string eventName, vector<EZJSParm> parameters)
 {
+	if (eventName == "SelectDemo")
+	{
+		assert(parameters.size() == 1);
+		assert(parameters[0].GetType() == EZJSParm::String);
+		string demoName = parameters[0].AsString();
+		if (demoName == "DemoBasic")
+		{
+			m_SelectedDemo = DemoId::DemoBasic;
+		}
+		if (demoName == "DemoBorderlessResizable")
+		{
+			m_SelectedDemo = DemoId::DemoBorderlessResizable;
+		}
+		if (demoName == "DemoBorderlessResizableMovable")
+		{
+			m_SelectedDemo = DemoId::DemoBorderlessResizableMovable;
+		}
+		if (demoName == "DemoCPPTextureInBrowser")
+		{
+			m_SelectedDemo = DemoId::DemoCPPTextureInBrowser;
+		}
+		if (demoName == "DemoInspector")
+		{
+			m_SelectedDemo = DemoId::DemoInspector;
+		}
+		if (demoName == "DemoJSCPPCommunication")
+		{
+			m_SelectedDemo = DemoId::DemoJSCPPCommunication;
+		}
+		if (demoName == "DemoOpenFileDialog")
+		{
+			m_SelectedDemo = DemoId::DemoOpenFileDialog;
+		}
+		if (demoName == "DemoTransparent")
+		{
+			m_SelectedDemo = DemoId::DemoTransparent;
+		}
+		if (m_SelectedDemo != DemoId::None)
+		{
+			m_PrimaryWindow->Close();
+		}
+	}
 	return EZJSParm();
 }
 
-void DemoTransparent::OnWindowDestroyStartCallback(int32_t windowId)
+void DemoSelector::OnWindowDestroyStartCallback(int32_t windowId)
 {
 	Window* pWindow = GetWindowFromId(windowId);
 	auto pViews = pWindow->GetSortedUltralightViews();
@@ -85,7 +127,7 @@ void DemoTransparent::OnWindowDestroyStartCallback(int32_t windowId)
 	}
 }
 
-void DemoTransparent::OnWindowDestroyEndCallback(int32_t windowId)
+void DemoSelector::OnWindowDestroyEndCallback(int32_t windowId)
 {
 	if (m_WindowIdToWindowInstanceMap.size() == 0)
 	{
@@ -93,6 +135,7 @@ void DemoTransparent::OnWindowDestroyEndCallback(int32_t windowId)
 	}
 }
 
-void DemoTransparent::OnWindowResizeCallback(Window* pWindow)
+void DemoSelector::OnWindowResizeCallback(Window* pWindow)
 {
 }
+

@@ -26,7 +26,8 @@ public:
 	virtual bool Startup();
 	virtual bool Tick(); //Tick is called once per frame before RenderFrame() and is where mouse/keyboard processing/redirection should occur.
 	virtual EZJSParm OnEventCallbackFromUltralight(int32_t viewId, string eventName, vector<EZJSParm> parameters) = 0;
-	virtual void OnWindowDestroyCallback(int32_t windowId) = 0;
+	virtual void OnWindowDestroyStartCallback(int32_t windowId) = 0;
+	virtual void OnWindowDestroyEndCallback(int32_t windowId) = 0;
 	virtual void OnWindowResizeCallback(Window* pWindow) = 0;
 	void SetRunning(bool running);
 	std::shared_ptr<Window> SpawnWindow(const WindowCreationParameters& parms);
@@ -38,9 +39,8 @@ protected:
 	static Engine* s_Instance; //There will only ever be one engine instance
 	InputController m_InputController; //Only one engine instance = only ever one input controller
 	Renderer m_Renderer; //Only one engine instance = only ever one renderer
-	shared_ptr<Window> m_PrimaryWindow = nullptr;
 	unordered_map<int32_t, shared_ptr<Window>> m_WindowIdToWindowInstanceMap;
-	UltralightManager m_UltralightMgr;
+	shared_ptr<UltralightManager> m_UltralightMgr;
 	bool m_IsRunning = false;
 	bool m_VSync = true;
 };

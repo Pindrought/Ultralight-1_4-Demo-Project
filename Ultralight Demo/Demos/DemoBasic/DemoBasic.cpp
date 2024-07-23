@@ -8,10 +8,9 @@ bool DemoBasic::Startup()
 	windowParms.Width = 800;
 	windowParms.Height = 600;
 	windowParms.Style = WindowStyle::Resizable | WindowStyle::ExitButton | WindowStyle::MaximizeAvailable;
-	windowParms.Title = "Default Title - Primary Window";
+	windowParms.Title = "Default Title - 1";
 	shared_ptr<Window> pWindow = SpawnWindow(windowParms);
-	m_PrimaryWindow = pWindow;
-	if (m_PrimaryWindow == nullptr)
+	if (pWindow == nullptr)
 	{
 		FatalError("Failed to initialize primary window. Program must now abort.");
 		return false;
@@ -24,16 +23,16 @@ bool DemoBasic::Startup()
 	parms.ForceMatchWindowDimensions = true;
 	parms.IsTransparent = true;
 
-	shared_ptr<UltralightView> pView = m_UltralightMgr.CreateUltralightView(parms);
+	shared_ptr<UltralightView> pView = m_UltralightMgr->CreateUltralightView(parms);
 	pView->LoadURL("http://www.google.com");
-	m_UltralightMgr.SetViewToWindow(pView->GetId(), pWindow->GetId());
+	m_UltralightMgr->SetViewToWindow(pView->GetId(), pWindow->GetId());
 
 	{
 		WindowCreationParameters windowParms;
 		windowParms.Width = 800;
 		windowParms.Height = 600;
 		windowParms.Style = WindowStyle::Resizable | WindowStyle::ExitButton | WindowStyle::MaximizeAvailable;
-		windowParms.Title = "Default Title";
+		windowParms.Title = "Default Title - 2";
 		shared_ptr<Window> pWindow = SpawnWindow(windowParms);
 
 		UltralightViewCreationParameters parms;
@@ -43,9 +42,9 @@ bool DemoBasic::Startup()
 		parms.ForceMatchWindowDimensions = true;
 		parms.IsTransparent = true;
 
-		shared_ptr<UltralightView> pView = m_UltralightMgr.CreateUltralightView(parms);
+		shared_ptr<UltralightView> pView = m_UltralightMgr->CreateUltralightView(parms);
 		pView->LoadURL("http://www.google.com");
-		m_UltralightMgr.SetViewToWindow(pView->GetId(), pWindow->GetId());
+		m_UltralightMgr->SetViewToWindow(pView->GetId(), pWindow->GetId());
 	}
 
 }
@@ -58,7 +57,7 @@ bool DemoBasic::Tick()
 	while (mouse.EventBufferIsEmpty() == false)
 	{
 		MouseEvent mouseEvent = mouse.ReadEvent();
-		bool dispatchedToHtml = m_UltralightMgr.FireMouseEvent(&mouseEvent);
+		bool dispatchedToHtml = m_UltralightMgr->FireMouseEvent(&mouseEvent);
 		if (dispatchedToHtml == false) //Because of the way the window is being initialized (without a default cursor), it is
 		{							   //possible to have the cursor state changed ex. resize border on window and have it not be
 									   //changed back to normal if not hovering over an Ultralight View to reset it
@@ -81,12 +80,12 @@ bool DemoBasic::Tick()
 	while (mouse.ScrollEventBufferIsEmpty() == false)
 	{
 		ScrollEvent scrollEvent = mouse.ReadScrollEvent();
-		bool dispatchedToHtml = m_UltralightMgr.FireScrollEvent(&scrollEvent);
+		bool dispatchedToHtml = m_UltralightMgr->FireScrollEvent(&scrollEvent);
 	}
 	while (keyboard.EventBufferIsEmpty() == false)
 	{
 		KeyboardEvent keyboardEvent = keyboard.ReadEvent();
-		bool dispatchedtoHtml = m_UltralightMgr.FireKeyboardEvent(&keyboardEvent);
+		bool dispatchedtoHtml = m_UltralightMgr->FireKeyboardEvent(&keyboardEvent);
 	}
 
 	return true;
@@ -97,13 +96,21 @@ EZJSParm DemoBasic::OnEventCallbackFromUltralight(int32_t viewId, string eventNa
 	return EZJSParm();
 }
 
-void DemoBasic::OnWindowDestroyCallback(int32_t windowId)
+void DemoBasic::OnWindowDestroyStartCallback(int32_t windowId)
 {
 	Window* pWindow = GetWindowFromId(windowId);
 	auto pViews = pWindow->GetSortedUltralightViews();
 	for (auto pView : pViews)
 	{
-		m_UltralightMgr.DestroyView(pView);
+		m_UltralightMgr->DestroyView(pView);
+	}
+}
+
+void DemoBasic::OnWindowDestroyEndCallback(int32_t windowId)
+{
+	if (m_WindowIdToWindowInstanceMap.size() == 0)
+	{
+		SetRunning(false);
 	}
 }
 

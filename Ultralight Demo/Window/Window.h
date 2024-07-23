@@ -40,6 +40,7 @@ public:
 	void Restore();
 	void Show();
 	void Hide();
+	void Close();
 private:
 	bool InitializeSwapchain();
 	bool InitializeRenderTargetContainer();

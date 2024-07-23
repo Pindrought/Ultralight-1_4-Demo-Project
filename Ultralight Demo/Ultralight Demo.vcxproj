@@ -162,10 +162,10 @@ copy /Y "$(SolutionDir)ThirdParty\Ultralight\bin\WebCore.dll" "$(TargetDir)WebCo
     <ClCompile Include="Demos\DemoCPPTextureInBrowser\CustomFileSystem\CustomFileSystem.cpp" />
     <ClCompile Include="Demos\DemoCPPTextureInBrowser\CustomGPUImpl\CustomGPUImpl.cpp" />
     <ClCompile Include="Demos\DemoCPPTextureInBrowser\DemoCPPTextureInBrowser.cpp" />
-    <ClCompile Include="Demos\DemoFileBrowser\DemoFileBrowser.cpp" />
     <ClCompile Include="Demos\DemoInspector\DemoInspector.cpp" />
     <ClCompile Include="Demos\DemoJSCppCommunication\DemoJSCPPCommunication.cpp" />
     <ClCompile Include="Demos\DemoOpenFileDialog\DemoOpenFileDialog.cpp" />
+    <ClCompile Include="Demos\DemoSelector\DemoSelector.cpp" />
     <ClCompile Include="Demos\DemoTransparent\DemoTransparent.cpp" />
     <ClCompile Include="Engine.cpp" />
     <ClCompile Include="Graphics\Buffer\ConstantBuffer.cpp" />
@@ -210,6 +210,7 @@ copy /Y "$(SolutionDir)ThirdParty\Ultralight\bin\WebCore.dll" "$(TargetDir)WebCo
     <ClCompile Include="Source.cpp" />
     <ClCompile Include="UltralightImpl\EZJSParm.cpp" />
     <ClCompile Include="UltralightImpl\GPUimpl\GPUDriverD3D11.cpp" />
+    <ClCompile Include="UltralightImpl\GPUimpl\RetargetableGPUDriverD3D11.cpp" />
     <ClCompile Include="UltralightImpl\impl\ClipboardWin.cpp" />
     <ClCompile Include="UltralightImpl\impl\FileSystemWin.cpp" />
     <ClCompile Include="UltralightImpl\impl\FontLoaderWin.cpp" />
@@ -236,11 +237,11 @@ copy /Y "$(SolutionDir)ThirdParty\Ultralight\bin\WebCore.dll" "$(TargetDir)WebCo
     <ClInclude Include="Demos\DemoCPPTextureInBrowser\CustomFileSystem\CustomFileSystem.h" />
     <ClInclude Include="Demos\DemoCPPTextureInBrowser\CustomGPUImpl\CustomGPUImpl.h" />
     <ClInclude Include="Demos\DemoCPPTextureInBrowser\DemoCPPTextureInBrowser.h" />
-    <ClInclude Include="Demos\DemoFileBrowser\DemoFileBrowser.h" />
     <ClInclude Include="Demos\DemoInspector\DemoInspector.h" />
     <ClInclude Include="Demos\DemoJSCppCommunication\DemoJSCPPCommunication.h" />
     <ClInclude Include="Demos\DemoOpenFileDialog\DemoOpenFileDialog.h" />
     <ClInclude Include="Demos\Demos.h" />
+    <ClInclude Include="Demos\DemoSelector\DemoSelector.h" />
     <ClInclude Include="Demos\DemoTransparent\DemoTransparent.h" />
     <ClInclude Include="Engine.h" />
     <ClInclude Include="Graphics\Buffer\ConstantBuffer.h" />
@@ -271,6 +272,7 @@ copy /Y "$(SolutionDir)ThirdParty\Ultralight\bin\WebCore.dll" "$(TargetDir)WebCo
     <ClInclude Include="UltralightImpl\EZJSParm.h" />
     <ClInclude Include="UltralightImpl\GPUimpl\GPUDriverD3D11.h" />
     <ClInclude Include="UltralightImpl\GPUimpl\IGPUDriverD3D11.h" />
+    <ClInclude Include="UltralightImpl\GPUimpl\RetargetableGPUDriverD3D11.h" />
     <ClInclude Include="UltralightImpl\impl\ClipboardWin.h" />
     <ClInclude Include="UltralightImpl\impl\FileSystemWin.h" />
     <ClInclude Include="UltralightImpl\impl\FontLoaderWin.h" />

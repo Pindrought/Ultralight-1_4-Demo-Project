@@ -287,6 +287,7 @@ LRESULT Window::WindowProcA(HWND hwnd,
 		if (m_ResizeOrMoveInProgress)
 		{
 			pEngine->Tick();
+			pEngine->RenderFrame();
 		}
 		else
 		{
@@ -299,11 +300,7 @@ LRESULT Window::WindowProcA(HWND hwnd,
 	case WM_CLOSE: //Window closed
 	{
 		auto pEngine = Engine::GetInstance();
-		if (GetId() == 0) //Primary window being closed?
-		{
-			pEngine->SetRunning(false);
-		}
-		pEngine->OnWindowDestroyCallback(m_Id);
+		pEngine->OnWindowDestroyStartCallback(m_Id);
 
 		pEngine->GetInputController()->ClearEventsForWindow(m_Id);
 
@@ -313,6 +310,7 @@ LRESULT Window::WindowProcA(HWND hwnd,
 		UltralightManager* pUltralightManager = UltralightManager::GetInstance();
 		assert(pUltralightManager != nullptr);
 		pUltralightManager->RemoveWindowId(m_Id);
+		pEngine->OnWindowDestroyEndCallback(m_Id);
 		return 0;
 	}
 	case WM_DWMCOMPOSITIONCHANGED:
@@ -503,6 +501,11 @@ void Window::Show()
 void Window::Hide()
 {
 	ShowWindow(m_HWND, SW_HIDE);
+}
+
+void Window::Close()
+{
+	SendMessageA(m_HWND, WM_CLOSE, NULL, NULL);
 }
 
 bool Window::InitializeSwapchain()

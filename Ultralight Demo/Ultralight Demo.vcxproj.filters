@@ -162,9 +162,6 @@
     <ClCompile Include="Demos\DemoBorderlessResizableMovable\DemoBorderlessResizableMovable.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Demos\DemoFileBrowser\DemoFileBrowser.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Demos\DemoCPPTextureInBrowser\DemoCPPTextureInBrowser.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -178,6 +175,12 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Demos\DemoJSCppCommunication\DemoJSCPPCommunication.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Demos\DemoSelector\DemoSelector.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="UltralightImpl\GPUimpl\RetargetableGPUDriverD3D11.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -344,9 +347,6 @@
     <ClInclude Include="Demos\DemoBorderlessResizableMovable\DemoBorderlessResizableMovable.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Demos\DemoFileBrowser\DemoFileBrowser.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Demos\DemoCPPTextureInBrowser\DemoCPPTextureInBrowser.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -363,6 +363,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Demos\DemoJSCppCommunication\DemoJSCPPCommunication.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Demos\DemoSelector\DemoSelector.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="UltralightImpl\GPUimpl\RetargetableGPUDriverD3D11.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

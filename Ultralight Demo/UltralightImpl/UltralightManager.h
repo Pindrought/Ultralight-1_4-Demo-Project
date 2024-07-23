@@ -4,7 +4,7 @@
 #include "impl/FileSystemWin.h"
 #include "impl/FontLoaderWin.h"
 #include "impl/LoggerDefault.h"
-#include "GPUimpl/GPUDriverD3D11.h"
+#include "GPUimpl/RetargetableGPUDriverD3D11.h"
 #include "UltralightView.h"
 
 #include "../Window/Window.h"
@@ -15,7 +15,7 @@ struct UltralightOverrides
 	shared_ptr<ul::FileSystem> FileSystem = nullptr;
 };
 
-class UltralightManager
+class UltralightManager //Note that this is a singleton and the ultralight renderer can only be created ONCE in a process. Due to this, we store a shared ptr to the single instance that gets generated.
 {
 public:
 	bool Initialize(UltralightOverrides* ultralightOverrides = nullptr);
@@ -29,6 +29,8 @@ public:
 	std::shared_ptr<UltralightView> CreateUltralightView(UltralightViewCreationParameters parms);
 	void DestroyView(shared_ptr<UltralightView> pView);
 	static UltralightManager* GetInstance();
+	static shared_ptr<UltralightManager> GetInstanceShared();
+
 	std::vector<std::shared_ptr<UltralightView>> GetViewsForWindow(int32_t windowId);
 	std::shared_ptr<UltralightView> GetViewFromId(int32_t viewId);
 	IGPUDriverD3D11* GetGPUDriver();
@@ -42,13 +44,14 @@ public:
 
 	~UltralightManager();
 private:
-	static UltralightManager* s_Instance;
+	UltralightManager();
+	static shared_ptr<UltralightManager> s_Instance;
 	ul::RefPtr<ul::Renderer> m_UltralightRenderer;
 	unique_ptr<LoggerDefault> m_Logger;
 	unique_ptr<FontLoaderWin> m_FontLoader;
 	shared_ptr<ul::FileSystem> m_FileSystem;
 	unique_ptr<ClipboardWin> m_Clipboard;
-	shared_ptr<IGPUDriverD3D11> m_GPUDriver;
+	shared_ptr<RetargetableGPUDriverD3D11> m_GPUDriver;
 
 	unordered_map<int32_t, shared_ptr<Window>> m_WindowIdToWindowPtrMap;
 	unordered_map<int32_t, set<int32_t>> m_WindowIdToViewIdMap;

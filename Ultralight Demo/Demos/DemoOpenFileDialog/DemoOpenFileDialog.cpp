@@ -28,9 +28,9 @@ bool DemoOpenFileDialog::Startup()
 	parms.ForceMatchWindowDimensions = true;
 	parms.IsTransparent = true;
 
-	m_PrimaryView = m_UltralightMgr.CreateUltralightView(parms);
+	m_PrimaryView = m_UltralightMgr->CreateUltralightView(parms);
 	m_PrimaryView->LoadURL("file:///Samples/OpenFileDialog/Startup.html");
-	m_UltralightMgr.SetViewToWindow(m_PrimaryView->GetId(), m_PrimaryWindow->GetId());
+	m_UltralightMgr->SetViewToWindow(m_PrimaryView->GetId(), m_PrimaryWindow->GetId());
 
 	m_LastDirectoryAccessed = DirectoryHelper::GetExecutableDirectoryA();
 }
@@ -43,7 +43,7 @@ bool DemoOpenFileDialog::Tick()
 	while (mouse.EventBufferIsEmpty() == false)
 	{
 		MouseEvent mouseEvent = mouse.ReadEvent();
-		bool dispatchedToHtml = m_UltralightMgr.FireMouseEvent(&mouseEvent);
+		bool dispatchedToHtml = m_UltralightMgr->FireMouseEvent(&mouseEvent);
 		if (dispatchedToHtml == false) //Because of the way the window is being initialized (without a default cursor), it is
 		{							   //possible to have the cursor state changed ex. resize border on window and have it not be
 									   //changed back to normal if not hovering over an Ultralight View to reset it
@@ -66,12 +66,12 @@ bool DemoOpenFileDialog::Tick()
 	while (mouse.ScrollEventBufferIsEmpty() == false)
 	{
 		ScrollEvent scrollEvent = mouse.ReadScrollEvent();
-		bool dispatchedToHtml = m_UltralightMgr.FireScrollEvent(&scrollEvent);
+		bool dispatchedToHtml = m_UltralightMgr->FireScrollEvent(&scrollEvent);
 	}
 	while (keyboard.EventBufferIsEmpty() == false)
 	{
 		KeyboardEvent keyboardEvent = keyboard.ReadEvent();
-		bool dispatchedtoHtml = m_UltralightMgr.FireKeyboardEvent(&keyboardEvent);
+		bool dispatchedtoHtml = m_UltralightMgr->FireKeyboardEvent(&keyboardEvent);
 	}
 
 	return true;
@@ -93,7 +93,7 @@ EZJSParm DemoOpenFileDialog::OnEventCallbackFromUltralight(int32_t viewId, strin
 {
 	if (eventName == "OpenFileDialogLoaded")
 	{
-		shared_ptr<UltralightView> pView = m_UltralightMgr.GetViewFromId(viewId);
+		shared_ptr<UltralightView> pView = m_UltralightMgr->GetViewFromId(viewId);
 			
 		auto AddQuickAccessPath = [](UltralightView* pView, string displayPath, int directoryID, string appendedPath = "")
 		{
@@ -178,7 +178,7 @@ EZJSParm DemoOpenFileDialog::OnEventCallbackFromUltralight(int32_t viewId, strin
 					}
 
 
-					shared_ptr<UltralightView> pView = m_UltralightMgr.GetViewFromId(viewId);
+					shared_ptr<UltralightView> pView = m_UltralightMgr->GetViewFromId(viewId);
 					EZJSParm outReturnVal;
 					string outException;
 					bool result = pView->CallJSFnc("UpdateDirectoryLocationAndEntries",
@@ -210,7 +210,7 @@ EZJSParm DemoOpenFileDialog::OnEventCallbackFromUltralight(int32_t viewId, strin
 			if (parameters[0].GetType() == EZJSParm::String)
 			{
 				string filePath = parameters[0].AsString();
-				SendMessageA(m_OpenFileDialogWindow->GetHWND(), WM_CLOSE, NULL, NULL); //Close the window for file picker
+				m_OpenFileDialogWindow->Close();
 				EZJSParm outReturnValue;
 				string outException;
 				bool result = m_PrimaryView->CallJSFnc("UpdatePickedFilePath", 
@@ -255,10 +255,10 @@ EZJSParm DemoOpenFileDialog::OnEventCallbackFromUltralight(int32_t viewId, strin
 			parms.ForceMatchWindowDimensions = true;
 			parms.IsTransparent = true;
 
-			m_OpenFileDialogView = m_UltralightMgr.CreateUltralightView(parms);
+			m_OpenFileDialogView = m_UltralightMgr->CreateUltralightView(parms);
 			m_OpenFileDialogView->LoadURL("file:///Samples/OpenFileDialog/OpenFileDialog.html");
 		}
-		m_UltralightMgr.SetViewToWindow(m_OpenFileDialogView->GetId(), m_OpenFileDialogWindow->GetId());
+		m_UltralightMgr->SetViewToWindow(m_OpenFileDialogView->GetId(), m_OpenFileDialogWindow->GetId());
 		m_OpenFileDialogWindow->Show();
 		return EZJSParm();
 	}
@@ -266,7 +266,7 @@ EZJSParm DemoOpenFileDialog::OnEventCallbackFromUltralight(int32_t viewId, strin
 	return EZJSParm();
 }
 
-void DemoOpenFileDialog::OnWindowDestroyCallback(int32_t windowId)
+void DemoOpenFileDialog::OnWindowDestroyStartCallback(int32_t windowId)
 {
 	Window* pWindow = GetWindowFromId(windowId);
 	if (m_OpenFileDialogWindow != nullptr)
@@ -283,7 +283,15 @@ void DemoOpenFileDialog::OnWindowDestroyCallback(int32_t windowId)
 		{
 			m_OpenFileDialogView = nullptr;
 		}
-		m_UltralightMgr.DestroyView(pView);
+		m_UltralightMgr->DestroyView(pView);
+	}
+}
+
+void DemoOpenFileDialog::OnWindowDestroyEndCallback(int32_t windowId)
+{
+	if (m_WindowIdToWindowInstanceMap.size() == 0)
+	{
+		SetRunning(false);
 	}
 }
 

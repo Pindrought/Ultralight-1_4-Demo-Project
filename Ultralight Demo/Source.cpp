@@ -21,17 +21,67 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance,
 								COINIT_MULTITHREADED);
 	FatalErrorIfFail(hr, "Failed to Initialize the COM Library. Program will now abort.");
 
+	while (true)
 	{
-		DemoJSCPPCommunication engine;
-		if (engine.Initialize())
+		DemoSelector::DemoId demoId = DemoSelector::DemoId::None;
 		{
-			while (engine.IsRunning())
+			DemoSelector engine;
+			if (engine.Initialize())
 			{
-				engine.ProcessWindowsMessages();
-				engine.Tick();
-				engine.RenderFrame();
+				while (engine.IsRunning())
+				{
+					engine.ProcessWindowsMessages();
+					engine.Tick();
+					engine.RenderFrame();
+				}
+			}
+			demoId = engine.m_SelectedDemo;
+		}
+
+		shared_ptr<Engine> demoEngine = nullptr;
+		switch (demoId)
+		{
+			case DemoSelector::DemoId::DemoBasic:
+				demoEngine = make_shared<DemoBasic>();
+				break;
+			case DemoSelector::DemoId::DemoBorderlessResizable:
+				demoEngine = make_shared<DemoBorderlessResizable>();
+				break;
+			case DemoSelector::DemoId::DemoBorderlessResizableMovable:
+				demoEngine = make_shared<DemoBorderlessResizableMovable>();
+				break;
+			/*case DemoSelector::DemoId::DemoCPPTextureInBrowser:
+				demoEngine = make_shared<DemoCPPTextureInBrowser>();
+				break;*/
+			case DemoSelector::DemoId::DemoInspector:
+				demoEngine = make_shared<DemoInspector>();
+				break;
+			case DemoSelector::DemoId::DemoJSCPPCommunication:
+				demoEngine = make_shared<DemoJSCPPCommunication>();
+				break;
+			case DemoSelector::DemoId::DemoOpenFileDialog:
+				demoEngine = make_shared<DemoOpenFileDialog>();
+				break;
+			case DemoSelector::DemoId::DemoTransparent:
+				demoEngine = make_shared<DemoTransparent>();
+				break;
+		}
+
+		if (demoEngine == nullptr)
+		{
+			break;
+		}
+
+		if (demoEngine->Initialize())
+		{
+			while (demoEngine->IsRunning())
+			{
+				demoEngine->ProcessWindowsMessages();
+				demoEngine->Tick();
+				demoEngine->RenderFrame();
 			}
 		}
+
 	}
 
 	return 0;
