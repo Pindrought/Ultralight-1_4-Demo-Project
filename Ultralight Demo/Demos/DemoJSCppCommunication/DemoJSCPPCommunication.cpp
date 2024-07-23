@@ -4,9 +4,12 @@
 
 bool DemoJSCPPCommunication::Startup()
 {
+	int screenWidth = GetSystemMetrics(SM_CXSCREEN);
+	int screenHeight = GetSystemMetrics(SM_CYSCREEN);
+
 	WindowCreationParameters windowParms;
-	windowParms.Width = 800;
-	windowParms.Height = 600;
+	windowParms.Width = screenWidth - 100;
+	windowParms.Height = screenHeight - 100;
 	windowParms.Style = WindowStyle::Resizable | WindowStyle::ExitButton | WindowStyle::MaximizeAvailable;
 	windowParms.Title = "Default Title - Primary Window";
 	shared_ptr<Window> pWindow = SpawnWindow(windowParms);

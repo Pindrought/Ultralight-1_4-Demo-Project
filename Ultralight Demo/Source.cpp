@@ -50,7 +50,7 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance,
 			case DemoSelector::DemoId::DemoBorderlessResizableMovable:
 				demoEngine = make_shared<DemoBorderlessResizableMovable>();
 				break;
-			/*case DemoSelector::DemoId::DemoCPPTextureInBrowser:
+			/*case DemoSelector::DemoId::DemoCPPTextureInBrowser: This is currently broken - waiting on Ultralight update for custom texture support via img
 				demoEngine = make_shared<DemoCPPTextureInBrowser>();
 				break;*/
 			case DemoSelector::DemoId::DemoInspector:

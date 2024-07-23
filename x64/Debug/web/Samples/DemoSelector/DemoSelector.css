@@ -4,7 +4,7 @@ body {
 }
 
 button {
-    background-color: #04AA6D; /* Green */
+    background-color: #0468aa; 
     border: none;
     color: white;
     padding: 8px 16px;
@@ -15,7 +15,7 @@ button {
 }
 
 button:hover {
-    background-color: #70c1a3; /* Green */
+    background-color: #549fbe; 
 }
 
 span {
