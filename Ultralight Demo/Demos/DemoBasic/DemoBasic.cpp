@@ -8,7 +8,7 @@ bool DemoBasic::Startup()
 	windowParms.Width = 800;
 	windowParms.Height = 600;
 	windowParms.Style = WindowStyle::Resizable | WindowStyle::ExitButton | WindowStyle::MaximizeAvailable;
-	windowParms.Title = "Default Title - 1";
+	windowParms.Title = "GPU Renderer";
 	shared_ptr<Window> pWindow = SpawnWindow(windowParms);
 	if (pWindow == nullptr)
 	{
@@ -19,7 +19,7 @@ bool DemoBasic::Startup()
 	UltralightViewCreationParameters parms;
 	parms.Width = pWindow->GetWidth();
 	parms.Height = pWindow->GetHeight();
-	parms.IsAccelerated = false;
+	parms.IsAccelerated = true;
 	parms.ForceMatchWindowDimensions = true;
 	parms.IsTransparent = true;
 
@@ -32,7 +32,7 @@ bool DemoBasic::Startup()
 		windowParms.Width = 800;
 		windowParms.Height = 600;
 		windowParms.Style = WindowStyle::Resizable | WindowStyle::ExitButton | WindowStyle::MaximizeAvailable;
-		windowParms.Title = "Default Title - 2";
+		windowParms.Title = "CPU Renderer";
 		shared_ptr<Window> pWindow = SpawnWindow(windowParms);
 
 		UltralightViewCreationParameters parms;
