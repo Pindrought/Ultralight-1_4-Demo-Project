@@ -5,13 +5,15 @@
 #include "../../Graphics/InputLayoutDescriptions.h"
 #include "../UltralightManager.h"
 
+#define ENABLE_MSAA true
+
 static IDPoolManager<uint32_t> s_UltralightGPUDriverGeometryIDManager(1u);
 static IDPoolManager<uint32_t> s_UltralightGPUDriverRenderBufferIDManager(1u);
 static IDPoolManager<uint32_t> s_UltralightGPUDriverTextureIDManager(1u);
 
 void GPUDriverD3D11::BeginSynchronize() 
 {
-    UltralightManager* pManager = UltralightManager::GetInstance();
+    /*UltralightManager* pManager = UltralightManager::GetInstance();
     for (auto viewEntry : pManager->GetViews())
     {
         auto pView = viewEntry.second;
@@ -35,7 +37,7 @@ void GPUDriverD3D11::BeginSynchronize()
                 m_ViewToTextureIdMap[view_id] = rt.texture_id;
             }
         }
-    }
+    }*/
 }
 
 void GPUDriverD3D11::EndSynchronize() {}
@@ -104,6 +106,8 @@ void GPUDriverD3D11::CreateTexture(uint32_t textureId, ul::RefPtr<ul::Bitmap> bi
           bitmap->format() == ul::BitmapFormat::A8_UNORM))
         FatalError("GPUDriverD3D11::CreateTexture, unsupported format.");
 
+    ID3D11Device* pDevice = m_D3DPtr->m_Device.Get();
+
     D3D11_TEXTURE2D_DESC desc = {};
     desc.Width = bitmap->width();
     desc.Height = bitmap->height();
@@ -128,10 +132,10 @@ void GPUDriverD3D11::CreateTexture(uint32_t textureId, ul::RefPtr<ul::Bitmap> bi
         desc.SampleDesc.Count = 8;
         desc.SampleDesc.Quality = D3D11_STANDARD_MULTISAMPLE_PATTERN;
 
-        textureEntry.isMSAARenderTarget = true;
+        textureEntry.IsMSAARenderTarget = true;
 #endif
 
-        hr = m_D3DPtr->m_Device->CreateTexture2D(&desc, NULL, &textureEntry.texture);
+        hr = pDevice->CreateTexture2D(&desc, NULL, &textureEntry.Texture);
     }
     else
     {
@@ -141,7 +145,7 @@ void GPUDriverD3D11::CreateTexture(uint32_t textureId, ul::RefPtr<ul::Bitmap> bi
         textureData.SysMemPitch = bitmap->row_bytes();
         textureData.SysMemSlicePitch = (UINT)bitmap->size();
 
-        hr = m_D3DPtr->m_Device->CreateTexture2D(&desc, &textureData, &textureEntry.texture);
+        hr = pDevice->CreateTexture2D(&desc, &textureData, &textureEntry.Texture);
         bitmap->UnlockPixels();
     }
     FatalErrorIfFail(hr, "GPUDriverD3D11::CreateTexture, unable to create texture.");
@@ -150,26 +154,26 @@ void GPUDriverD3D11::CreateTexture(uint32_t textureId, ul::RefPtr<ul::Bitmap> bi
     D3D11_SHADER_RESOURCE_VIEW_DESC srv_desc;
     ZeroMemory(&srv_desc, sizeof(srv_desc));
     srv_desc.Format = desc.Format;
-    srv_desc.ViewDimension = textureEntry.isMSAARenderTarget ? D3D11_SRV_DIMENSION_TEXTURE2DMS : D3D11_SRV_DIMENSION_TEXTURE2D;
+    srv_desc.ViewDimension = textureEntry.IsMSAARenderTarget ? D3D11_SRV_DIMENSION_TEXTURE2DMS : D3D11_SRV_DIMENSION_TEXTURE2D;
     srv_desc.Texture2D.MostDetailedMip = 0;
     srv_desc.Texture2D.MipLevels = 1;
 
-    hr = m_D3DPtr->m_Device->CreateShaderResourceView(textureEntry.texture.Get(), &srv_desc, &textureEntry.textureSRV);
+    hr = pDevice->CreateShaderResourceView(textureEntry.Texture.Get(), &srv_desc, &textureEntry.TextureSRV);
     FatalErrorIfFail(hr, "GPUDriverD3D11::CreateTexture, unable to create shader resource view for texture.");
 
 #if ENABLE_MSAA
-    if (textureEntry.isMSAARenderTarget)
+    if (textureEntry.IsMSAARenderTarget)
     {
         // Create resolve texture and shader resource view
 
         desc.SampleDesc.Count = 1;
         desc.SampleDesc.Quality = 0;
-        hr = pd3d->device->CreateTexture2D(&desc, NULL, &textureEntry.resolveTexture);
+        hr = pDevice->CreateTexture2D(&desc, NULL, &textureEntry.ResolveTexture);
         FatalErrorIfFail(hr, "GPUDriverD3D11::CreateTexture, unable to create MSAA resolve texture.");
 
         srv_desc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
 
-        hr = pd3d->device->CreateShaderResourceView(textureEntry.resolveTexture.Get(), &srv_desc, &textureEntry.resolveSRV);
+        hr = pDevice->CreateShaderResourceView(textureEntry.ResolveTexture.Get(), &srv_desc, &textureEntry.ResolveSRV);
         FatalErrorIfFail(hr, "GPUDriverD3D11::CreateTexture, unable to create shader resource view for MSAA resolve texture.");
     }
 #endif
@@ -185,7 +189,7 @@ void GPUDriverD3D11::UpdateTexture(uint32_t textureId, ul::RefPtr<ul::Bitmap> bi
 
     auto& entry = iter->second;
     D3D11_MAPPED_SUBRESOURCE res;
-    HRESULT hr = m_D3DPtr->m_Context->Map(entry.texture.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &res);
+    HRESULT hr = m_D3DPtr->m_Context->Map(entry.Texture.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &res);
     if (FAILED(hr))
     {
         DebugBreak();
@@ -212,7 +216,7 @@ void GPUDriverD3D11::UpdateTexture(uint32_t textureId, ul::RefPtr<ul::Bitmap> bi
         }
     }
 
-    m_D3DPtr->m_Context->Unmap(entry.texture.Get(), 0);
+    m_D3DPtr->m_Context->Unmap(entry.Texture.Get(), 0);
 }
 
 void GPUDriverD3D11::DestroyTexture(uint32_t textureId)
@@ -243,22 +247,22 @@ void GPUDriverD3D11::CreateRenderBuffer(uint32_t renderBufferId_, const ul::Rend
     if (textureEntry == m_TextureMap.end())
         FatalError("GPUDriverD3D11::CreateRenderBuffer, texture id doesn't exist.");
 
-    textureEntry->second.isRenderBuffer = true;
+    textureEntry->second.IsRenderBuffer = true;
     
     D3D11_RENDER_TARGET_VIEW_DESC renderTargetViewDesc = {};
     renderTargetViewDesc.Format = DXGI_FORMAT_B8G8R8A8_UNORM;
     renderTargetViewDesc.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE2D;
 
-    if (textureEntry->second.isMSAARenderTarget)
+    if (textureEntry->second.IsMSAARenderTarget)
     {
         renderTargetViewDesc.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE2DMS;
     }
 
-    ComPtr<ID3D11Texture2D> tex = textureEntry->second.texture;
+    ComPtr<ID3D11Texture2D> tex = textureEntry->second.Texture;
     auto& render_target_entry = m_RenderTargetMap[renderBufferId_];
-    HRESULT hr = m_D3DPtr->m_Device->CreateRenderTargetView(tex.Get(), &renderTargetViewDesc, render_target_entry.renderTargetView.GetAddressOf());
+    HRESULT hr = m_D3DPtr->m_Device->CreateRenderTargetView(tex.Get(), &renderTargetViewDesc, render_target_entry.RenderTargetView.GetAddressOf());
 
-    render_target_entry.renderTargetTextureId = buffer_.texture_id;
+    render_target_entry.RenderTargetTextureId = buffer_.texture_id;
     FatalErrorIfFail(hr, "GPUDriverD3D11::CreateRenderBuffer, unable to create render target.");
 }
 
@@ -269,7 +273,7 @@ void GPUDriverD3D11::DestroyRenderBuffer(uint32_t renderBufferId)
     auto iter = m_RenderTargetMap.find(renderBufferId);
     if (iter != m_RenderTargetMap.end())
     {
-        iter->second.renderTargetView.Reset();
+        iter->second.RenderTargetView.Reset();
         m_RenderTargetMap.erase(iter);
     }
     else
@@ -286,7 +290,7 @@ void GPUDriverD3D11::CreateGeometry(uint32_t geometryId,
         FatalError("GPUDriverD3D11::CreateGeometry called with a geometry id that already exists.");
 
     GeometryEntry geometry;
-    geometry.format = vertices.format;
+    geometry.Format = vertices.format;
 
     HRESULT hr;
 
@@ -301,7 +305,7 @@ void GPUDriverD3D11::CreateGeometry(uint32_t geometryId,
 
     hr = m_D3DPtr->m_Device->CreateBuffer(&vertex_desc,
                                           &vertex_data,
-                                          geometry.vertexBuffer.GetAddressOf());
+                                          geometry.VertexBuffer.GetAddressOf());
     FatalErrorIfFail(hr, "GPUDriverD3D11::CreateGeometry CreateBuffer for vertex buffer failed.");
 
     D3D11_BUFFER_DESC index_desc = {};
@@ -315,7 +319,7 @@ void GPUDriverD3D11::CreateGeometry(uint32_t geometryId,
 
     hr = m_D3DPtr->m_Device->CreateBuffer(&index_desc,
                                           &index_data,
-                                          geometry.indexBuffer.GetAddressOf());
+                                          geometry.IndexBuffer.GetAddressOf());
     FatalErrorIfFail(hr, "GPUDriverD3D11::CreateGeometry CreateBuffer for index buffer failed.");
 
     m_GeometryMap.insert({ geometryId, std::move(geometry) });
@@ -335,21 +339,21 @@ void GPUDriverD3D11::UpdateGeometry(uint32_t geometryId,
     auto& entry = iter->second;
     D3D11_MAPPED_SUBRESOURCE res;
 
-    HRESULT hr = m_D3DPtr->m_Context->Map(entry.vertexBuffer.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &res);
+    HRESULT hr = m_D3DPtr->m_Context->Map(entry.VertexBuffer.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &res);
     if (FAILED(hr))
     {
         DebugBreak();
     }
     memcpy(res.pData, vertices.data, vertices.size);
-    m_D3DPtr->m_Context->Unmap(entry.vertexBuffer.Get(), 0);
+    m_D3DPtr->m_Context->Unmap(entry.VertexBuffer.Get(), 0);
 
-    hr = m_D3DPtr->m_Context->Map(entry.indexBuffer.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &res);
+    hr = m_D3DPtr->m_Context->Map(entry.IndexBuffer.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &res);
     if (FAILED(hr))
     {
         DebugBreak();
     }
     memcpy(res.pData, indices.data, indices.size);
-    m_D3DPtr->m_Context->Unmap(entry.indexBuffer.Get(), 0);
+    m_D3DPtr->m_Context->Unmap(entry.IndexBuffer.Get(), 0);
 }
 
 void GPUDriverD3D11::DestroyGeometry(uint32_t geometryId)
@@ -359,8 +363,8 @@ void GPUDriverD3D11::DestroyGeometry(uint32_t geometryId)
     auto iter = m_GeometryMap.find(geometryId);
     if (iter != m_GeometryMap.end())
     {
-        iter->second.vertexBuffer.Reset();
-        iter->second.indexBuffer.Reset();
+        iter->second.VertexBuffer.Reset();
+        iter->second.IndexBuffer.Reset();
         m_GeometryMap.erase(iter);
     }
     else
@@ -442,15 +446,15 @@ void GPUDriverD3D11::ClearRenderBuffer(uint32_t renderBufferId)
         FatalError("GPUDriverD3D11::ClearRenderBuffer, render buffer id doesn't exist.");
     }
 
-    m_D3DPtr->m_Context->ClearRenderTargetView(renderTargetIter->second.renderTargetView.Get(), color);
+    m_D3DPtr->m_Context->ClearRenderTargetView(renderTargetIter->second.RenderTargetView.Get(), color);
 
 #if ENABLE_MSAA
-    auto textureIter = textureMap.find(renderTargetIter->second.renderTargetTextureId);
-    if (textureIter == textureMap.end())
+    auto textureIter = m_TextureMap.find(renderTargetIter->second.RenderTargetTextureId);
+    if (textureIter == m_TextureMap.end())
         FatalError("GPUDriverD3D11::ClearRenderBuffer, render target texture id doesn't exist.");
 
     // Flag the MSAA render target texture for Resolve when we bind it to a shader for reading later.
-    textureIter->second.needsResolve = true;
+    textureIter->second.NeedsResolve = true;
 #endif
 }
 
@@ -460,7 +464,13 @@ ID3D11ShaderResourceView* GPUDriverD3D11::GetShaderResourceView(ul::View* pView)
     auto iter = m_TextureMap.find(textureId);
     if (iter == m_TextureMap.end())
         return nullptr;
-    return iter->second.textureSRV.Get();
+    auto& entry = iter->second;
+    if (entry.IsMSAARenderTarget)
+    {
+        m_D3DPtr->m_Context->ResolveSubresource(entry.ResolveTexture.Get(), 0, entry.Texture.Get(), 0, DXGI_FORMAT_B8G8R8A8_UNORM);
+        return entry.ResolveSRV.Get();
+    }
+    return entry.TextureSRV.Get();
 }
 
 ID3D11Texture2D* GPUDriverD3D11::GetTexture(ul::View* view)
@@ -469,7 +479,12 @@ ID3D11Texture2D* GPUDriverD3D11::GetTexture(ul::View* view)
     auto iter = m_TextureMap.find(textureId);
     if (iter == m_TextureMap.end())
         return nullptr;
-    return iter->second.texture.Get();
+    auto& entry = iter->second;
+    if (entry.IsMSAARenderTarget)
+    {
+        return entry.ResolveTexture.Get();
+    }
+    return entry.Texture.Get();
 }
 
 IGPUDriverD3D11::StoredEntries GPUDriverD3D11::GetStoredResourceEntries()
@@ -586,15 +601,15 @@ void GPUDriverD3D11::BindRenderBuffer(uint32_t renderBufferId)
     if (renderTarget == m_RenderTargetMap.end())
         FatalError("GPUDriverD3D11::BindRenderBuffer, render buffer id doesn't exist.");
 
-    target = renderTarget->second.renderTargetView.Get();
+    target = renderTarget->second.RenderTargetView.Get();
 
 #if ENABLE_MSAA
-    auto renderTargetTexture = textureMap.find(renderTarget->second.renderTargetTextureId);
-    if (renderTargetTexture == textureMap.end())
+    auto renderTargetTexture = m_TextureMap.find(renderTarget->second.RenderTargetTextureId);
+    if (renderTargetTexture == m_TextureMap.end())
         FatalError("GPUDriverD3D11::BindRenderBuffer, render target texture id doesn't exist.");
 
     // Flag the MSAA render target texture for Resolve when we bind it to a shader for reading later.
-    renderTargetTexture->second.needsResolve = true;
+    renderTargetTexture->second.NeedsResolve = true;
 #endif
 
     m_D3DPtr->m_Context->OMSetRenderTargets(1, &target, nullptr);
@@ -622,18 +637,18 @@ void GPUDriverD3D11::BindTexture(uint8_t textureUnit, uint32_t textureId)
 
     auto& entry = iter->second;
 
-    if (entry.isMSAARenderTarget)
+    if (entry.IsMSAARenderTarget)
     {
-        if (entry.needsResolve)
+        if (entry.NeedsResolve)
         {
-            m_D3DPtr->m_Context->ResolveSubresource(entry.resolveTexture.Get(), 0, entry.texture.Get(), 0, DXGI_FORMAT_B8G8R8A8_UNORM);
-            entry.needsResolve = false;
+            m_D3DPtr->m_Context->ResolveSubresource(entry.ResolveTexture.Get(), 0, entry.Texture.Get(), 0, DXGI_FORMAT_B8G8R8A8_UNORM);
+            entry.NeedsResolve = false;
         }
-        m_D3DPtr->m_Context->PSSetShaderResources(textureUnit, 1, entry.resolveSRV.GetAddressOf());
+        m_D3DPtr->m_Context->PSSetShaderResources(textureUnit, 1, entry.ResolveSRV.GetAddressOf());
     }
     else
     {
-        m_D3DPtr->m_Context->PSSetShaderResources(textureUnit, 1, entry.textureSRV.GetAddressOf());
+        m_D3DPtr->m_Context->PSSetShaderResources(textureUnit, 1, entry.TextureSRV.GetAddressOf());
     }
 }
 
@@ -684,12 +699,12 @@ void GPUDriverD3D11::BindGeometry(uint32_t geometryId)
 
     auto& geometry = iter->second;
 
-    UINT stride = geometry.format == ul::VertexBufferFormat::_2f_4ub_2f ? sizeof(ul::Vertex_2f_4ub_2f) : sizeof(ul::Vertex_2f_4ub_2f_2f_28f);
+    UINT stride = geometry.Format == ul::VertexBufferFormat::_2f_4ub_2f ? sizeof(ul::Vertex_2f_4ub_2f) : sizeof(ul::Vertex_2f_4ub_2f_2f_28f);
     UINT offset = 0;
-    m_D3DPtr->m_Context->IASetVertexBuffers(0, 1, geometry.vertexBuffer.GetAddressOf(), &stride, &offset);
-    m_D3DPtr->m_Context->IASetIndexBuffer(geometry.indexBuffer.Get(), DXGI_FORMAT_R32_UINT, 0);
+    m_D3DPtr->m_Context->IASetVertexBuffers(0, 1, geometry.VertexBuffer.GetAddressOf(), &stride, &offset);
+    m_D3DPtr->m_Context->IASetIndexBuffer(geometry.IndexBuffer.Get(), DXGI_FORMAT_R32_UINT, 0);
     m_D3DPtr->m_Context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-    if (geometry.format == ul::VertexBufferFormat::_2f_4ub_2f)
+    if (geometry.Format == ul::VertexBufferFormat::_2f_4ub_2f)
         m_D3DPtr->m_Context->IASetInputLayout(m_VertexShader_FillPath.GetInputLayout());
     else
         m_D3DPtr->m_Context->IASetInputLayout(m_VertexShader_Fill.GetInputLayout());

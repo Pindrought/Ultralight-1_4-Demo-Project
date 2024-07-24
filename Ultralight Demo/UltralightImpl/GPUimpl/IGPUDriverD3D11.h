@@ -3,26 +3,26 @@
 
 struct GeometryEntry
 {
-    ul::VertexBufferFormat format;
-    ComPtr<ID3D11Buffer> vertexBuffer;
-    ComPtr<ID3D11Buffer> indexBuffer;
+    ul::VertexBufferFormat Format;
+    ComPtr<ID3D11Buffer> VertexBuffer;
+    ComPtr<ID3D11Buffer> IndexBuffer;
 };
 
 struct TextureEntry
 {
-    ComPtr<ID3D11Texture2D> texture;
-    ComPtr<ID3D11ShaderResourceView> textureSRV;
-    bool isMSAARenderTarget = false;
-    bool needsResolve = false;
-    ComPtr<ID3D11Texture2D> resolveTexture;
-    ComPtr<ID3D11ShaderResourceView> resolveSRV;
-    bool isRenderBuffer = false;
+    ComPtr<ID3D11Texture2D> Texture;
+    ComPtr<ID3D11ShaderResourceView> TextureSRV;
+    bool IsMSAARenderTarget = false;
+    bool NeedsResolve = false;
+    ComPtr<ID3D11Texture2D> ResolveTexture;
+    ComPtr<ID3D11ShaderResourceView> ResolveSRV;
+    bool IsRenderBuffer = false;
 };
 
 struct RenderTargetEntry
 {
-    ComPtr<ID3D11RenderTargetView> renderTargetView;
-    uint32_t renderTargetTextureId;
+    ComPtr<ID3D11RenderTargetView> RenderTargetView;
+    uint32_t RenderTargetTextureId;
 };
 
 class IGPUDriverD3D11 : public ul::GPUDriver

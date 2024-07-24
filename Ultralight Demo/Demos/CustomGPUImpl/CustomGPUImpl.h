@@ -6,29 +6,34 @@
 #include "../../../Graphics/Buffer/ConstantBuffer.h"
 #include "../../../Graphics/Texture.h"
 
-struct CustomGeometryEntry
+struct CustomTextureEntry : public TextureEntry
 {
-    ul::VertexBufferFormat format;
-    ComPtr<ID3D11Buffer> vertexBuffer;
-    ComPtr<ID3D11Buffer> indexBuffer;
-};
+    bool IsCPPTexture = false;
+    CustomTextureEntry() :TextureEntry() { };
+    CustomTextureEntry(TextureEntry other)
+    {
+        this->IsMSAARenderTarget = other.IsMSAARenderTarget;
+        this->IsRenderBuffer = other.IsRenderBuffer;
+        this->NeedsResolve = other.NeedsResolve;
+        this->ResolveSRV = other.ResolveSRV;
+        this->ResolveTexture = other.ResolveTexture;
+        this->Texture = other.Texture;
+        this->TextureSRV = other.TextureSRV;
+    }
+    TextureEntry ToTextureEntry() //For converting back to original texture entry and losing custom fields for when switching gpu driver impl
+    {
+        TextureEntry entry;
 
-struct CustomTextureEntry
-{
-    bool isCPPTexture = false;
-    ComPtr<ID3D11Texture2D> texture;
-    ComPtr<ID3D11ShaderResourceView> textureSRV;
-    bool isMSAARenderTarget = false;
-    bool needsResolve = false;
-    ComPtr<ID3D11Texture2D> resolveTexture;
-    ComPtr<ID3D11ShaderResourceView> resolveSRV;
-    bool isRenderBuffer = false;
-};
+        entry.IsMSAARenderTarget = this->IsMSAARenderTarget;
+        entry.IsRenderBuffer = this->IsRenderBuffer;
+        entry.NeedsResolve = this->NeedsResolve;
+        entry.ResolveSRV = this->ResolveSRV;
+        entry.ResolveTexture = this->ResolveTexture;
+        entry.Texture = this->Texture;
+        entry.TextureSRV = this->TextureSRV;
 
-struct CustomRenderTargetEntry
-{
-    ComPtr<ID3D11RenderTargetView> renderTargetView;
-    uint32_t renderTargetTextureId;
+        return entry;
+    }
 };
 
 struct TextureOverwriteData
@@ -85,8 +90,8 @@ private:
     void UpdateConstantBuffer(const ul::GPUState& state);
     void BindGeometry(uint32_t geometryId);
     ul::Matrix ApplyProjection(const ul::Matrix4x4& transform, float screenWidth, float screenHeight);
-    std::map<uint32_t, CustomGeometryEntry> m_GeometryMap;
-    std::map<uint32_t, CustomRenderTargetEntry> m_RenderTargetMap;
+    std::map<uint32_t, GeometryEntry> m_GeometryMap;
+    std::map<uint32_t, RenderTargetEntry> m_RenderTargetMap;
     std::map<uint32_t, CustomTextureEntry> m_TextureMap;
     VertexShader m_VertexShader_Fill;
     VertexShader m_VertexShader_FillPath;
@@ -99,6 +104,6 @@ private:
     ComPtr<ID3D11RasterizerState> m_RasterizerState_Default;
     ComPtr<ID3D11RasterizerState> m_RasterizerState_Scissored;
     D3DClass* m_D3DPtr = nullptr;
-    map<uint32_t, uint32_t> m_ViewToTextureIdMap;
+    //map<uint32_t, uint32_t> m_ViewToTextureIdMap;
     map<uint32_t, TextureOverwriteData> m_TextureOverwriteData; //This is for textures to be pulled in from outside ultralight ex. rendertarget from d3d11
 };

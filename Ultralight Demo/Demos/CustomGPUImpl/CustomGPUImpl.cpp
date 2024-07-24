@@ -11,7 +11,7 @@ static IDPoolManager<uint32_t> s_UltralightGPUDriverTextureIDManager(1u);
 
 void CustomGPUImpl::BeginSynchronize()
 {
-    UltralightManager* pManager = UltralightManager::GetInstance();
+    /*UltralightManager* pManager = UltralightManager::GetInstance();
     for (auto viewEntry : pManager->GetViews())
     {
         auto pView = viewEntry.second;
@@ -35,7 +35,7 @@ void CustomGPUImpl::BeginSynchronize()
                 m_ViewToTextureIdMap[view_id] = rt.texture_id;
             }
         }
-    }
+    }*/
 }
 
 void CustomGPUImpl::EndSynchronize() {}
@@ -124,9 +124,9 @@ void CustomGPUImpl::CreateTexture(uint32_t textureId, ul::RefPtr<ul::Bitmap> bit
             {
                 auto& textureEntry = m_TextureMap[textureId];
                 auto texture = iter->second.Texture;
-                textureEntry.texture = texture->GetTextureResourceComPtr();
-                textureEntry.textureSRV = texture->GetTextureResourceViewComPtr();
-                textureEntry.isCPPTexture = true;
+                textureEntry.Texture = texture->GetTextureResourceComPtr();
+                textureEntry.TextureSRV = texture->GetTextureResourceViewComPtr();
+                textureEntry.IsCPPTexture = true;
                 bitmap->UnlockPixels();
                 return;
             }
@@ -162,7 +162,7 @@ void CustomGPUImpl::CreateTexture(uint32_t textureId, ul::RefPtr<ul::Bitmap> bit
         textureEntry.isMSAARenderTarget = true;
 #endif
 
-        hr = m_D3DPtr->m_Device->CreateTexture2D(&desc, NULL, &textureEntry.texture);
+        hr = m_D3DPtr->m_Device->CreateTexture2D(&desc, NULL, &textureEntry.Texture);
     }
     else
     {
@@ -172,7 +172,7 @@ void CustomGPUImpl::CreateTexture(uint32_t textureId, ul::RefPtr<ul::Bitmap> bit
         textureData.SysMemPitch = bitmap->row_bytes();
         textureData.SysMemSlicePitch = (UINT)bitmap->size();
 
-        hr = m_D3DPtr->m_Device->CreateTexture2D(&desc, &textureData, &textureEntry.texture);
+        hr = m_D3DPtr->m_Device->CreateTexture2D(&desc, &textureData, &textureEntry.Texture);
         bitmap->UnlockPixels();
     }
     FatalErrorIfFail(hr, "CustomGPUImpl::CreateTexture, unable to create texture.");
@@ -181,11 +181,11 @@ void CustomGPUImpl::CreateTexture(uint32_t textureId, ul::RefPtr<ul::Bitmap> bit
     D3D11_SHADER_RESOURCE_VIEW_DESC srv_desc;
     ZeroMemory(&srv_desc, sizeof(srv_desc));
     srv_desc.Format = desc.Format;
-    srv_desc.ViewDimension = textureEntry.isMSAARenderTarget ? D3D11_SRV_DIMENSION_TEXTURE2DMS : D3D11_SRV_DIMENSION_TEXTURE2D;
+    srv_desc.ViewDimension = textureEntry.IsMSAARenderTarget ? D3D11_SRV_DIMENSION_TEXTURE2DMS : D3D11_SRV_DIMENSION_TEXTURE2D;
     srv_desc.Texture2D.MostDetailedMip = 0;
     srv_desc.Texture2D.MipLevels = 1;
 
-    hr = m_D3DPtr->m_Device->CreateShaderResourceView(textureEntry.texture.Get(), &srv_desc, &textureEntry.textureSRV);
+    hr = m_D3DPtr->m_Device->CreateShaderResourceView(textureEntry.Texture.Get(), &srv_desc, &textureEntry.TextureSRV);
     FatalErrorIfFail(hr, "CustomGPUImpl::CreateTexture, unable to create shader resource view for texture.");
 
 #if ENABLE_MSAA
@@ -214,7 +214,7 @@ void CustomGPUImpl::UpdateTexture(uint32_t textureId, ul::RefPtr<ul::Bitmap> bit
 
     auto& entry = iter->second;
     D3D11_MAPPED_SUBRESOURCE res;
-    HRESULT hr = m_D3DPtr->m_Context->Map(entry.texture.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &res);
+    HRESULT hr = m_D3DPtr->m_Context->Map(entry.Texture.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &res);
     if (FAILED(hr))
     {
         DebugBreak();
@@ -241,7 +241,7 @@ void CustomGPUImpl::UpdateTexture(uint32_t textureId, ul::RefPtr<ul::Bitmap> bit
         }
     }
 
-    m_D3DPtr->m_Context->Unmap(entry.texture.Get(), 0);
+    m_D3DPtr->m_Context->Unmap(entry.Texture.Get(), 0);
 }
 
 void CustomGPUImpl::DestroyTexture(uint32_t textureId)
@@ -250,7 +250,7 @@ void CustomGPUImpl::DestroyTexture(uint32_t textureId)
     auto iter = m_TextureMap.find(textureId);
     if (iter != m_TextureMap.end())
     {
-        if (iter->second.isCPPTexture)
+        if (iter->second.IsCPPTexture)
         {
             LOGINFO("DestroyCPPTexture");
         }
@@ -276,22 +276,22 @@ void CustomGPUImpl::CreateRenderBuffer(uint32_t renderBufferId_, const ul::Rende
     if (textureEntry == m_TextureMap.end())
         FatalError("CustomGPUImpl::CreateRenderBuffer, texture id doesn't exist.");
 
-    textureEntry->second.isRenderBuffer = true;
+    textureEntry->second.IsRenderBuffer = true;
 
     D3D11_RENDER_TARGET_VIEW_DESC renderTargetViewDesc = {};
     renderTargetViewDesc.Format = DXGI_FORMAT_B8G8R8A8_UNORM;
     renderTargetViewDesc.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE2D;
 
-    if (textureEntry->second.isMSAARenderTarget)
+    if (textureEntry->second.IsMSAARenderTarget)
     {
         renderTargetViewDesc.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE2DMS;
     }
 
-    ComPtr<ID3D11Texture2D> tex = textureEntry->second.texture;
+    ComPtr<ID3D11Texture2D> tex = textureEntry->second.Texture;
     auto& render_target_entry = m_RenderTargetMap[renderBufferId_];
-    HRESULT hr = m_D3DPtr->m_Device->CreateRenderTargetView(tex.Get(), &renderTargetViewDesc, render_target_entry.renderTargetView.GetAddressOf());
+    HRESULT hr = m_D3DPtr->m_Device->CreateRenderTargetView(tex.Get(), &renderTargetViewDesc, render_target_entry.RenderTargetView.GetAddressOf());
 
-    render_target_entry.renderTargetTextureId = buffer_.texture_id;
+    render_target_entry.RenderTargetTextureId = buffer_.texture_id;
     FatalErrorIfFail(hr, "CustomGPUImpl::CreateRenderBuffer, unable to create render target.");
 }
 
@@ -302,7 +302,7 @@ void CustomGPUImpl::DestroyRenderBuffer(uint32_t renderBufferId_)
     auto iter = m_RenderTargetMap.find(renderBufferId_);
     if (iter != m_RenderTargetMap.end())
     {
-        iter->second.renderTargetView.Reset();
+        iter->second.RenderTargetView.Reset();
         m_RenderTargetMap.erase(iter);
     }
     else
@@ -318,8 +318,8 @@ void CustomGPUImpl::CreateGeometry(uint32_t geometryId,
     if (m_GeometryMap.find(geometryId) != m_GeometryMap.end())
         FatalError("CustomGPUImpl::CreateGeometry called with a geometry id that already exists.");
 
-    CustomGeometryEntry geometry;
-    geometry.format = vertices.format;
+    GeometryEntry geometry;
+    geometry.Format = vertices.format;
 
     HRESULT hr;
 
@@ -334,7 +334,7 @@ void CustomGPUImpl::CreateGeometry(uint32_t geometryId,
 
     hr = m_D3DPtr->m_Device->CreateBuffer(&vertex_desc,
                                           &vertex_data,
-                                          geometry.vertexBuffer.GetAddressOf());
+                                          geometry.VertexBuffer.GetAddressOf());
     FatalErrorIfFail(hr, "CustomGPUImpl::CreateGeometry CreateBuffer for vertex buffer failed.");
 
     D3D11_BUFFER_DESC index_desc = {};
@@ -348,7 +348,7 @@ void CustomGPUImpl::CreateGeometry(uint32_t geometryId,
 
     hr = m_D3DPtr->m_Device->CreateBuffer(&index_desc,
                                           &index_data,
-                                          geometry.indexBuffer.GetAddressOf());
+                                          geometry.IndexBuffer.GetAddressOf());
     FatalErrorIfFail(hr, "CustomGPUImpl::CreateGeometry CreateBuffer for index buffer failed.");
 
     m_GeometryMap.insert({ geometryId, std::move(geometry) });
@@ -365,21 +365,21 @@ void CustomGPUImpl::UpdateGeometry(uint32_t geometryId,
     auto& entry = iter->second;
     D3D11_MAPPED_SUBRESOURCE res;
 
-    HRESULT hr = m_D3DPtr->m_Context->Map(entry.vertexBuffer.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &res);
+    HRESULT hr = m_D3DPtr->m_Context->Map(entry.VertexBuffer.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &res);
     if (FAILED(hr))
     {
         DebugBreak();
     }
     memcpy(res.pData, vertices.data, vertices.size);
-    m_D3DPtr->m_Context->Unmap(entry.vertexBuffer.Get(), 0);
+    m_D3DPtr->m_Context->Unmap(entry.VertexBuffer.Get(), 0);
 
-    hr = m_D3DPtr->m_Context->Map(entry.indexBuffer.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &res);
+    hr = m_D3DPtr->m_Context->Map(entry.IndexBuffer.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &res);
     if (FAILED(hr))
     {
         DebugBreak();
     }
     memcpy(res.pData, indices.data, indices.size);
-    m_D3DPtr->m_Context->Unmap(entry.indexBuffer.Get(), 0);
+    m_D3DPtr->m_Context->Unmap(entry.IndexBuffer.Get(), 0);
 }
 
 void CustomGPUImpl::DestroyGeometry(uint32_t geometryId)
@@ -389,8 +389,8 @@ void CustomGPUImpl::DestroyGeometry(uint32_t geometryId)
     auto iter = m_GeometryMap.find(geometryId);
     if (iter != m_GeometryMap.end())
     {
-        iter->second.vertexBuffer.Reset();
-        iter->second.indexBuffer.Reset();
+        iter->second.VertexBuffer.Reset();
+        iter->second.IndexBuffer.Reset();
         m_GeometryMap.erase(iter);
     }
     else
@@ -473,7 +473,7 @@ void CustomGPUImpl::ClearRenderBuffer(uint32_t renderBufferId)
         FatalError("CustomGPUImpl::ClearRenderBuffer, render buffer id doesn't exist.");
     }
 
-    m_D3DPtr->m_Context->ClearRenderTargetView(renderTargetIter->second.renderTargetView.Get(), color);
+    m_D3DPtr->m_Context->ClearRenderTargetView(renderTargetIter->second.RenderTargetView.Get(), color);
 
 #if ENABLE_MSAA
     auto textureIter = textureMap.find(renderTargetIter->second.renderTargetTextureId);
@@ -491,7 +491,7 @@ ID3D11ShaderResourceView* CustomGPUImpl::GetShaderResourceView(ul::View* pView)
     auto iter = m_TextureMap.find(textureId);
     if (iter == m_TextureMap.end())
         return nullptr;
-    return iter->second.textureSRV.Get();
+    return iter->second.TextureSRV.Get();
 }
 
 ID3D11Texture2D* CustomGPUImpl::GetTexture(ul::View* view)
@@ -500,16 +500,29 @@ ID3D11Texture2D* CustomGPUImpl::GetTexture(ul::View* view)
     auto iter = m_TextureMap.find(textureId);
     if (iter == m_TextureMap.end())
         return nullptr;
-    return iter->second.texture.Get();
+    return iter->second.Texture.Get();
 }
 
 IGPUDriverD3D11::StoredEntries CustomGPUImpl::GetStoredResourceEntries()
 {
-    return StoredEntries();
+    IGPUDriverD3D11::StoredEntries entries;
+    entries.Geometries = m_GeometryMap;
+    entries.RenderTargets = m_RenderTargetMap;
+    for (auto& entry : m_TextureMap)
+    {
+        entries.TextureEntries[entry.first] = entry.second.ToTextureEntry();
+    }
+    return entries;
 }
 
 void CustomGPUImpl::RegisterStoredResourceEntries(StoredEntries& entries)
 {
+    m_GeometryMap = entries.Geometries;
+    m_RenderTargetMap = entries.RenderTargets;
+    for (auto& entry : entries.TextureEntries)
+    {
+        m_TextureMap[entry.first] = entry.second;
+    }
 }
 
 void CustomGPUImpl::QueueCPPTextureOverwrite(TextureOverwriteData data)
@@ -615,7 +628,7 @@ void CustomGPUImpl::BindRenderBuffer(uint32_t renderBufferId)
     if (renderTarget == m_RenderTargetMap.end())
         FatalError("CustomGPUImpl::BindRenderBuffer, render buffer id doesn't exist.");
 
-    target = renderTarget->second.renderTargetView.Get();
+    target = renderTarget->second.RenderTargetView.Get();
 
 #if ENABLE_MSAA
     auto renderTargetTexture = textureMap.find(renderTarget->second.renderTargetTextureId);
@@ -649,18 +662,18 @@ void CustomGPUImpl::BindTexture(uint8_t textureUnit, uint32_t textureId)
 
     auto& entry = iter->second;
 
-    if (entry.isMSAARenderTarget)
+    if (entry.IsMSAARenderTarget)
     {
-        if (entry.needsResolve)
+        if (entry.NeedsResolve)
         {
-            m_D3DPtr->m_Context->ResolveSubresource(entry.resolveTexture.Get(), 0, entry.texture.Get(), 0, DXGI_FORMAT_B8G8R8A8_UNORM);
-            entry.needsResolve = false;
+            m_D3DPtr->m_Context->ResolveSubresource(entry.ResolveTexture.Get(), 0, entry.Texture.Get(), 0, DXGI_FORMAT_B8G8R8A8_UNORM);
+            entry.NeedsResolve = false;
         }
-        m_D3DPtr->m_Context->PSSetShaderResources(textureUnit, 1, entry.resolveSRV.GetAddressOf());
+        m_D3DPtr->m_Context->PSSetShaderResources(textureUnit, 1, entry.ResolveSRV.GetAddressOf());
     }
     else
     {
-        m_D3DPtr->m_Context->PSSetShaderResources(textureUnit, 1, entry.textureSRV.GetAddressOf());
+        m_D3DPtr->m_Context->PSSetShaderResources(textureUnit, 1, entry.TextureSRV.GetAddressOf());
     }
 }
 
@@ -709,12 +722,12 @@ void CustomGPUImpl::BindGeometry(uint32_t geometryId_)
 
     auto& geometry = iter->second;
 
-    UINT stride = geometry.format == ul::VertexBufferFormat::_2f_4ub_2f ? sizeof(ul::Vertex_2f_4ub_2f) : sizeof(ul::Vertex_2f_4ub_2f_2f_28f);
+    UINT stride = geometry.Format == ul::VertexBufferFormat::_2f_4ub_2f ? sizeof(ul::Vertex_2f_4ub_2f) : sizeof(ul::Vertex_2f_4ub_2f_2f_28f);
     UINT offset = 0;
-    m_D3DPtr->m_Context->IASetVertexBuffers(0, 1, geometry.vertexBuffer.GetAddressOf(), &stride, &offset);
-    m_D3DPtr->m_Context->IASetIndexBuffer(geometry.indexBuffer.Get(), DXGI_FORMAT_R32_UINT, 0);
+    m_D3DPtr->m_Context->IASetVertexBuffers(0, 1, geometry.VertexBuffer.GetAddressOf(), &stride, &offset);
+    m_D3DPtr->m_Context->IASetIndexBuffer(geometry.IndexBuffer.Get(), DXGI_FORMAT_R32_UINT, 0);
     m_D3DPtr->m_Context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-    if (geometry.format == ul::VertexBufferFormat::_2f_4ub_2f)
+    if (geometry.Format == ul::VertexBufferFormat::_2f_4ub_2f)
         m_D3DPtr->m_Context->IASetInputLayout(m_VertexShader_FillPath.GetInputLayout());
     else
         m_D3DPtr->m_Context->IASetInputLayout(m_VertexShader_Fill.GetInputLayout());

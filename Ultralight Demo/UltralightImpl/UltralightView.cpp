@@ -290,13 +290,13 @@ bool UltralightView::Resize(uint32_t width, uint32_t height)
 
 			if (FAILED(pDevice->CreateTexture2D(&texDesc, nullptr, &m_TempTexture)))
 			{
-				ErrorHandler::LogCriticalError("Failed to create temporary texture for accelered resized Ultralight View.");
+				ErrorHandler::LogCriticalError("Failed to create temporary texture for accelerated resized Ultralight View.");
 				return false;
 			}
 
 			if (FAILED(pDevice->CreateShaderResourceView(m_TempTexture.Get(), &srvDesc, &m_TempSRV)))
 			{
-				ErrorHandler::LogCriticalError("Failed to create temporary texture shader resource view for accelered resized Ultralight View.");
+				ErrorHandler::LogCriticalError("Failed to create temporary texture shader resource view for accelerated resized Ultralight View.");
 				return false;
 			}
 			pContext->CopyResource(m_TempTexture.Get(), pTexture);

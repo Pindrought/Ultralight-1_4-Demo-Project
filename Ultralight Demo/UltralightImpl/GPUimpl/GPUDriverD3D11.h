@@ -63,5 +63,5 @@ private:
     ComPtr<ID3D11RasterizerState> m_RasterizerState_Default;
     ComPtr<ID3D11RasterizerState> m_RasterizerState_Scissored;
     D3DClass* m_D3DPtr = nullptr;
-    map<uint32_t, uint32_t> m_ViewToTextureIdMap;
+    //map<uint32_t, uint32_t> m_ViewToTextureIdMap;
 };

@@ -1,7 +1,7 @@
 #pragma once
 #include <PCH.h>
 #include "../Engine.h"
-#include "CustomGPUImpl/CustomGPUImpl.h"
+#include "../CustomGPUImpl/CustomGPUImpl.h"
 #include "CustomFileSystem/CustomFileSystem.h"
 
 class DemoCPPTextureInBrowser : public Engine
