@@ -458,6 +458,7 @@ void CustomGPUImpl::DrawGeometry(uint32_t geometryId,
     m_D3DPtr->m_Context->VSSetConstantBuffers(0, 1, m_ConstantBuffer.GetAddressOf());
     m_D3DPtr->m_Context->PSSetConstantBuffers(0, 1, m_ConstantBuffer.GetAddressOf());
     m_D3DPtr->m_Context->DrawIndexed(indexCount, indexOffset, 0);
+
 }
 
 void CustomGPUImpl::ClearRenderBuffer(uint32_t renderBufferId)
@@ -502,27 +503,13 @@ ID3D11Texture2D* CustomGPUImpl::GetTexture(ul::View* view)
     return iter->second.texture.Get();
 }
 
-IGPUDriverD3D11::OldReservedEntries CustomGPUImpl::GetOutstandingReservedIds()
+IGPUDriverD3D11::StoredEntries CustomGPUImpl::GetStoredResourceEntries()
 {
-    OldReservedEntries entries;
-    for (auto& geo : m_GeometryMap)
-    {
-        entries.GeometryIds.insert(geo.first);
-    }
-    for (auto& texture : m_TextureMap)
-    {
-        entries.TextureIds.insert(texture.first);
-    }
-    for (auto& rt : m_RenderTargetMap)
-    {
-        entries.RenderTargetIds.insert(rt.first);
-    }
-    return entries;
+    return StoredEntries();
 }
 
-void CustomGPUImpl::RegisterOldReservedIds(OldReservedEntries& entries)
+void CustomGPUImpl::RegisterStoredResourceEntries(StoredEntries& entries)
 {
-    m_OldReservedEntries = entries;
 }
 
 void CustomGPUImpl::QueueCPPTextureOverwrite(TextureOverwriteData data)

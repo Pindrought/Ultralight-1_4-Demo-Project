@@ -34,8 +34,8 @@ public:
     ID3D11ShaderResourceView* GetShaderResourceView(ul::View* pView) override;
     ID3D11Texture2D* GetTexture(ul::View* pView) override;
 
-    virtual OldReservedEntries GetOutstandingReservedIds();
-    virtual void RegisterOldReservedIds(OldReservedEntries& entries);
+    virtual StoredEntries GetStoredResourceEntries() override;
+    virtual void RegisterStoredResourceEntries(StoredEntries& entries) override;
 
     shared_ptr<IGPUDriverD3D11> m_CurrentGPUDriverImpl = nullptr;
 private:

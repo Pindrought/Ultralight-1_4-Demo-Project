@@ -125,12 +125,14 @@ ID3D11Texture2D* RetargetableGPUDriverD3D11::GetTexture(ul::View* pView)
 	return m_CurrentGPUDriverImpl->GetTexture(pView);
 }
 
-IGPUDriverD3D11::OldReservedEntries RetargetableGPUDriverD3D11::GetOutstandingReservedIds()
+IGPUDriverD3D11::StoredEntries RetargetableGPUDriverD3D11::GetStoredResourceEntries()
 {
-	return m_CurrentGPUDriverImpl->GetOutstandingReservedIds();
+	assert(m_CurrentGPUDriverImpl != nullptr);
+	return m_CurrentGPUDriverImpl->GetStoredResourceEntries();
 }
 
-void RetargetableGPUDriverD3D11::RegisterOldReservedIds(OldReservedEntries& entries)
+void RetargetableGPUDriverD3D11::RegisterStoredResourceEntries(StoredEntries& entries)
 {
-	m_CurrentGPUDriverImpl->RegisterOldReservedIds(entries);
+	assert(m_CurrentGPUDriverImpl != nullptr);
+	m_CurrentGPUDriverImpl->RegisterStoredResourceEntries(entries);
 }

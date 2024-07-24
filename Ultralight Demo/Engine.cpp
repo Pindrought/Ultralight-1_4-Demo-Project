@@ -198,12 +198,12 @@ Engine::~Engine()
 	m_WindowIdToWindowInstanceMap.clear();
 	m_UltralightMgr->Shutdown();
 	/*RetargetableGPUDriverD3D11* pR = (RetargetableGPUDriverD3D11*)m_UltralightMgr->GetGPUDriver();
-	GPUDriverD3D11* pDriver = (GPUDriverD3D11*)pR->m_CurrentGPUDriverImpl.get();
-	for (int i = 0; i < 60; i++)
-	{
-		Sleep(1);
-		RenderFrame();
-	}*/
+	GPUDriverD3D11* pDriver = (GPUDriverD3D11*)pR->m_CurrentGPUDriverImpl.get();*/
+	//for (int i = 0; i < 60; i++)
+	//{
+	//	Sleep(1);
+	//	RenderFrame();
+	//}
 }
 
 void Engine::RenderFrame()

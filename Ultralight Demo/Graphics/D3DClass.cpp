@@ -1,36 +1,48 @@
 #include "PCH.h"
 #include "D3DClass.h"
 
-D3DClass* D3DClass::s_Instance = nullptr;
+shared_ptr<D3DClass> D3DClass::s_Instance = nullptr;
+bool D3DClass::s_Initialized = false;
 
 D3DClass* D3DClass::GetInstance()
 {
-	assert(s_Instance != nullptr);
+	if (s_Instance == nullptr)
+	{
+		return GetInstanceShared().get();
+	}
+	return s_Instance.get();
+}
+
+shared_ptr<D3DClass> D3DClass::GetInstanceShared()
+{
+	if (s_Instance == nullptr)
+	{
+		//Workaround to pass private constructor into make_shared from https://stackoverflow.com/a/25069711
+		struct make_shared_enabler : public D3DClass {};
+
+		s_Instance = make_shared<make_shared_enabler>();
+	}
 	return s_Instance;
 }
 
+
 bool D3DClass::Initialize()
 {
-	if (s_Instance != nullptr)
+	if (s_Initialized == true)
 	{
-		ErrorHandler::LogCriticalError("D3D Class initializated more than once.");
-		return false;
+		return true; //Already initialized
 	}
 
-	s_Instance = this;
 
 	if (!InitializeDeviceAndContext())
 		return false;
 
+	s_Initialized = true;
 	return true;
 }
 
 D3DClass::~D3DClass()
 {
-	if (s_Instance == this)
-	{
-		s_Instance = nullptr;
-	}
 }
 
 bool D3DClass::IsTearingSupported()
@@ -97,3 +109,5 @@ bool D3DClass::InitializeDeviceAndContext()
 
 	return true;
 }
+
+D3DClass::D3DClass() {}

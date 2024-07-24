@@ -65,15 +65,12 @@ public:
     ID3D11ShaderResourceView* GetShaderResourceView(ul::View* pView) override;
     ID3D11Texture2D* GetTexture(ul::View* view) override;
 
-    virtual OldReservedEntries GetOutstandingReservedIds();
-    virtual void RegisterOldReservedIds(OldReservedEntries& entries);
+    virtual StoredEntries GetStoredResourceEntries() override;
+    virtual void RegisterStoredResourceEntries(StoredEntries& entries) override;
 
     void QueueCPPTextureOverwrite(TextureOverwriteData data);
 
 private:
-    uint32_t m_NextTextureId = 1;
-    uint32_t m_NextRenderBufferId = 1;
-    uint32_t m_NextGeometryId = 1;
     std::vector<ul::Command> m_CommandList;
 
 private:

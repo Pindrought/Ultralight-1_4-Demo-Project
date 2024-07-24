@@ -180,10 +180,6 @@ void GPUDriverD3D11::UpdateTexture(uint32_t textureId, ul::RefPtr<ul::Bitmap> bi
     auto iter = m_TextureMap.find(textureId);
     if (iter == m_TextureMap.end())
     {
-        if (m_OldReservedEntries.TextureIds.find(textureId) != m_OldReservedEntries.TextureIds.end())
-        {
-            return;
-        }
         FatalError("GPUDriverD3D11::UpdateTexture, texture id doesn't exist.");
     }
 
@@ -229,11 +225,6 @@ void GPUDriverD3D11::DestroyTexture(uint32_t textureId)
     }
     else
     {
-        if (m_OldReservedEntries.TextureIds.find(textureId) != m_OldReservedEntries.TextureIds.end())
-        {
-            m_OldReservedEntries.TextureIds.erase(textureId);
-            return;
-        }
         FatalError("GPUDriverD3D11::DestroyTexture");
     }
 }
@@ -283,11 +274,6 @@ void GPUDriverD3D11::DestroyRenderBuffer(uint32_t renderBufferId)
     }
     else
     {
-        if (m_OldReservedEntries.RenderTargetIds.find(renderBufferId) != m_OldReservedEntries.RenderTargetIds.end())
-        {
-            m_OldReservedEntries.RenderTargetIds.erase(renderBufferId);
-            return;
-        }
         FatalError("GPUDriverD3D11::DestroyRenderBuffer");
     }
 }
@@ -342,10 +328,6 @@ void GPUDriverD3D11::UpdateGeometry(uint32_t geometryId,
     auto iter = m_GeometryMap.find(geometryId);
     if (iter == m_GeometryMap.end())
     {
-        if (m_OldReservedEntries.GeometryIds.find(geometryId) != m_OldReservedEntries.GeometryIds.end())
-        {
-            return;
-        }
         FatalError("GPUDriverD3D11::UpdateGeometry, geometry id doesn't exist.");
 
     }
@@ -383,11 +365,6 @@ void GPUDriverD3D11::DestroyGeometry(uint32_t geometryId)
     }
     else
     {
-        if (m_OldReservedEntries.GeometryIds.find(geometryId) != m_OldReservedEntries.GeometryIds.end())
-        {
-            m_OldReservedEntries.GeometryIds.erase(geometryId);
-            return;
-        }
         FatalError("GPUDriverD3D11::DestroyRenderBuffer");
     }
 }
@@ -495,27 +472,20 @@ ID3D11Texture2D* GPUDriverD3D11::GetTexture(ul::View* view)
     return iter->second.texture.Get();
 }
 
-IGPUDriverD3D11::OldReservedEntries GPUDriverD3D11::GetOutstandingReservedIds()
+IGPUDriverD3D11::StoredEntries GPUDriverD3D11::GetStoredResourceEntries()
 {
-    OldReservedEntries entries = m_OldReservedEntries;
-    for (auto& geo : m_GeometryMap)
-    {
-        entries.GeometryIds.insert(geo.first);
-    }
-    for (auto& texture : m_TextureMap)
-    {
-        entries.TextureIds.insert(texture.first);
-    }
-    for (auto& rt : m_RenderTargetMap)
-    {
-        entries.RenderTargetIds.insert(rt.first);
-    }
+    IGPUDriverD3D11::StoredEntries entries;
+    entries.Geometries = m_GeometryMap;
+    entries.RenderTargets = m_RenderTargetMap;
+    entries.TextureEntries = m_TextureMap;
     return entries;
 }
 
-void GPUDriverD3D11::RegisterOldReservedIds(OldReservedEntries& entries)
+void GPUDriverD3D11::RegisterStoredResourceEntries(StoredEntries& entries)
 {
-    m_OldReservedEntries = entries;
+    m_GeometryMap = entries.Geometries;
+    m_RenderTargetMap = entries.RenderTargets;
+    m_TextureMap = entries.TextureEntries;
 }
 
 void GPUDriverD3D11::LoadShaders()
@@ -647,10 +617,6 @@ void GPUDriverD3D11::BindTexture(uint8_t textureUnit, uint32_t textureId)
     auto iter = m_TextureMap.find(textureId);
     if (iter == m_TextureMap.end())
     {
-        if (m_OldReservedEntries.TextureIds.find(textureId) != m_OldReservedEntries.TextureIds.end())
-        {
-            return;
-        }
         FatalError("GPUDriverD3D11::BindTexture, texture id doesn't exist.");
     }
 
@@ -713,10 +679,6 @@ void GPUDriverD3D11::BindGeometry(uint32_t geometryId)
     auto iter = m_GeometryMap.find(geometryId);
     if (iter == m_GeometryMap.end())
     {
-        if (m_OldReservedEntries.GeometryIds.find(geometryId) != m_OldReservedEntries.GeometryIds.end())
-        {
-            return;
-        }
         FatalError("GPUDriverD3D11::BindGeometry geometry id does not exist in geometry map.");
     }
 

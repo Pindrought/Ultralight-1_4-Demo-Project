@@ -5,30 +5,6 @@
 #include "../../Graphics/Shader/VertexShader.h"
 #include "../../Graphics/Buffer/ConstantBuffer.h"
 
-struct GeometryEntry
-{
-    ul::VertexBufferFormat format;
-    ComPtr<ID3D11Buffer> vertexBuffer;
-    ComPtr<ID3D11Buffer> indexBuffer;
-};
-
-struct TextureEntry
-{
-    ComPtr<ID3D11Texture2D> texture;
-    ComPtr<ID3D11ShaderResourceView> textureSRV;
-    bool isMSAARenderTarget = false;
-    bool needsResolve = false;
-    ComPtr<ID3D11Texture2D> resolveTexture;
-    ComPtr<ID3D11ShaderResourceView> resolveSRV;
-    bool isRenderBuffer = false;
-};
-
-struct RenderTargetEntry
-{
-    ComPtr<ID3D11RenderTargetView> renderTargetView;
-    uint32_t renderTargetTextureId;
-};
-
 class GPUDriverD3D11 : public IGPUDriverD3D11
 {
 public:
@@ -56,12 +32,9 @@ public:
     ID3D11ShaderResourceView* GetShaderResourceView(ul::View* pView) override;
     ID3D11Texture2D* GetTexture(ul::View* view) override;
 
-    virtual OldReservedEntries GetOutstandingReservedIds();
-    virtual void RegisterOldReservedIds(OldReservedEntries& entries);
+    virtual StoredEntries GetStoredResourceEntries() override;
+    virtual void RegisterStoredResourceEntries(StoredEntries& entries) override;
 private:
-    uint32_t m_NextTextureId = 1;
-    uint32_t m_NextRenderBufferId = 1;
-    uint32_t m_NextGeometryId = 1;
     std::vector<ul::Command> m_CommandList;
 
 private:

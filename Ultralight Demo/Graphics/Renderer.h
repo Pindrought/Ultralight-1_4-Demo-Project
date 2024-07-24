@@ -20,7 +20,7 @@ public:
 private:
 	bool BuildQuadMeshForUltralightView();
 	static Renderer* s_Instance; //Only ever one renderer instance
-	D3DClass m_D3D;
+	shared_ptr<D3DClass> m_D3D;
 	shared_ptr<PipelineState> m_ActivePipelineState = nullptr;
 	unordered_map<string, shared_ptr<PipelineState>> m_PipelineStatesMap;
 	ConstantBuffer<ConstantBufferType::CB_PerFrameData_2D> m_CB_PerFrameData_2D;

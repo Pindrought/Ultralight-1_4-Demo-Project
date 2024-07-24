@@ -23,7 +23,9 @@ bool Renderer::Initialize()
 
 	s_Instance = this;
 
-	if (!m_D3D.Initialize())
+	m_D3D = D3DClass::GetInstanceShared();
+
+	if (!m_D3D->Initialize())
 	{
 		ErrorHandler::LogCriticalError("Failed to initialize DirectX11.");
 		return false;
@@ -64,13 +66,13 @@ bool Renderer::Initialize()
 
 D3DClass* Renderer::GetD3D()
 {
-	return &m_D3D;
+	return m_D3D.get();
 }
 
 void Renderer::ClearRenderTarget(RenderTargetContainer* pRenderTargetContainer)
 {
 	ActivatePipelineState(nullptr);
-	ID3D11DeviceContext* pContext = m_D3D.m_Context.Get();
+	ID3D11DeviceContext* pContext = m_D3D->m_Context.Get();
 	pContext->ClearState();
 	pContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY::D3D10_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 	pContext->RSSetViewports(1, &pRenderTargetContainer->GetViewport());
@@ -104,7 +106,7 @@ void Renderer::ClearRenderTarget(RenderTargetContainer* pRenderTargetContainer)
 
 void Renderer::ActivatePipelineState(std::shared_ptr<PipelineState> pipelineState)
 {
-	ID3D11DeviceContext* pContext = m_D3D.m_Context.Get();
+	ID3D11DeviceContext* pContext = m_D3D->m_Context.Get();
 	if (m_ActivePipelineState == pipelineState)
 	{
 		return;
@@ -215,7 +217,7 @@ void Renderer::RenderUltralightView(UltralightView* pUltralightView)
 		ErrorHandler::LogCriticalError("Failed to update the per draw data 2d constant buffer.");
 	}
 
-	ID3D11DeviceContext* pContext = m_D3D.m_Context.Get();
+	ID3D11DeviceContext* pContext = m_D3D->m_Context.Get();
 
 	ID3D11ShaderResourceView* pResourceView = pUltralightView->GetTextureSRV();
 	pContext->PSSetShaderResources(0, 1, &pResourceView);
@@ -226,6 +228,7 @@ void Renderer::RenderUltralightView(UltralightView* pUltralightView)
 	const uint32_t offset = 0;
 	pContext->IASetVertexBuffers(0, 1, &pVertexBuffer, &stride, &offset);
 	pContext->DrawIndexed(m_QuadMeshForUltralightView.GetIndexCount(), 0, 0);
+
 }
 
 Renderer::~Renderer()

@@ -1,6 +1,30 @@
 #pragma once
 #include <PCH.h>
 
+struct GeometryEntry
+{
+    ul::VertexBufferFormat format;
+    ComPtr<ID3D11Buffer> vertexBuffer;
+    ComPtr<ID3D11Buffer> indexBuffer;
+};
+
+struct TextureEntry
+{
+    ComPtr<ID3D11Texture2D> texture;
+    ComPtr<ID3D11ShaderResourceView> textureSRV;
+    bool isMSAARenderTarget = false;
+    bool needsResolve = false;
+    ComPtr<ID3D11Texture2D> resolveTexture;
+    ComPtr<ID3D11ShaderResourceView> resolveSRV;
+    bool isRenderBuffer = false;
+};
+
+struct RenderTargetEntry
+{
+    ComPtr<ID3D11RenderTargetView> renderTargetView;
+    uint32_t renderTargetTextureId;
+};
+
 class IGPUDriverD3D11 : public ul::GPUDriver
 {
 public:
@@ -36,16 +60,12 @@ public:
     //Even though the gpu driver was technically a completely different instance and those assets had already actually been deallocated
     //Because of this, i'm storing the id's it thinks are still out there so I can validate against them for error checking when destroying a texture/renderarget/geometry that doesn't exist
     //I hate this solution and if I didn't need the option of switching between different gpu driver impl's during runtime I wouldn't have done this
-    struct OldReservedEntries {
-        std::set<uint32_t> GeometryIds;
-        std::set<uint32_t> RenderTargetIds;
-        std::set<uint32_t> TextureIds;
+    struct StoredEntries {
+        std::map<uint32_t, GeometryEntry> Geometries;
+        std::map<uint32_t, RenderTargetEntry> RenderTargets;
+        std::map<uint32_t, TextureEntry> TextureEntries;
     };
 
-
-    virtual OldReservedEntries GetOutstandingReservedIds() = 0;
-    virtual void RegisterOldReservedIds(OldReservedEntries& entries) = 0;
-
-protected:
-    OldReservedEntries m_OldReservedEntries;
+    virtual StoredEntries GetStoredResourceEntries() = 0;
+    virtual void RegisterStoredResourceEntries(StoredEntries& entries) = 0;
 };
