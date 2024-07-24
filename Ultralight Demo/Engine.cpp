@@ -234,13 +234,15 @@ void Engine::RenderFrame()
 			continue; //Do not render render targets if they are not ready to be rendered. This only happens when limiting refresh rate at render target level.
 		}
 
-		m_Renderer.ClearRenderTarget(pRenderTargetContainer);
 	}
 
 	OnPreRenderULViews(); //for if we want to draw anything before the UL views have been rendered
 
 	for (auto pWindow : windowsFlaggedForRender) //Render each of our ultralight views to each window
 	{
+		RenderTargetContainer* pRenderTargetContainer = pWindow->GetRenderTargetContainer();
+		m_Renderer.ClearRenderTarget(pRenderTargetContainer);
+
 		for (shared_ptr<UltralightView> pUltralightView : pWindow->GetSortedUltralightViews())
 		{
 			m_Renderer.RenderUltralightView(pUltralightView.get());
