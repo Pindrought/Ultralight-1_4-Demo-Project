@@ -65,6 +65,9 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance,
 			case DemoSelector::DemoId::DemoTransparent:
 				demoEngine = make_shared<DemoTransparent>();
 				break;
+			case DemoSelector::DemoId::DemoOverlayedCPPTexture:
+				demoEngine = make_shared<DemoOverlayedCPPTextureOnDiv>();
+				break;
 		}
 
 		if (demoEngine == nullptr)

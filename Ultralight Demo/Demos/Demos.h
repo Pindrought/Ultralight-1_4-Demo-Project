@@ -9,4 +9,6 @@
 //#include "DemoCPPTextureInBrowser/DemoCPPTextureInBrowser.h"
 #include "DemoOpenFileDialog/DemoOpenFileDialog.h"
 #include "DemoJSCppCommunication/DemoJSCPPCommunication.h"
+#include "DemoOverlayedCPPTextureOnDiv/DemoOverlayedCPPTextureOnDiv.h"
+
 #include "DemoSelector/DemoSelector.h"

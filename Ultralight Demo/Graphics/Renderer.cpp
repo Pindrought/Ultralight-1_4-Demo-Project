@@ -69,6 +69,13 @@ D3DClass* Renderer::GetD3D()
 	return m_D3D.get();
 }
 
+void Renderer::ActivateRenderTarget(RenderTargetContainer* pRenderTargetContainer)
+{
+	m_D3D->m_Context->OMSetRenderTargets(1, 
+										 pRenderTargetContainer->GetRenderTargetViewAddressOf(), 
+										 pRenderTargetContainer->GetDepthStencilView());
+}
+
 void Renderer::ClearRenderTarget(RenderTargetContainer* pRenderTargetContainer)
 {
 	ActivatePipelineState(nullptr);
@@ -228,7 +235,36 @@ void Renderer::RenderUltralightView(UltralightView* pUltralightView)
 	const uint32_t offset = 0;
 	pContext->IASetVertexBuffers(0, 1, &pVertexBuffer, &stride, &offset);
 	pContext->DrawIndexed(m_QuadMeshForUltralightView.GetIndexCount(), 0, 0);
+}
 
+void Renderer::DrawSprite(Texture* pTexture, float x, float y, float z, float width, float height)
+{
+	std::shared_ptr<PipelineState> render2D = GetPipelineState("2D");
+	assert(render2D != nullptr);
+	ActivatePipelineState(render2D);
+
+	DirectX::XMMATRIX modelMatrix = DirectX::XMMatrixScaling(width, height, 1.0f) *
+									DirectX::XMMatrixTranslation(x, y, z);
+	modelMatrix = DirectX::XMMatrixTranspose(modelMatrix);
+	DirectX::XMStoreFloat4x4(&m_CB_PerDrawData_2D.m_Data.ModelMatrix, modelMatrix);
+
+	if (!m_CB_PerDrawData_2D.ApplyChanges())
+	{
+		ErrorHandler::LogCriticalError("Failed to update the per draw data 2d constant buffer.");
+	}
+
+	ID3D11DeviceContext* pContext = m_D3D->m_Context.Get();
+
+	ID3D11ShaderResourceView* pResourceView = pTexture->GetTextureResourceView();
+	pContext->PSSetShaderResources(0, 1, &pResourceView);
+
+	//Just going to reuse the same quad used for Ultralight views here since it's same setup
+	pContext->IASetIndexBuffer(m_QuadMeshForUltralightView.GetIndexBuffer(), DXGI_FORMAT::DXGI_FORMAT_R32_UINT, 0);
+	ID3D11Buffer* pVertexBuffer = m_QuadMeshForUltralightView.GetVertexBuffer();
+	const uint32_t stride = m_QuadMeshForUltralightView.GetStride();
+	const uint32_t offset = 0;
+	pContext->IASetVertexBuffers(0, 1, &pVertexBuffer, &stride, &offset);
+	pContext->DrawIndexed(m_QuadMeshForUltralightView.GetIndexCount(), 0, 0);
 }
 
 Renderer::~Renderer()

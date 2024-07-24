@@ -1,17 +1,14 @@
 #include "PCH.h"
-#include "DemoSelector.h"
+#include "DemoOverlayedCPPTextureOnDiv.h"
 #include "../Misc/CursorManager.h"
 
-bool DemoSelector::Startup()
+bool DemoOverlayedCPPTextureOnDiv::Startup()
 {
-	int screenWidth = GetSystemMetrics(SM_CXSCREEN);
-	int screenHeight = GetSystemMetrics(SM_CYSCREEN);
-
 	WindowCreationParameters windowParms;
-	windowParms.Width = screenWidth - 100;
-	windowParms.Height = screenHeight - 100;
+	windowParms.Width = 800;
+	windowParms.Height = 600;
 	windowParms.Style = WindowStyle::Resizable | WindowStyle::ExitButton | WindowStyle::MaximizeAvailable;
-	windowParms.Title = "Demo Selector";
+	windowParms.Title = "Overlayed CPP Texture Example";
 	m_PrimaryWindow = SpawnWindow(windowParms);
 	if (m_PrimaryWindow == nullptr)
 	{
@@ -27,11 +24,17 @@ bool DemoSelector::Startup()
 	parms.IsTransparent = true;
 
 	shared_ptr<UltralightView> pView = m_UltralightMgr->CreateUltralightView(parms);
-	pView->LoadURL("file:///Samples/DemoSelector/DemoSelector.html");
+	pView->LoadURL("file:///Samples/OverlayedCPPTextureOnDiv/OverlayedCPPTextureOnDiv.html");
 	m_UltralightMgr->SetViewToWindow(pView->GetId(), m_PrimaryWindow->GetId());
+
+	m_CPPTexture = std::make_shared<Texture>();
+	if (!m_CPPTexture->Initialize("AIBowser.png"))
+	{
+		return false;
+	}
 }
 
-bool DemoSelector::Tick()
+bool DemoOverlayedCPPTextureOnDiv::Tick()
 {
 	//Process Input Events
 	auto& keyboard = m_InputController.m_Keyboard;
@@ -73,58 +76,28 @@ bool DemoSelector::Tick()
 	return true;
 }
 
-EZJSParm DemoSelector::OnEventCallbackFromUltralight(int32_t viewId, string eventName, vector<EZJSParm> parameters)
+EZJSParm DemoOverlayedCPPTextureOnDiv::OnEventCallbackFromUltralight(int32_t viewId, string eventName, vector<EZJSParm> parameters)
 {
-	if (eventName == "SelectDemo")
+	if (eventName == "UpdateDivRect")
 	{
-		assert(parameters.size() == 1);
-		assert(parameters[0].GetType() == EZJSParm::String);
-		string demoName = parameters[0].AsString();
-		if (demoName == "DemoBasic")
-		{
-			m_SelectedDemo = DemoId::DemoBasic;
-		}
-		if (demoName == "DemoBorderlessResizable")
-		{
-			m_SelectedDemo = DemoId::DemoBorderlessResizable;
-		}
-		if (demoName == "DemoBorderlessResizableMovable")
-		{
-			m_SelectedDemo = DemoId::DemoBorderlessResizableMovable;
-		}
-		if (demoName == "DemoCPPTextureInBrowser")
-		{
-			m_SelectedDemo = DemoId::DemoCPPTextureInBrowser;
-		}
-		if (demoName == "DemoInspector")
-		{
-			m_SelectedDemo = DemoId::DemoInspector;
-		}
-		if (demoName == "DemoJSCPPCommunication")
-		{
-			m_SelectedDemo = DemoId::DemoJSCPPCommunication;
-		}
-		if (demoName == "DemoOpenFileDialog")
-		{
-			m_SelectedDemo = DemoId::DemoOpenFileDialog;
-		}
-		if (demoName == "DemoTransparent")
-		{
-			m_SelectedDemo = DemoId::DemoTransparent;
-		}
-		if (demoName == "DemoOverlayedCPPTexture")
-		{
-			m_SelectedDemo = DemoId::DemoOverlayedCPPTexture;
-		}
-		if (m_SelectedDemo != DemoId::None)
-		{
-			m_PrimaryWindow->Close();
-		}
+		assert(parameters.size() == 4);
+		assert(parameters[0].GetType() == EZJSParm::Number);
+		assert(parameters[1].GetType() == EZJSParm::Number);
+		assert(parameters[2].GetType() == EZJSParm::Number);
+		assert(parameters[3].GetType() == EZJSParm::Number);
+		float x = parameters[0].AsDouble();
+		float y = parameters[1].AsDouble();
+		float width = parameters[2].AsDouble();
+		float height = parameters[3].AsDouble();
+		m_DivData.X = x;
+		m_DivData.Y = y;
+		m_DivData.Width = width;
+		m_DivData.Height = height;
 	}
 	return EZJSParm();
 }
 
-void DemoSelector::OnWindowDestroyStartCallback(int32_t windowId)
+void DemoOverlayedCPPTextureOnDiv::OnWindowDestroyStartCallback(int32_t windowId)
 {
 	Window* pWindow = GetWindowFromId(windowId);
 	auto pViews = pWindow->GetSortedUltralightViews();
@@ -134,7 +107,7 @@ void DemoSelector::OnWindowDestroyStartCallback(int32_t windowId)
 	}
 }
 
-void DemoSelector::OnWindowDestroyEndCallback(int32_t windowId)
+void DemoOverlayedCPPTextureOnDiv::OnWindowDestroyEndCallback(int32_t windowId)
 {
 	if (m_WindowIdToWindowInstanceMap.size() == 0)
 	{
@@ -142,7 +115,18 @@ void DemoSelector::OnWindowDestroyEndCallback(int32_t windowId)
 	}
 }
 
-void DemoSelector::OnWindowResizeCallback(Window* pWindow)
+void DemoOverlayedCPPTextureOnDiv::OnWindowResizeCallback(Window* pWindow)
 {
+}
+
+void DemoOverlayedCPPTextureOnDiv::OnPostRenderULViews()
+{
+	RenderTargetContainer* pRenderTarget = m_PrimaryWindow->GetRenderTargetContainer();
+	m_Renderer.DrawSprite(m_CPPTexture.get(),
+						  m_DivData.X, 
+						  m_DivData.Y,
+						  0, //Z
+						  m_DivData.Width, 
+						  m_DivData.Height);
 }
 

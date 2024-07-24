@@ -13,7 +13,6 @@ public:
 	virtual EZJSParm OnEventCallbackFromUltralight(int32_t viewId, string eventName, vector<EZJSParm> parameters);
 	void OnWindowDestroyStartCallback(int32_t windowId) override;
 	void OnWindowDestroyEndCallback(int32_t windowId) override;
-
 	void OnWindowResizeCallback(Window* pWindow) override;
 private:
 	map<string, shared_ptr<Texture>> m_CPPTexturesForBrowserMap;

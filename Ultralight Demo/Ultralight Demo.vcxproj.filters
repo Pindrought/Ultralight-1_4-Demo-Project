@@ -183,6 +183,9 @@
     <ClCompile Include="UltralightImpl\GPUimpl\RetargetableGPUDriverD3D11.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Demos\DemoOverlayedCPPTextureOnDiv\DemoOverlayedCPPTextureOnDiv.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="PrecompiledHeader\ErrorHandler.h">
@@ -369,6 +372,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="UltralightImpl\GPUimpl\RetargetableGPUDriverD3D11.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Demos\DemoOverlayedCPPTextureOnDiv\DemoOverlayedCPPTextureOnDiv.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

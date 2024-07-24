@@ -211,6 +211,8 @@ void Engine::RenderFrame()
 	m_UltralightMgr->UpdateViews();
 
 	float deltaTime = 0;
+	vector<Window*> windowsFlaggedForRender;
+
 	for (auto& windowPair : m_WindowIdToWindowInstanceMap)
 	{
 		int32_t windowId = windowPair.first;
@@ -225,6 +227,7 @@ void Engine::RenderFrame()
 		if (pRenderTargetContainer->IsReadyForRender())
 		{
 			pRenderTargetContainer->ResetReadyForRender();
+			windowsFlaggedForRender.push_back(pWindow.get());
 		}
 		else
 		{
@@ -232,14 +235,24 @@ void Engine::RenderFrame()
 		}
 
 		m_Renderer.ClearRenderTarget(pRenderTargetContainer);
+	}
 
-		ID3D11DeviceContext* pContext = m_Renderer.GetD3D()->m_Context.Get();
+	OnPreRenderULViews(); //for if we want to draw anything before the UL views have been rendered
 
+	for (auto pWindow : windowsFlaggedForRender) //Render each of our ultralight views to each window
+	{
 		for (shared_ptr<UltralightView> pUltralightView : pWindow->GetSortedUltralightViews())
 		{
 			m_Renderer.RenderUltralightView(pUltralightView.get());
 		}
+	}
 
+	OnPostRenderULViews(); //for if we want to draw anything after the UL views have been rendered
+
+	//Present each window's render target
+	for (auto pWindow : windowsFlaggedForRender)
+	{
+		RenderTargetContainer* pRenderTargetContainer = pWindow->GetRenderTargetContainer();
 		pRenderTargetContainer->ResolveIfNecessary();
 
 		auto pSwapChain = pWindow->GetSwapChainPtr();
@@ -261,4 +274,12 @@ void Engine::RenderFrame()
 	}
 
 	m_UltralightMgr->RefreshViewDisplaysForAnimations();
+}
+
+void Engine::OnPreRenderULViews()
+{
+}
+
+void Engine::OnPostRenderULViews()
+{
 }

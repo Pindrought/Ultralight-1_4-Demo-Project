@@ -34,6 +34,8 @@ public:
 	bool CleanupWindow(int32_t windowId);
 	Window* GetWindowFromId(int32_t windowId);
 	void RenderFrame();
+	virtual void OnPreRenderULViews();
+	virtual void OnPostRenderULViews();
 	~Engine();
 protected:
 	static Engine* s_Instance; //There will only ever be one engine instance

@@ -11,11 +11,13 @@ public:
 	static Renderer* GetInstance();
 	bool Initialize();
 	D3DClass* GetD3D();
+	void ActivateRenderTarget(RenderTargetContainer* pRenderTargetContainer);
 	void ClearRenderTarget(RenderTargetContainer* pRenderTargetContainer);
 	void ActivatePipelineState(shared_ptr<PipelineState> pipelineState);
 	shared_ptr<PipelineState> GetPipelineState(string name);
 	void RegisterPipelineState(std::shared_ptr<PipelineState> pipelineState);
 	void RenderUltralightView(UltralightView* pUltralightView);
+	void DrawSprite(Texture* pTexture, float x, float y, float z, float width, float height);
 	~Renderer();
 private:
 	bool BuildQuadMeshForUltralightView();

@@ -72,6 +72,7 @@ class Renderer;
 class RenderTarget;
 class RenderTargetContainer;
 class ScrollEvent;
+class Texture;
 class UltralightManager;
 class UltralightView;
 class Window;

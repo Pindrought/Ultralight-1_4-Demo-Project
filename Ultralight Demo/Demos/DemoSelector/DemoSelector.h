@@ -20,7 +20,8 @@ public:
 		DemoInspector,
 		DemoJSCPPCommunication,
 		DemoOpenFileDialog,
-		DemoTransparent
+		DemoTransparent,
+		DemoOverlayedCPPTexture
 	};
 	DemoId m_SelectedDemo = DemoId::None;
 	shared_ptr<Window> m_PrimaryWindow = nullptr;
