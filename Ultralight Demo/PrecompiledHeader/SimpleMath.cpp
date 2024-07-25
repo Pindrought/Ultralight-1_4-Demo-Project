@@ -32,10 +32,10 @@ namespace DirectX
         const Vector3 Vector3::UnitZ = { 0.f, 0.f, 1.f };
         const Vector3 Vector3::Up = { 0.f, 1.f, 0.f };
         const Vector3 Vector3::Down = { 0.f, -1.f, 0.f };
-        const Vector3 Vector3::Right = { -1.f, 0.f, 0.f };
-        const Vector3 Vector3::Left = { 1.f, 0.f, 0.f };
-        const Vector3 Vector3::Forward = { 0.f, 0.f, 1.f };
-        const Vector3 Vector3::Backward = { 0.f, 0.f, -1.f };
+        const Vector3 Vector3::Right = { 1.f, 0.f, 0.f };
+        const Vector3 Vector3::Left = { -1.f, 0.f, 0.f };
+        const Vector3 Vector3::Forward = { 0.f, 0.f, -1.f };
+        const Vector3 Vector3::Backward = { 0.f, 0.f, 1.f };
 
         const Vector4 Vector4::Zero = { 0.f, 0.f, 0.f, 0.f };
         const Vector4 Vector4::One = { 1.f, 1.f, 1.f, 1.f };
@@ -56,42 +56,11 @@ namespace DirectX
 using namespace DirectX;
 using namespace DirectX::SimpleMath;
 
-bool Vector3::IsNearZero(float inMaxDistSq) noexcept
-{
-    return LengthSquared() <= inMaxDistSq;
-}
-
-float Plane::SignedDistance(Vector3 p) noexcept
-{
-    return (x * p.x + y * p.y + z * p.z + w);
-}
-
 /****************************************************************************
  *
  * Quaternion
  *
  ****************************************************************************/
-
-Quaternion Quaternion::FromAVecToBVec(Vector3 a, Vector3 b) noexcept
-{
-    // It is important that the inputs are of equal length when
-    // calculating the half-way vector.
-    auto u = a;
-    u.Normalize();
-    auto v = b;
-    v.Normalize();
-    auto xyz = u.Cross(v);
-
-    Quaternion q;
-    q.x = xyz.x;
-    q.y = xyz.y;
-    q.z = xyz.z;
-    q.w = 1 + u.Dot(v);
-
-    q.Normalize();
-
-    return q;
-}
 
 void Quaternion::RotateTowards(const Quaternion& target, float maxAngle, Quaternion& result) const noexcept
 {

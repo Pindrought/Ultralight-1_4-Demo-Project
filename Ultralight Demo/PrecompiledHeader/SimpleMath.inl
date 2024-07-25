@@ -3313,13 +3313,13 @@ inline float Quaternion::Angle(const Quaternion& q1, const Quaternion& q2) noexc
  *
  ****************************************************************************/
 
-inline SMColor::SMColor(const DirectX::PackedVector::XMCOLOR& Packed) noexcept
+inline Color::Color(const DirectX::PackedVector::XMCOLOR& Packed) noexcept
 {
     using namespace DirectX;
     XMStoreFloat4(this, PackedVector::XMLoadColor(&Packed));
 }
 
-inline SMColor::SMColor(const DirectX::PackedVector::XMUBYTEN4& Packed) noexcept
+inline Color::Color(const DirectX::PackedVector::XMUBYTEN4& Packed) noexcept
 {
     using namespace DirectX;
     XMStoreFloat4(this, PackedVector::XMLoadUByteN4(&Packed));
@@ -3328,7 +3328,7 @@ inline SMColor::SMColor(const DirectX::PackedVector::XMUBYTEN4& Packed) noexcept
 //------------------------------------------------------------------------------
 // Comparision operators
 //------------------------------------------------------------------------------
-inline bool SMColor::operator == (const SMColor& c) const noexcept
+inline bool Color::operator == (const Color& c) const noexcept
 {
     using namespace DirectX;
     const XMVECTOR c1 = XMLoadFloat4(this);
@@ -3336,7 +3336,7 @@ inline bool SMColor::operator == (const SMColor& c) const noexcept
     return XMColorEqual(c1, c2);
 }
 
-inline bool SMColor::operator != (const SMColor& c) const noexcept
+inline bool Color::operator != (const Color& c) const noexcept
 {
     using namespace DirectX;
     const XMVECTOR c1 = XMLoadFloat4(this);
@@ -3348,21 +3348,21 @@ inline bool SMColor::operator != (const SMColor& c) const noexcept
 // Assignment operators
 //------------------------------------------------------------------------------
 
-inline SMColor& SMColor::operator= (const DirectX::PackedVector::XMCOLOR& Packed) noexcept
+inline Color& Color::operator= (const DirectX::PackedVector::XMCOLOR& Packed) noexcept
 {
     using namespace DirectX;
     XMStoreFloat4(this, PackedVector::XMLoadColor(&Packed));
     return *this;
 }
 
-inline SMColor& SMColor::operator= (const DirectX::PackedVector::XMUBYTEN4& Packed) noexcept
+inline Color& Color::operator= (const DirectX::PackedVector::XMUBYTEN4& Packed) noexcept
 {
     using namespace DirectX;
     XMStoreFloat4(this, PackedVector::XMLoadUByteN4(&Packed));
     return *this;
 }
 
-inline SMColor& SMColor::operator+= (const SMColor& c) noexcept
+inline Color& Color::operator+= (const Color& c) noexcept
 {
     using namespace DirectX;
     const XMVECTOR c1 = XMLoadFloat4(this);
@@ -3371,7 +3371,7 @@ inline SMColor& SMColor::operator+= (const SMColor& c) noexcept
     return *this;
 }
 
-inline SMColor& SMColor::operator-= (const SMColor& c) noexcept
+inline Color& Color::operator-= (const Color& c) noexcept
 {
     using namespace DirectX;
     const XMVECTOR c1 = XMLoadFloat4(this);
@@ -3380,7 +3380,7 @@ inline SMColor& SMColor::operator-= (const SMColor& c) noexcept
     return *this;
 }
 
-inline SMColor& SMColor::operator*= (const SMColor& c) noexcept
+inline Color& Color::operator*= (const Color& c) noexcept
 {
     using namespace DirectX;
     const XMVECTOR c1 = XMLoadFloat4(this);
@@ -3389,7 +3389,7 @@ inline SMColor& SMColor::operator*= (const SMColor& c) noexcept
     return *this;
 }
 
-inline SMColor& SMColor::operator*= (float S) noexcept
+inline Color& Color::operator*= (float S) noexcept
 {
     using namespace DirectX;
     const XMVECTOR c = XMLoadFloat4(this);
@@ -3397,7 +3397,7 @@ inline SMColor& SMColor::operator*= (float S) noexcept
     return *this;
 }
 
-inline SMColor& SMColor::operator/= (const SMColor& c) noexcept
+inline Color& Color::operator/= (const Color& c) noexcept
 {
     using namespace DirectX;
     const XMVECTOR c1 = XMLoadFloat4(this);
@@ -3410,11 +3410,11 @@ inline SMColor& SMColor::operator/= (const SMColor& c) noexcept
 // Urnary operators
 //------------------------------------------------------------------------------
 
-inline SMColor SMColor::operator- () const noexcept
+inline Color Color::operator- () const noexcept
 {
     using namespace DirectX;
     const XMVECTOR c = XMLoadFloat4(this);
-    SMColor R;
+    Color R;
     XMStoreFloat4(&R, XMVectorNegate(c));
     return R;
 }
@@ -3423,60 +3423,60 @@ inline SMColor SMColor::operator- () const noexcept
 // Binary operators
 //------------------------------------------------------------------------------
 
-inline SMColor operator+ (const SMColor& C1, const SMColor& C2) noexcept
+inline Color operator+ (const Color& C1, const Color& C2) noexcept
 {
     using namespace DirectX;
     const XMVECTOR c1 = XMLoadFloat4(&C1);
     const XMVECTOR c2 = XMLoadFloat4(&C2);
-    SMColor R;
+    Color R;
     XMStoreFloat4(&R, XMVectorAdd(c1, c2));
     return R;
 }
 
-inline SMColor operator- (const SMColor& C1, const SMColor& C2) noexcept
+inline Color operator- (const Color& C1, const Color& C2) noexcept
 {
     using namespace DirectX;
     const XMVECTOR c1 = XMLoadFloat4(&C1);
     const XMVECTOR c2 = XMLoadFloat4(&C2);
-    SMColor R;
+    Color R;
     XMStoreFloat4(&R, XMVectorSubtract(c1, c2));
     return R;
 }
 
-inline SMColor operator* (const SMColor& C1, const SMColor& C2) noexcept
+inline Color operator* (const Color& C1, const Color& C2) noexcept
 {
     using namespace DirectX;
     const XMVECTOR c1 = XMLoadFloat4(&C1);
     const XMVECTOR c2 = XMLoadFloat4(&C2);
-    SMColor R;
+    Color R;
     XMStoreFloat4(&R, XMVectorMultiply(c1, c2));
     return R;
 }
 
-inline SMColor operator* (const SMColor& C, float S) noexcept
+inline Color operator* (const Color& C, float S) noexcept
 {
     using namespace DirectX;
     const XMVECTOR c = XMLoadFloat4(&C);
-    SMColor R;
+    Color R;
     XMStoreFloat4(&R, XMVectorScale(c, S));
     return R;
 }
 
-inline SMColor operator/ (const SMColor& C1, const SMColor& C2) noexcept
+inline Color operator/ (const Color& C1, const Color& C2) noexcept
 {
     using namespace DirectX;
     const XMVECTOR c1 = XMLoadFloat4(&C1);
     const XMVECTOR c2 = XMLoadFloat4(&C2);
-    SMColor R;
+    Color R;
     XMStoreFloat4(&R, XMVectorDivide(c1, c2));
     return R;
 }
 
-inline SMColor operator* (float S, const SMColor& C) noexcept
+inline Color operator* (float S, const Color& C) noexcept
 {
     using namespace DirectX;
     const XMVECTOR c1 = XMLoadFloat4(&C);
-    SMColor R;
+    Color R;
     XMStoreFloat4(&R, XMVectorScale(c1, S));
     return R;
 }
@@ -3485,7 +3485,7 @@ inline SMColor operator* (float S, const SMColor& C) noexcept
 // Color operations
 //------------------------------------------------------------------------------
 
-inline DirectX::PackedVector::XMCOLOR SMColor::BGRA() const noexcept
+inline DirectX::PackedVector::XMCOLOR Color::BGRA() const noexcept
 {
     using namespace DirectX;
     const XMVECTOR clr = XMLoadFloat4(this);
@@ -3494,7 +3494,7 @@ inline DirectX::PackedVector::XMCOLOR SMColor::BGRA() const noexcept
     return Packed;
 }
 
-inline DirectX::PackedVector::XMUBYTEN4 SMColor::RGBA() const noexcept
+inline DirectX::PackedVector::XMUBYTEN4 Color::RGBA() const noexcept
 {
     using namespace DirectX;
     const XMVECTOR clr = XMLoadFloat4(this);
@@ -3503,45 +3503,45 @@ inline DirectX::PackedVector::XMUBYTEN4 SMColor::RGBA() const noexcept
     return Packed;
 }
 
-inline Vector3 SMColor::ToVector3() const noexcept
+inline Vector3 Color::ToVector3() const noexcept
 {
     return Vector3(x, y, z);
 }
 
-inline Vector4 SMColor::ToVector4() const noexcept
+inline Vector4 Color::ToVector4() const noexcept
 {
     return Vector4(x, y, z, w);
 }
 
-inline void SMColor::Negate() noexcept
+inline void Color::Negate() noexcept
 {
     using namespace DirectX;
     const XMVECTOR c = XMLoadFloat4(this);
     XMStoreFloat4(this, XMColorNegative(c));
 }
 
-inline void SMColor::Negate(SMColor& result) const noexcept
+inline void Color::Negate(Color& result) const noexcept
 {
     using namespace DirectX;
     const XMVECTOR c = XMLoadFloat4(this);
     XMStoreFloat4(&result, XMColorNegative(c));
 }
 
-inline void SMColor::Saturate() noexcept
+inline void Color::Saturate() noexcept
 {
     using namespace DirectX;
     const XMVECTOR c = XMLoadFloat4(this);
     XMStoreFloat4(this, XMVectorSaturate(c));
 }
 
-inline void SMColor::Saturate(SMColor& result) const noexcept
+inline void Color::Saturate(Color& result) const noexcept
 {
     using namespace DirectX;
     const XMVECTOR c = XMLoadFloat4(this);
     XMStoreFloat4(&result, XMVectorSaturate(c));
 }
 
-inline void SMColor::Premultiply() noexcept
+inline void Color::Premultiply() noexcept
 {
     using namespace DirectX;
     const XMVECTOR c = XMLoadFloat4(this);
@@ -3550,7 +3550,7 @@ inline void SMColor::Premultiply() noexcept
     XMStoreFloat4(this, XMVectorMultiply(c, a));
 }
 
-inline void SMColor::Premultiply(SMColor& result) const noexcept
+inline void Color::Premultiply(Color& result) const noexcept
 {
     using namespace DirectX;
     const XMVECTOR c = XMLoadFloat4(this);
@@ -3559,28 +3559,28 @@ inline void SMColor::Premultiply(SMColor& result) const noexcept
     XMStoreFloat4(&result, XMVectorMultiply(c, a));
 }
 
-inline void SMColor::AdjustSaturation(float sat) noexcept
+inline void Color::AdjustSaturation(float sat) noexcept
 {
     using namespace DirectX;
     const XMVECTOR c = XMLoadFloat4(this);
     XMStoreFloat4(this, XMColorAdjustSaturation(c, sat));
 }
 
-inline void SMColor::AdjustSaturation(float sat, SMColor& result) const noexcept
+inline void Color::AdjustSaturation(float sat, Color& result) const noexcept
 {
     using namespace DirectX;
     const XMVECTOR c = XMLoadFloat4(this);
     XMStoreFloat4(&result, XMColorAdjustSaturation(c, sat));
 }
 
-inline void SMColor::AdjustContrast(float contrast) noexcept
+inline void Color::AdjustContrast(float contrast) noexcept
 {
     using namespace DirectX;
     const XMVECTOR c = XMLoadFloat4(this);
     XMStoreFloat4(this, XMColorAdjustContrast(c, contrast));
 }
 
-inline void SMColor::AdjustContrast(float contrast, SMColor& result) const noexcept
+inline void Color::AdjustContrast(float contrast, Color& result) const noexcept
 {
     using namespace DirectX;
     const XMVECTOR c = XMLoadFloat4(this);
@@ -3591,7 +3591,7 @@ inline void SMColor::AdjustContrast(float contrast, SMColor& result) const noexc
 // Static functions
 //------------------------------------------------------------------------------
 
-inline void SMColor::Modulate(const SMColor& c1, const SMColor& c2, SMColor& result) noexcept
+inline void Color::Modulate(const Color& c1, const Color& c2, Color& result) noexcept
 {
     using namespace DirectX;
     const XMVECTOR C0 = XMLoadFloat4(&c1);
@@ -3599,18 +3599,18 @@ inline void SMColor::Modulate(const SMColor& c1, const SMColor& c2, SMColor& res
     XMStoreFloat4(&result, XMColorModulate(C0, C1));
 }
 
-inline SMColor SMColor::Modulate(const SMColor& c1, const SMColor& c2) noexcept
+inline Color Color::Modulate(const Color& c1, const Color& c2) noexcept
 {
     using namespace DirectX;
     const XMVECTOR C0 = XMLoadFloat4(&c1);
     const XMVECTOR C1 = XMLoadFloat4(&c2);
 
-    SMColor result;
+    Color result;
     XMStoreFloat4(&result, XMColorModulate(C0, C1));
     return result;
 }
 
-inline void SMColor::Lerp(const SMColor& c1, const SMColor& c2, float t, SMColor& result) noexcept
+inline void Color::Lerp(const Color& c1, const Color& c2, float t, Color& result) noexcept
 {
     using namespace DirectX;
     const XMVECTOR C0 = XMLoadFloat4(&c1);
@@ -3618,13 +3618,13 @@ inline void SMColor::Lerp(const SMColor& c1, const SMColor& c2, float t, SMColor
     XMStoreFloat4(&result, XMVectorLerp(C0, C1, t));
 }
 
-inline SMColor SMColor::Lerp(const SMColor& c1, const SMColor& c2, float t) noexcept
+inline Color Color::Lerp(const Color& c1, const Color& c2, float t) noexcept
 {
     using namespace DirectX;
     const XMVECTOR C0 = XMLoadFloat4(&c1);
     const XMVECTOR C1 = XMLoadFloat4(&c2);
 
-    SMColor result;
+    Color result;
     XMStoreFloat4(&result, XMVectorLerp(C0, C1, t));
     return result;
 }

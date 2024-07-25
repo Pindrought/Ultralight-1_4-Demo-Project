@@ -1,4 +1,3 @@
-#pragma once
 //-------------------------------------------------------------------------------------
 // SimpleMath.h -- Simplified C++ Math wrapper for DirectXMath
 //
@@ -9,8 +8,7 @@
 // http://go.microsoft.com/fwlink/?LinkID=615561
 //-------------------------------------------------------------------------------------
 
-#ifndef _SIMPLEMATH
-#define _SIMPLEMATH
+#pragma once
 
 #if (defined(_WIN32) || defined(WINAPI_FAMILY)) && !(defined(_XBOX_ONE) && defined(_TITLE)) && !defined(_GAMING_XBOX)
 #include <dxgi1_2.h>
@@ -271,8 +269,6 @@ namespace DirectX
             void Cross(const Vector3& V, Vector3& result) const noexcept;
             Vector3 Cross(const Vector3& V) const noexcept;
 
-            bool IsNearZero(float inMaxDistSq = 1.0e-12f) noexcept;
-
             void Normalize() noexcept;
             void Normalize(Vector3& result) const noexcept;
 
@@ -282,7 +278,6 @@ namespace DirectX
             // Static functions
             static float Distance(const Vector3& v1, const Vector3& v2) noexcept;
             static float DistanceSquared(const Vector3& v1, const Vector3& v2) noexcept;
-
 
             static void Min(const Vector3& v1, const Vector3& v2, Vector3& result) noexcept;
             static Vector3 Min(const Vector3& v1, const Vector3& v2) noexcept;
@@ -463,7 +458,7 @@ namespace DirectX
         Vector4 operator* (float S, const Vector4& V) noexcept;
 
         //------------------------------------------------------------------------------
-        // 4x4 Matrix (assumes right-handed cooordinates) (I've edited what i'm using to be left handed)
+        // 4x4 Matrix (assumes right-handed cooordinates)
         struct Matrix : public XMFLOAT4X4
         {
             Matrix() noexcept
@@ -539,17 +534,17 @@ namespace DirectX
             Vector3 Down() const  noexcept { return Vector3(-_21, -_22, -_23); }
             void Down(const Vector3& v) noexcept { _21 = -v.x; _22 = -v.y; _23 = -v.z; }
 
-            Vector3 Right() const noexcept { return Vector3(-_11, -_12, -_13); }
-            void Right(const Vector3& v) noexcept { _11 = -v.x; _12 = -v.y; _13 = -v.z; }
+            Vector3 Right() const noexcept { return Vector3(_11, _12, _13); }
+            void Right(const Vector3& v) noexcept { _11 = v.x; _12 = v.y; _13 = v.z; }
 
-            Vector3 Left() const noexcept { return Vector3(_11, _12, _13); }
-            void Left(const Vector3& v) noexcept { _11 = v.x; _12 = v.y; _13 = v.z; }
+            Vector3 Left() const noexcept { return Vector3(-_11, -_12, -_13); }
+            void Left(const Vector3& v) noexcept { _11 = -v.x; _12 = -v.y; _13 = -v.z; }
 
-            Vector3 Forward() const noexcept { return Vector3(_31, _32, _33); }
-            void Forward(const Vector3& v) noexcept { _31 = v.x; _32 = v.y; _33 = v.z; }
+            Vector3 Forward() const noexcept { return Vector3(-_31, -_32, -_33); }
+            void Forward(const Vector3& v) noexcept { _31 = -v.x; _32 = -v.y; _33 = -v.z; }
 
-            Vector3 Backward() const noexcept { return Vector3(-_31, -_32, -_33); }
-            void Backward(const Vector3& v) noexcept { _31 = -v.x; _32 = -v.y; _33 = -v.z; }
+            Vector3 Backward() const noexcept { return Vector3(_31, _32, _33); }
+            void Backward(const Vector3& v) noexcept { _31 = v.x; _32 = v.y; _33 = v.z; }
 
             Vector3 Translation() const  noexcept { return Vector3(_41, _42, _43); }
             void Translation(const Vector3& v) noexcept { _41 = v.x; _42 = v.y; _43 = v.z; }
@@ -661,8 +656,6 @@ namespace DirectX
             // Assignment operators
             Plane& operator= (const XMVECTORF32& F) noexcept { x = F.f[0]; y = F.f[1]; z = F.f[2]; w = F.f[3]; return *this; }
 
-            float SignedDistance(Vector3 p) noexcept;
-
             // Properties
             Vector3 Normal() const noexcept { return Vector3(x, y, z); }
             void Normal(const Vector3& normal) noexcept { x = normal.x; y = normal.y; z = normal.z; }
@@ -707,8 +700,6 @@ namespace DirectX
             Quaternion& operator=(Quaternion&&) = default;
 
             operator XMVECTOR() const noexcept { return XMLoadFloat4(this); }
-
-            static Quaternion FromAVecToBVec(Vector3 a, Vector3 b) noexcept;
 
             // Comparison operators
             bool operator == (const Quaternion& q) const noexcept;
@@ -788,50 +779,63 @@ namespace DirectX
 
         //------------------------------------------------------------------------------
         // Color
-        struct SMColor : public XMFLOAT4
+        struct Color : public XMFLOAT4
         {
-            SMColor() noexcept : XMFLOAT4(0, 0, 0, 1.f) {}
-            constexpr SMColor(float _r, float _g, float _b) noexcept : XMFLOAT4(_r, _g, _b, 1.f) {}
-            constexpr SMColor(float _r, float _g, float _b, float _a) noexcept : XMFLOAT4(_r, _g, _b, _a) {}
-            explicit SMColor(const Vector3& clr) noexcept : XMFLOAT4(clr.x, clr.y, clr.z, 1.f) {}
-            explicit SMColor(const Vector4& clr) noexcept : XMFLOAT4(clr.x, clr.y, clr.z, clr.w) {}
-            explicit SMColor(_In_reads_(4) const float* pArray) noexcept : XMFLOAT4(pArray) {}
-            SMColor(FXMVECTOR V) noexcept { XMStoreFloat4(this, V); }
-            SMColor(const XMFLOAT4& c) noexcept { this->x = c.x; this->y = c.y; this->z = c.z; this->w = c.w; }
-            explicit SMColor(const XMVECTORF32& F) noexcept { this->x = F.f[0]; this->y = F.f[1]; this->z = F.f[2]; this->w = F.f[3]; }
+            Color() noexcept : XMFLOAT4(0, 0, 0, 1.f) {}
+            constexpr Color(float _r, float _g, float _b) noexcept : XMFLOAT4(_r, _g, _b, 1.f) {}
+            constexpr Color(float _r, float _g, float _b, float _a) noexcept : XMFLOAT4(_r, _g, _b, _a) {}
+            explicit Color(const Vector3& clr) noexcept : XMFLOAT4(clr.x, clr.y, clr.z, 1.f) {}
+            explicit Color(const Vector4& clr) noexcept : XMFLOAT4(clr.x, clr.y, clr.z, clr.w) {}
+            explicit Color(_In_reads_(4) const float* pArray) noexcept : XMFLOAT4(pArray) {}
+            Color(FXMVECTOR V) noexcept { XMStoreFloat4(this, V); }
+            Color(const XMFLOAT4& c) noexcept { this->x = c.x; this->y = c.y; this->z = c.z; this->w = c.w; }
+            explicit Color(const XMVECTORF32& F) noexcept { this->x = F.f[0]; this->y = F.f[1]; this->z = F.f[2]; this->w = F.f[3]; }
 
             // BGRA Direct3D 9 D3DCOLOR packed color
-            explicit SMColor(const DirectX::PackedVector::XMCOLOR& Packed) noexcept;
+            explicit Color(const DirectX::PackedVector::XMCOLOR& Packed) noexcept;
 
             // RGBA XNA Game Studio packed color
-            explicit SMColor(const DirectX::PackedVector::XMUBYTEN4& Packed) noexcept;
+            explicit Color(const DirectX::PackedVector::XMUBYTEN4& Packed) noexcept;
 
-            SMColor(const SMColor&) = default;
-            SMColor& operator=(const SMColor&) = default;
+            Color(const Color&) = default;
+            Color& operator=(const Color&) = default;
 
-            SMColor(SMColor&&) = default;
-            SMColor& operator=(SMColor&&) = default;
+            Color(Color&&) = default;
+            Color& operator=(Color&&) = default;
 
             operator XMVECTOR() const noexcept { return XMLoadFloat4(this); }
             operator const float* () const noexcept { return reinterpret_cast<const float*>(this); }
 
             // Comparison operators
-            bool operator == (const SMColor& c) const noexcept;
-            bool operator != (const SMColor& c) const noexcept;
+            bool operator == (const Color& c) const noexcept;
+            bool operator != (const Color& c) const noexcept;
 
             // Assignment operators
-            SMColor& operator= (const XMVECTORF32& F) noexcept { x = F.f[0]; y = F.f[1]; z = F.f[2]; w = F.f[3]; return *this; }
-            SMColor& operator= (const DirectX::PackedVector::XMCOLOR& Packed) noexcept;
-            SMColor& operator= (const DirectX::PackedVector::XMUBYTEN4& Packed) noexcept;
-            SMColor& operator+= (const SMColor& c) noexcept;
-            SMColor& operator-= (const SMColor& c) noexcept;
-            SMColor& operator*= (const SMColor& c) noexcept;
-            SMColor& operator*= (float S) noexcept;
-            SMColor& operator/= (const SMColor& c) noexcept;
+            Color& operator= (const XMVECTORF32& F) noexcept { x = F.f[0]; y = F.f[1]; z = F.f[2]; w = F.f[3]; return *this; }
+            Color& operator= (const DirectX::PackedVector::XMCOLOR& Packed) noexcept;
+            Color& operator= (const DirectX::PackedVector::XMUBYTEN4& Packed) noexcept;
+            Color& operator+= (const Color& c) noexcept;
+            Color& operator-= (const Color& c) noexcept;
+            Color& operator*= (const Color& c) noexcept;
+            Color& operator*= (float S) noexcept;
+            Color& operator/= (const Color& c) noexcept;
 
             // Unary operators
-            SMColor operator+ () const noexcept { return *this; }
-            SMColor operator- () const noexcept;
+            Color operator+ () const noexcept { return *this; }
+            Color operator- () const noexcept;
+
+            // Properties
+            float R() const noexcept { return x; }
+            void R(float r) noexcept { x = r; }
+
+            float G() const noexcept { return y; }
+            void G(float g) noexcept { y = g; }
+
+            float B() const noexcept { return z; }
+            void B(float b) noexcept { z = b; }
+
+            float A() const noexcept { return w; }
+            void A(float a) noexcept { w = a; }
 
             // Color operations
             DirectX::PackedVector::XMCOLOR BGRA() const noexcept;
@@ -841,35 +845,35 @@ namespace DirectX
             Vector4 ToVector4() const noexcept;
 
             void Negate() noexcept;
-            void Negate(SMColor& result) const noexcept;
+            void Negate(Color& result) const noexcept;
 
             void Saturate() noexcept;
-            void Saturate(SMColor& result) const noexcept;
+            void Saturate(Color& result) const noexcept;
 
             void Premultiply() noexcept;
-            void Premultiply(SMColor& result) const noexcept;
+            void Premultiply(Color& result) const noexcept;
 
             void AdjustSaturation(float sat) noexcept;
-            void AdjustSaturation(float sat, SMColor& result) const noexcept;
+            void AdjustSaturation(float sat, Color& result) const noexcept;
 
             void AdjustContrast(float contrast) noexcept;
-            void AdjustContrast(float contrast, SMColor& result) const noexcept;
+            void AdjustContrast(float contrast, Color& result) const noexcept;
 
             // Static functions
-            static void Modulate(const SMColor& c1, const SMColor& c2, SMColor& result) noexcept;
-            static SMColor Modulate(const SMColor& c1, const SMColor& c2) noexcept;
+            static void Modulate(const Color& c1, const Color& c2, Color& result) noexcept;
+            static Color Modulate(const Color& c1, const Color& c2) noexcept;
 
-            static void Lerp(const SMColor& c1, const SMColor& c2, float t, SMColor& result) noexcept;
-            static SMColor Lerp(const SMColor& c1, const SMColor& c2, float t) noexcept;
+            static void Lerp(const Color& c1, const Color& c2, float t, Color& result) noexcept;
+            static Color Lerp(const Color& c1, const Color& c2, float t) noexcept;
         };
 
         // Binary operators
-        SMColor operator+ (const SMColor& C1, const SMColor& C2) noexcept;
-        SMColor operator- (const SMColor& C1, const SMColor& C2) noexcept;
-        SMColor operator* (const SMColor& C1, const SMColor& C2) noexcept;
-        SMColor operator* (const SMColor& C, float S) noexcept;
-        SMColor operator/ (const SMColor& C1, const SMColor& C2) noexcept;
-        SMColor operator* (float S, const SMColor& C) noexcept;
+        Color operator+ (const Color& C1, const Color& C2) noexcept;
+        Color operator- (const Color& C1, const Color& C2) noexcept;
+        Color operator* (const Color& C1, const Color& C2) noexcept;
+        Color operator* (const Color& C, float S) noexcept;
+        Color operator/ (const Color& C1, const Color& C2) noexcept;
+        Color operator* (float S, const Color& C) noexcept;
 
         //------------------------------------------------------------------------------
         // Ray
@@ -1087,9 +1091,9 @@ namespace std
         }
     };
 
-    template<> struct less<DirectX::SimpleMath::SMColor>
+    template<> struct less<DirectX::SimpleMath::Color>
     {
-        bool operator()(const DirectX::SimpleMath::SMColor& C1, const DirectX::SimpleMath::SMColor& C2) const noexcept
+        bool operator()(const DirectX::SimpleMath::Color& C1, const DirectX::SimpleMath::Color& C2) const noexcept
         {
             return ((C1.x < C2.x)
                     || ((C1.x == C2.x) && (C1.y < C2.y))
@@ -1135,6 +1139,4 @@ namespace std
 
 #ifdef __clang__
 #pragma clang diagnostic pop
-#endif
-
 #endif
