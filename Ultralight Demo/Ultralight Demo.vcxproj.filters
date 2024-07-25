@@ -165,9 +165,6 @@
     <ClCompile Include="Demos\DemoCPPTextureInBrowser\DemoCPPTextureInBrowser.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Demos\CustomGPUImpl\CustomGPUImpl.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Demos\DemoCPPTextureInBrowser\CustomFileSystem\CustomFileSystem.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -354,9 +351,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="UltralightImpl\GPUimpl\IGPUDriverD3D11.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Demos\CustomGPUImpl\CustomGPUImpl.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Demos\DemoCPPTextureInBrowser\CustomFileSystem\CustomFileSystem.h">

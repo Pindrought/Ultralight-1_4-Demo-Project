@@ -49,9 +49,9 @@ private:
     void UpdateConstantBuffer(const ul::GPUState& state);
     void BindGeometry(uint32_t geometryId);
     ul::Matrix ApplyProjection(const ul::Matrix4x4& transform, float screenWidth, float screenHeight);
-    std::map<uint32_t, GeometryEntry> m_GeometryMap;
-    std::map<uint32_t, RenderTargetEntry> m_RenderTargetMap;
-    std::map<uint32_t, TextureEntry> m_TextureMap;
+    map<uint32_t, GeometryEntry> m_GeometryMap;
+    map<uint32_t, RenderTargetEntry> m_RenderTargetMap;
+    map<uint32_t, TextureEntry> m_TextureMap;
     VertexShader m_VertexShader_Fill;
     VertexShader m_VertexShader_FillPath;
     PixelShader m_PixelShader_Fill;
@@ -63,5 +63,7 @@ private:
     ComPtr<ID3D11RasterizerState> m_RasterizerState_Default;
     ComPtr<ID3D11RasterizerState> m_RasterizerState_Scissored;
     D3DClass* m_D3DPtr = nullptr;
+
+    set<uint32_t> m_UnlinkedRenderTargets;
     //map<uint32_t, uint32_t> m_ViewToTextureIdMap;
 };

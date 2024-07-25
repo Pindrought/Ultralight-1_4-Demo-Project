@@ -160,7 +160,6 @@ copy /Y "$(SolutionDir)ThirdParty\Ultralight\bin\WebCore.dll" "$(TargetDir)WebCo
     <ClCompile Include="Demos\DemoBorderlessResizableMovable\DemoBorderlessResizableMovable.cpp" />
     <ClCompile Include="Demos\DemoBorderlessResizable\DemoBorderlessResizable.cpp" />
     <ClCompile Include="Demos\DemoCPPTextureInBrowser\CustomFileSystem\CustomFileSystem.cpp" />
-    <ClCompile Include="Demos\CustomGPUImpl\CustomGPUImpl.cpp" />
     <ClCompile Include="Demos\DemoCPPTextureInBrowser\DemoCPPTextureInBrowser.cpp" />
     <ClCompile Include="Demos\DemoInspector\DemoInspector.cpp" />
     <ClCompile Include="Demos\DemoJSCppCommunication\DemoJSCPPCommunication.cpp" />
@@ -236,7 +235,6 @@ copy /Y "$(SolutionDir)ThirdParty\Ultralight\bin\WebCore.dll" "$(TargetDir)WebCo
     <ClInclude Include="Demos\DemoBorderlessResizableMovable\DemoBorderlessResizableMovable.h" />
     <ClInclude Include="Demos\DemoBorderlessResizable\DemoBorderlessResizable.h" />
     <ClInclude Include="Demos\DemoCPPTextureInBrowser\CustomFileSystem\CustomFileSystem.h" />
-    <ClInclude Include="Demos\CustomGPUImpl\CustomGPUImpl.h" />
     <ClInclude Include="Demos\DemoCPPTextureInBrowser\DemoCPPTextureInBrowser.h" />
     <ClInclude Include="Demos\DemoInspector\DemoInspector.h" />
     <ClInclude Include="Demos\DemoJSCppCommunication\DemoJSCPPCommunication.h" />

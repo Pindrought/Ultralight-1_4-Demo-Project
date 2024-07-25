@@ -233,17 +233,18 @@ void GPUDriverD3D11::DestroyTexture(uint32_t textureId)
     }
 }
 
-void GPUDriverD3D11::CreateRenderBuffer(uint32_t renderBufferId_, const ul::RenderBuffer& buffer_)
+void GPUDriverD3D11::CreateRenderBuffer(uint32_t renderBufferId, const ul::RenderBuffer& buffer)
 {
+    LOGINFO("CreateRenderBuffer()\n");
 
-    if (renderBufferId_ == 0)
+    if (renderBufferId == 0)
         FatalError("GPUDriverD3D11::CreateRenderBuffer, render buffer ID 0 is reserved for default render target view.");
 
-    auto i = m_RenderTargetMap.find(renderBufferId_);
+    auto i = m_RenderTargetMap.find(renderBufferId);
     if (i != m_RenderTargetMap.end())
         FatalError("GPUDriverD3D11::CreateRenderBuffer, render buffer id already exists.");
 
-    auto textureEntry = m_TextureMap.find(buffer_.texture_id);
+    auto textureEntry = m_TextureMap.find(buffer.texture_id);
     if (textureEntry == m_TextureMap.end())
         FatalError("GPUDriverD3D11::CreateRenderBuffer, texture id doesn't exist.");
 
@@ -259,15 +260,17 @@ void GPUDriverD3D11::CreateRenderBuffer(uint32_t renderBufferId_, const ul::Rend
     }
 
     ComPtr<ID3D11Texture2D> tex = textureEntry->second.Texture;
-    auto& render_target_entry = m_RenderTargetMap[renderBufferId_];
+    auto& render_target_entry = m_RenderTargetMap[renderBufferId];
     HRESULT hr = m_D3DPtr->m_Device->CreateRenderTargetView(tex.Get(), &renderTargetViewDesc, render_target_entry.RenderTargetView.GetAddressOf());
 
-    render_target_entry.RenderTargetTextureId = buffer_.texture_id;
+    render_target_entry.RenderTargetTextureId = buffer.texture_id;
+    m_UnlinkedRenderTargets.insert(renderBufferId);
     FatalErrorIfFail(hr, "GPUDriverD3D11::CreateRenderBuffer, unable to create render target.");
 }
 
 void GPUDriverD3D11::DestroyRenderBuffer(uint32_t renderBufferId)
 {
+    LOGINFO("DestroyRenderBuffer()\n");
     s_UltralightGPUDriverRenderBufferIDManager.StoreId(renderBufferId);
 
     auto iter = m_RenderTargetMap.find(renderBufferId);
