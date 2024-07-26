@@ -12,7 +12,8 @@ static IDPoolManager<uint32_t> s_UltralightGPUDriverTextureIDManager(1u);
 void GPUDriverD3D11::BeginSynchronize() 
 {
     //The purpose of this is to allow both MSAA views as well as views with a sample count of 1
-    //I have to identify which textures are associated with which views and if they should be multisampled or not
+    //I have to identify which render target textures are associated with which views and if they should be multisampled or not
+    //See GPUDriverD3D11::CreateRenderBuffer()
     UltralightManager* pManager = UltralightManager::GetInstance();
     ID3D11Device* pDevice = D3DClass::GetInstance()->m_Device.Get();
 
@@ -75,7 +76,7 @@ void GPUDriverD3D11::DrawCommandList()
 {
 	if (m_CommandList.empty())
 		return;
-    LOGINFO("DrawCmdList");
+    //LOGINFO("DrawCmdList");
     m_CurrentlyBoundRenderTargetId = 0;
     m_RenderTargetForViewWithMSAAIsCurrentlyBound = false;
 	for (auto& cmd : m_CommandList)
@@ -287,14 +288,11 @@ void GPUDriverD3D11::CreateRenderBuffer(uint32_t renderBufferId, const ul::Rende
         textureEntry.NeedsResolve = true;
     }
 
-
-
     ComPtr<ID3D11Texture2D> tex = textureEntry.Texture;
     
     HRESULT hr = m_D3DPtr->m_Device->CreateRenderTargetView(tex.Get(), &renderTargetViewDesc, render_target_entry.RenderTargetView.GetAddressOf());
 
     FatalErrorIfFail(hr, "GPUDriverD3D11::CreateRenderBuffer, unable to create render target.");
-
 }
 
 void GPUDriverD3D11::DestroyRenderBuffer(uint32_t renderBufferId)
@@ -375,7 +373,6 @@ void GPUDriverD3D11::UpdateGeometry(uint32_t geometryId,
     if (iter == m_GeometryMap.end())
     {
         FatalError("GPUDriverD3D11::UpdateGeometry, geometry id doesn't exist.");
-
     }
 
     auto& entry = iter->second;
