@@ -16,13 +16,15 @@ struct TextureEntry
     bool NeedsResolve = false;
     ComPtr<ID3D11Texture2D> ResolveTexture;
     ComPtr<ID3D11ShaderResourceView> ResolveSRV;
-    bool IsRenderBuffer = false;
+    bool IsRenderBuffer = false; //This isn't really necessary since I have the RenderTargetId variable but just keeping it for now
+    uint32_t RenderTargetId = 0; //This is only to be used when this is a texture for a render buffer. This is used for allowing diff MSAA levels
 };
 
 struct RenderTargetEntry
 {
     ComPtr<ID3D11RenderTargetView> RenderTargetView;
-    uint32_t RenderTargetTextureId;
+    uint32_t RenderTargetTextureId = 0;
+    bool IsMSAARenderTarget = false;
 };
 
 class IGPUDriverD3D11 : public ul::GPUDriver

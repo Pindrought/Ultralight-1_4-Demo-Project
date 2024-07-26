@@ -50,6 +50,11 @@ bool D3DClass::IsTearingSupported()
 	return m_IsTearingSupported;
 }
 
+bool D3DClass::IsSampleCountSupported(int sampleCount)
+{
+	return m_SampleCountOptions.contains(sampleCount);
+}
+
 bool D3DClass::InitializeDeviceAndContext()
 {
 	HRESULT hr;

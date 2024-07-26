@@ -1,5 +1,6 @@
 #pragma once
 #include <PCH.h>
+#include "DemoAntiAliasTest/DemoAntiAliasTest.h"
 #include "DemoBasic/DemoBasic.h"
 #include "DemoInspector/DemoInspector.h"
 #include "DemoBorderlessResizable/DemoBorderlessResizable.h"

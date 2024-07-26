@@ -122,6 +122,11 @@ uint32_t UltralightView::GetHeight() const
 	return m_Height;
 }
 
+uint32_t UltralightView::GetSampleCount() const
+{
+	return m_SampleCount;
+}
+
 PixelColor UltralightView::GetPixelColor(int x, int y)
 {
 	assert(x >= 0 && x < m_Width);
@@ -454,6 +459,7 @@ bool UltralightView::Initialize(UltralightViewCreationParameters params)
 	m_Name = params.Name;
 	m_Width = params.Width;
 	m_Height = params.Height;
+	m_SampleCount = params.SampleCount;
 	m_IsAccelerated = params.IsAccelerated;
 	m_Position = params.Position;
 	m_IsTransparent = params.IsTransparent;

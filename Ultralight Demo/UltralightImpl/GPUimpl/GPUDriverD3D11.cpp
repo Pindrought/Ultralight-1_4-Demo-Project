@@ -5,7 +5,7 @@
 #include "../../Graphics/InputLayoutDescriptions.h"
 #include "../UltralightManager.h"
 
-#define ENABLE_MSAA true
+//#define ENABLE_MSAA true
 
 static IDPoolManager<uint32_t> s_UltralightGPUDriverGeometryIDManager(1u);
 static IDPoolManager<uint32_t> s_UltralightGPUDriverRenderBufferIDManager(1u);
@@ -13,31 +13,71 @@ static IDPoolManager<uint32_t> s_UltralightGPUDriverTextureIDManager(1u);
 
 void GPUDriverD3D11::BeginSynchronize() 
 {
-    /*UltralightManager* pManager = UltralightManager::GetInstance();
-    for (auto viewEntry : pManager->GetViews())
+    //The purpose of this is to allow both MSAA views as well as views with a sample count of 1
+    //I have to identify which textures are associated with which views and if they should be multisampled or not
+    UltralightManager* pManager = UltralightManager::GetInstance();
+    ID3D11Device* pDevice = D3DClass::GetInstance()->m_Device.Get();
+
+    auto acceleratedViews = pManager->GetAcceleratedViews();
+    if (acceleratedViews.size() == 0)
+    {
+        return;
+    }
+    //LOGINFO("BeginSynchronize");
+    for (auto viewEntry : acceleratedViews)
     {
         auto pView = viewEntry.second;
-        if (!pView->IsAccelerated())
+
+        if (pView->GetSampleCount() <= 1) //Just doing this for Multisampled views
         {
             continue;
         }
-        auto nativeView = pView->GetView();
-        uint32_t view_id = nativeView->display_id();
-        auto rt = nativeView->render_target();
 
-        auto iter = m_ViewToTextureIdMap.find(view_id);
-        if (iter == m_ViewToTextureIdMap.end())
+        auto nativeView = pView->GetView();
+        auto rt = nativeView->render_target();
+        const uint32_t viewId = pView->GetId();
+
+        auto rtToViewIter = m_RenderBufferToViewIdMap.find(rt.render_buffer_id);
+        if (rtToViewIter == m_RenderBufferToViewIdMap.end())
         {
-            m_ViewToTextureIdMap[view_id] = rt.texture_id;
+            m_RenderBufferToViewIdMap[rt.render_buffer_id] = viewId;
+            m_MSAARenderTargetSampleCountLookup.insert(make_pair(rt.render_buffer_id, pView->GetSampleCount()));
+            //Need to update the texture first and then update the render target
+
+            //auto textureIter = m_TextureMap.find(rt.texture_id);
+            //if (textureIter == m_TextureMap.end())
+            //{
+            //    continue;
+            //    FatalError("When trying to update a texture used for a MSAA RenderBuffer, it was not found in the texture map. That's unexpected.");
+            //}
+            //auto& textureEntry = textureIter->second;
+            //assert(textureEntry.IsRenderBuffer == true);
+            //assert(textureEntry.IsMSAARenderTarget == false); //This should not be set yet - just sanity checking
+            //assert(textureEntry.ResolveTexture == nullptr && textureEntry.ResolveSRV == nullptr);
+
+            //textureEntry.IsMSAARenderTarget = true;
+            ////Assign resolve texture/srv to current texture/srv and create a new texture/srv for higher sample count
+            //textureEntry.ResolveSRV = textureEntry.TextureSRV;
+            //textureEntry.ResolveTexture = textureEntry.Texture;
+
+            //D3D11_TEXTURE2D_DESC desc;
+            //textureEntry.ResolveTexture->GetDesc(&desc);
+            //desc.SampleDesc.Count = pView->GetSampleCount();
+            //desc.SampleDesc.Quality = D3D11_STANDARD_MULTISAMPLE_PATTERN;
+            //HRESULT hr = pDevice->CreateTexture2D(&desc, NULL, &textureEntry.Texture);
+            //FatalErrorIfFail(hr, "Failed to create the multisampled textore for a MSAA render buffer in ultralight for a view.");
+
+            //D3D11_SHADER_RESOURCE_VIEW_DESC srv_desc;
+            //textureEntry.ResolveSRV->GetDesc(&srv_desc);
+
+            //srv_desc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2DMS;
+
+            //hr = pDevice->CreateShaderResourceView(textureEntry.Texture.Get(), &srv_desc, &textureEntry.TextureSRV);
+            //FatalErrorIfFail(hr, "Failed to create the multisampled textore SRV for a MSAA render buffer in ultralight for a view.");
+
+            //textureEntry.NeedsResolve = true;
         }
-        else
-        {
-            if (iter->second != rt.texture_id)
-            {
-                m_ViewToTextureIdMap[view_id] = rt.texture_id;
-            }
-        }
-    }*/
+    }
 }
 
 void GPUDriverD3D11::EndSynchronize() {}
@@ -70,6 +110,9 @@ void GPUDriverD3D11::DrawCommandList()
 {
 	if (m_CommandList.empty())
 		return;
+    LOGINFO("DrawCmdList");
+    m_CurrentlyBoundRenderTargetId = 0;
+    m_RenderTargetForViewWithMSAAIsCurrentlyBound = false;
 	for (auto& cmd : m_CommandList)
 	{
 		if (cmd.command_type == ul::CommandType::DrawGeometry)
@@ -244,28 +287,72 @@ void GPUDriverD3D11::CreateRenderBuffer(uint32_t renderBufferId, const ul::Rende
     if (i != m_RenderTargetMap.end())
         FatalError("GPUDriverD3D11::CreateRenderBuffer, render buffer id already exists.");
 
-    auto textureEntry = m_TextureMap.find(buffer.texture_id);
-    if (textureEntry == m_TextureMap.end())
+    auto textureIter = m_TextureMap.find(buffer.texture_id);
+    if (textureIter == m_TextureMap.end())
         FatalError("GPUDriverD3D11::CreateRenderBuffer, texture id doesn't exist.");
 
-    textureEntry->second.IsRenderBuffer = true;
+    auto& textureEntry = textureIter->second;
+    textureEntry.IsRenderBuffer = true;
+    textureEntry.RenderTargetId = renderBufferId;
     
+    auto& render_target_entry = m_RenderTargetMap[renderBufferId];
+    render_target_entry.RenderTargetTextureId = buffer.texture_id;
+
+    int sampleCount = 1;
+    auto sampleLookupIter = m_MSAARenderTargetSampleCountLookup.find(renderBufferId);
+    if (sampleLookupIter != m_MSAARenderTargetSampleCountLookup.end())
+    {
+        render_target_entry.IsMSAARenderTarget = true;
+        sampleCount = sampleLookupIter->second;
+    }
+
     D3D11_RENDER_TARGET_VIEW_DESC renderTargetViewDesc = {};
     renderTargetViewDesc.Format = DXGI_FORMAT_B8G8R8A8_UNORM;
     renderTargetViewDesc.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE2D;
 
-    if (textureEntry->second.IsMSAARenderTarget)
+    if (render_target_entry.IsMSAARenderTarget)
     {
         renderTargetViewDesc.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE2DMS;
     }
 
-    ComPtr<ID3D11Texture2D> tex = textureEntry->second.Texture;
-    auto& render_target_entry = m_RenderTargetMap[renderBufferId];
+    {
+        ID3D11Device* pDevice = D3DClass::GetInstance()->m_Device.Get();
+        //For MSAA Render targets, this is where we need to update the texture being stored to be a MSAA texture and move the current texture to be used for the resolve texture
+        assert(textureEntry.IsRenderBuffer == true);
+        assert(textureEntry.IsMSAARenderTarget == false); //This should not be set yet - just sanity checking
+        assert(textureEntry.ResolveTexture == nullptr && textureEntry.ResolveSRV == nullptr);
+
+        textureEntry.IsMSAARenderTarget = true;
+        //Assign resolve texture/srv to current texture/srv and create a new texture/srv for higher sample count
+        textureEntry.ResolveSRV = textureEntry.TextureSRV;
+        textureEntry.ResolveTexture = textureEntry.Texture;
+
+        D3D11_TEXTURE2D_DESC desc;
+        textureEntry.ResolveTexture->GetDesc(&desc);
+        desc.SampleDesc.Count = sampleCount;
+        desc.SampleDesc.Quality = D3D11_STANDARD_MULTISAMPLE_PATTERN;
+        HRESULT hr = pDevice->CreateTexture2D(&desc, NULL, &textureEntry.Texture);
+        FatalErrorIfFail(hr, "Failed to create the multisampled texture for a MSAA render buffer in ultralight for a view.");
+
+        D3D11_SHADER_RESOURCE_VIEW_DESC srv_desc;
+        textureEntry.ResolveSRV->GetDesc(&srv_desc);
+
+        srv_desc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2DMS;
+
+        hr = pDevice->CreateShaderResourceView(textureEntry.Texture.Get(), &srv_desc, &textureEntry.TextureSRV);
+        FatalErrorIfFail(hr, "Failed to create the multisampled texture SRV for a MSAA render buffer in ultralight for a view.");
+
+        textureEntry.NeedsResolve = true;
+    }
+
+
+
+    ComPtr<ID3D11Texture2D> tex = textureEntry.Texture;
+    
     HRESULT hr = m_D3DPtr->m_Device->CreateRenderTargetView(tex.Get(), &renderTargetViewDesc, render_target_entry.RenderTargetView.GetAddressOf());
 
-    render_target_entry.RenderTargetTextureId = buffer.texture_id;
-    m_UnlinkedRenderTargets.insert(renderBufferId);
     FatalErrorIfFail(hr, "GPUDriverD3D11::CreateRenderBuffer, unable to create render target.");
+
 }
 
 void GPUDriverD3D11::DestroyRenderBuffer(uint32_t renderBufferId)
@@ -282,6 +369,16 @@ void GPUDriverD3D11::DestroyRenderBuffer(uint32_t renderBufferId)
     else
     {
         FatalError("GPUDriverD3D11::DestroyRenderBuffer");
+    }
+
+    //I think both of these should always be true but just checking anyways
+    if (m_RenderBufferToViewIdMap.contains(renderBufferId))
+    {
+        m_RenderBufferToViewIdMap.erase(renderBufferId);
+    }
+    if (m_MSAARenderTargetSampleCountLookup.contains(renderBufferId))
+    {
+        m_MSAARenderTargetSampleCountLookup.erase(renderBufferId);
     }
 }
 
@@ -416,7 +513,14 @@ void GPUDriverD3D11::DrawGeometry(uint32_t geometryId,
 
     if (state.enable_scissor)
     {
-        m_D3DPtr->m_Context->RSSetState(m_RasterizerState_Scissored.Get());
+        if(m_RenderTargetForViewWithMSAAIsCurrentlyBound)
+        {
+            m_D3DPtr->m_Context->RSSetState(m_RasterizerState_Scissored_MSAA.Get());
+        }
+        else
+        {
+            m_D3DPtr->m_Context->RSSetState(m_RasterizerState_Scissored.Get());
+        }
         D3D11_RECT scissor_rect =
         {
           (LONG)(state.scissor_rect.left),
@@ -429,7 +533,14 @@ void GPUDriverD3D11::DrawGeometry(uint32_t geometryId,
     }
     else
     {
-        m_D3DPtr->m_Context->RSSetState(m_RasterizerState_Default.Get());
+        if (m_RenderTargetForViewWithMSAAIsCurrentlyBound)
+        {
+            m_D3DPtr->m_Context->RSSetState(m_RasterizerState_Default_MSAA.Get());
+        }
+        else
+        {
+            m_D3DPtr->m_Context->RSSetState(m_RasterizerState_Default.Get());
+        }
     }
 
     m_D3DPtr->m_Context->VSSetConstantBuffers(0, 1, m_ConstantBuffer.GetAddressOf());
@@ -449,7 +560,19 @@ void GPUDriverD3D11::ClearRenderBuffer(uint32_t renderBufferId)
         FatalError("GPUDriverD3D11::ClearRenderBuffer, render buffer id doesn't exist.");
     }
 
-    m_D3DPtr->m_Context->ClearRenderTargetView(renderTargetIter->second.RenderTargetView.Get(), color);
+    auto& entry = renderTargetIter->second;
+
+    m_D3DPtr->m_Context->ClearRenderTargetView(entry.RenderTargetView.Get(), color);
+
+    if (entry.IsMSAARenderTarget)
+    {
+        auto textureIter = m_TextureMap.find(renderTargetIter->second.RenderTargetTextureId);
+        if (textureIter == m_TextureMap.end())
+            FatalError("GPUDriverD3D11::ClearRenderBuffer, render target texture id doesn't exist.");
+
+        // Flag the MSAA render target texture for Resolve when we bind it to a shader for reading later.
+        textureIter->second.NeedsResolve = true;
+    }
 
 #if ENABLE_MSAA
     auto textureIter = m_TextureMap.find(renderTargetIter->second.RenderTargetTextureId);
@@ -578,6 +701,13 @@ void GPUDriverD3D11::InitializeRasterizerStates()
                                                    &m_RasterizerState_Default);
     FatalErrorIfFail(hr, "GPUDriverD3D11::InitializeRasterizerStates failed to create default rasterizer state.");
 
+    CD3D11_RASTERIZER_DESC rasterizerDesc_default_msaa = rasterizerDesc_default;
+    rasterizerDesc_default_msaa.MultisampleEnable = true;
+    rasterizerDesc_default_msaa.AntialiasedLineEnable = true;
+    hr = m_D3DPtr->m_Device->CreateRasterizerState(&rasterizerDesc_default_msaa,
+                                                   &m_RasterizerState_Default_MSAA);
+    FatalErrorIfFail(hr, "GPUDriverD3D11::InitializeRasterizerStates failed to create default MSAA rasterizer state.");
+
     CD3D11_RASTERIZER_DESC rasterizerDesc_scissor(D3D11_DEFAULT);
     rasterizerDesc_scissor.CullMode = D3D11_CULL_NONE;
     rasterizerDesc_scissor.DepthClipEnable = FALSE;
@@ -590,10 +720,25 @@ void GPUDriverD3D11::InitializeRasterizerStates()
     hr = m_D3DPtr->m_Device->CreateRasterizerState(&rasterizerDesc_scissor,
                                                    &m_RasterizerState_Scissored);
     FatalErrorIfFail(hr, "GPUDriverD3D11::InitializeRasterizerStates failed to create scissored rasterizer state.");
+
+
+    CD3D11_RASTERIZER_DESC rasterizerDesc_scissor_msaa = rasterizerDesc_scissor;
+    rasterizerDesc_scissor.MultisampleEnable = true;
+    rasterizerDesc_scissor.AntialiasedLineEnable = true;
+    hr = m_D3DPtr->m_Device->CreateRasterizerState(&rasterizerDesc_scissor,
+                                                   &m_RasterizerState_Scissored_MSAA);
+    FatalErrorIfFail(hr, "GPUDriverD3D11::InitializeRasterizerStates failed to create scissored MSAA rasterizer state.");
+
 }
 
 void GPUDriverD3D11::BindRenderBuffer(uint32_t renderBufferId)
 {
+    if (renderBufferId == m_CurrentlyBoundRenderTargetId)
+    {
+        return;
+    }
+    m_CurrentlyBoundRenderTargetId = renderBufferId;
+
     // Unbind any textures/shader resources to avoid warnings in case a render buffer that we would like to bind is already bound as an input texture.
     ID3D11ShaderResourceView* nullSRV[3] = { nullptr, nullptr, nullptr };
     m_D3DPtr->m_Context->PSSetShaderResources(0, 3, nullSRV);
@@ -605,6 +750,22 @@ void GPUDriverD3D11::BindRenderBuffer(uint32_t renderBufferId)
         FatalError("GPUDriverD3D11::BindRenderBuffer, render buffer id doesn't exist.");
 
     target = renderTarget->second.RenderTargetView.Get();
+
+    if (m_MSAARenderTargetSampleCountLookup.contains(renderBufferId))
+    {
+        m_RenderTargetForViewWithMSAAIsCurrentlyBound = true;
+
+        auto renderTargetTexture = m_TextureMap.find(renderTarget->second.RenderTargetTextureId);
+        if (renderTargetTexture == m_TextureMap.end())
+            FatalError("GPUDriverD3D11::BindRenderBuffer, render target texture id doesn't exist.");
+
+        // Flag the MSAA render target texture for Resolve when we bind it to a shader for reading later.
+        renderTargetTexture->second.NeedsResolve = true;
+    }
+    else
+    {
+        m_RenderTargetForViewWithMSAAIsCurrentlyBound = false;
+    }
 
 #if ENABLE_MSAA
     auto renderTargetTexture = m_TextureMap.find(renderTarget->second.RenderTargetTextureId);

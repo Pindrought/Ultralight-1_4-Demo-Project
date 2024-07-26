@@ -80,6 +80,10 @@ EZJSParm DemoSelector::OnEventCallbackFromUltralight(int32_t viewId, string even
 		assert(parameters.size() == 1);
 		assert(parameters[0].GetType() == EZJSParm::String);
 		string demoName = parameters[0].AsString();
+		if (demoName == "DemoAntiAliasTest")
+		{
+			m_SelectedDemo = DemoId::DemoAntiAliasTest;
+		}
 		if (demoName == "DemoBasic")
 		{
 			m_SelectedDemo = DemoId::DemoBasic;

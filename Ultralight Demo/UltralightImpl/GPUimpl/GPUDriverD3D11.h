@@ -62,8 +62,13 @@ private:
     ComPtr<ID3D11BlendState> m_BlendState_Enabled;
     ComPtr<ID3D11RasterizerState> m_RasterizerState_Default;
     ComPtr<ID3D11RasterizerState> m_RasterizerState_Scissored;
+    ComPtr<ID3D11RasterizerState> m_RasterizerState_Default_MSAA;
+    ComPtr<ID3D11RasterizerState> m_RasterizerState_Scissored_MSAA;
     D3DClass* m_D3DPtr = nullptr;
 
-    set<uint32_t> m_UnlinkedRenderTargets;
-    //map<uint32_t, uint32_t> m_ViewToTextureIdMap;
+    map<uint32_t, uint32_t> m_ViewToTextureIdMap;
+    map<uint32_t, uint32_t> m_RenderBufferToViewIdMap;
+    map<uint32_t, uint32_t> m_MSAARenderTargetSampleCountLookup; //Key=RenderBufferId Value=SampleCount
+    uint32_t m_CurrentlyBoundRenderTargetId = 0;
+    bool m_RenderTargetForViewWithMSAAIsCurrentlyBound = false;
 };

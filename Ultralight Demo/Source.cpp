@@ -41,6 +41,9 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance,
 		shared_ptr<Engine> demoEngine = nullptr;
 		switch (demoId)
 		{
+			case DemoSelector::DemoId::DemoAntiAliasTest:
+				demoEngine = make_shared<DemoAntiAliasTest>();
+				break;
 			case DemoSelector::DemoId::DemoBasic:
 				demoEngine = make_shared<DemoBasic>();
 				break;

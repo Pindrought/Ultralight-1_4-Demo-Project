@@ -11,6 +11,7 @@ struct UltralightViewCreationParameters
 	string Name = ""; //For debugging purposes
 	uint32_t Width = 400;
 	uint32_t Height = 400;
+	uint32_t SampleCount = 1;
 	DirectX::XMFLOAT3 Position = { 0,0,0 };
 	bool ForceMatchWindowDimensions = false;
 	bool IsAccelerated = false;
@@ -32,6 +33,7 @@ public:
 	shared_ptr<UltralightView> GetInspectorView();
 	uint32_t GetWidth() const;
 	uint32_t GetHeight() const;
+	uint32_t GetSampleCount() const;
 	PixelColor GetPixelColor(int x, int y);
 	int32_t GetWindowId();
 	void FireKeyboardEvent(ul::KeyEvent keyboardEvent);
@@ -51,9 +53,9 @@ public:
 	bool CallJSFnc(std::string inFunctionName, std::initializer_list<EZJSParm> inParmList, EZJSParm& outReturnValue, std::string& outException);
 
 	bool CallJSFnc(std::string inFunctionName, vector<EZJSParm>& inParmList, EZJSParm& outReturnValue, std::string& outException);
-	UltralightView() {} //This should only be instantiated by the UltralightManager but since i'm using shared_ptr was running into issues. 
 	~UltralightView();
 private:
+	UltralightView() {} //This should only be instantiated by the UltralightManager but since i'm using shared_ptr was running into issues. 
 	void SetToWindow(int32_t windowId); //To remove confusion, this is all managed by the UltralightManager AddViewToWindow/RemoveViewFromWindow functions
 	bool Initialize(UltralightViewCreationParameters parms); //This should only be initialized by the UltralightManager
 	ul::RefPtr<ul::View> m_NativeView = nullptr;
@@ -65,6 +67,7 @@ private:
 	DirectX::XMFLOAT3 m_Position = { 0,0, 0 };
 	uint32_t m_Width = 0;
 	uint32_t m_Height = 0;
+	uint32_t m_SampleCount = 1;
 	bool m_InputEnabled = true;
 	bool m_IsVisible = true;
 	bool m_IsInspectorView = false;

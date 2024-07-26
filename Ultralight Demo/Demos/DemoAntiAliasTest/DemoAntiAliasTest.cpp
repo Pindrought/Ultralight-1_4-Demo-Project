@@ -1,56 +1,50 @@
 #include "PCH.h"
-#include "DemoBasic.h"
+#include "DemoAntiAliasTest.h"
 #include "../Misc/CursorManager.h"
 
-bool DemoBasic::Startup()
+bool DemoAntiAliasTest::Startup()
 {
 	WindowCreationParameters windowParms;
 	windowParms.Width = 800;
-	windowParms.Height = 600;
+	windowParms.Height = 330;
 	windowParms.Style = WindowStyle::Resizable | WindowStyle::ExitButton | WindowStyle::MaximizeAvailable;
-	windowParms.Title = "GPU Renderer";
-	shared_ptr<Window> pWindow = SpawnWindow(windowParms);
-	if (pWindow == nullptr)
-	{
-		FatalError("Failed to initialize primary window. Program must now abort.");
-		return false;
-	}
+	
 
 	UltralightViewCreationParameters parms;
-	parms.Width = pWindow->GetWidth();
-	parms.Height = pWindow->GetHeight();
+	parms.Width = windowParms.Width;
+	parms.Height = windowParms.Height;
 	parms.IsAccelerated = true;
 	parms.ForceMatchWindowDimensions = true;
 	parms.IsTransparent = true;
-	parms.SampleCount = 8;
 
-	shared_ptr<UltralightView> pView = m_UltralightMgr->CreateUltralightView(parms);
-	pView->LoadURL("http://www.google.com");
-	m_UltralightMgr->SetViewToWindow(pView->GetId(), pWindow->GetId());
-
+	for (int sampleCount = 1; sampleCount <= 8; sampleCount *= 2)
 	{
-		WindowCreationParameters windowParms;
-		windowParms.Width = 800;
-		windowParms.Height = 600;
-		windowParms.Style = WindowStyle::Resizable | WindowStyle::ExitButton | WindowStyle::MaximizeAvailable;
-		windowParms.Title = "CPU Renderer";
+		if (sampleCount > 1)
+		{
+			if (m_Renderer.GetD3D()->IsSampleCountSupported(sampleCount) == false)
+			{
+				continue;
+			}
+		}
+
+		windowParms.Title = "SampleCount = ";
+		windowParms.Title += std::to_string(sampleCount);
+
 		shared_ptr<Window> pWindow = SpawnWindow(windowParms);
+		if (pWindow == nullptr)
+		{
+			FatalError("Failed to initialize window. Program must now abort.");
+			return false;
+		}
 
-		UltralightViewCreationParameters parms;
-		parms.Width = pWindow->GetWidth();
-		parms.Height = pWindow->GetHeight();
-		parms.IsAccelerated = false;
-		parms.ForceMatchWindowDimensions = true;
-		parms.IsTransparent = true;
-
+		parms.SampleCount = sampleCount;
 		shared_ptr<UltralightView> pView = m_UltralightMgr->CreateUltralightView(parms);
-		pView->LoadURL("http://www.google.com");
+		pView->LoadURL("file:///Samples/AntiAliasTest/AntiAliasTest.html");
 		m_UltralightMgr->SetViewToWindow(pView->GetId(), pWindow->GetId());
 	}
-
 }
 
-bool DemoBasic::Tick()
+bool DemoAntiAliasTest::Tick()
 {
 	//Process Input Events
 	auto& keyboard = m_InputController.m_Keyboard;
@@ -92,12 +86,12 @@ bool DemoBasic::Tick()
 	return true;
 }
 
-EZJSParm DemoBasic::OnEventCallbackFromUltralight(int32_t viewId, string eventName, vector<EZJSParm> parameters)
-{	
+EZJSParm DemoAntiAliasTest::OnEventCallbackFromUltralight(int32_t viewId, string eventName, vector<EZJSParm> parameters)
+{
 	return EZJSParm();
 }
 
-void DemoBasic::OnWindowDestroyStartCallback(int32_t windowId)
+void DemoAntiAliasTest::OnWindowDestroyStartCallback(int32_t windowId)
 {
 	Window* pWindow = GetWindowFromId(windowId);
 	auto pViews = pWindow->GetSortedUltralightViews();
@@ -107,7 +101,7 @@ void DemoBasic::OnWindowDestroyStartCallback(int32_t windowId)
 	}
 }
 
-void DemoBasic::OnWindowDestroyEndCallback(int32_t windowId)
+void DemoAntiAliasTest::OnWindowDestroyEndCallback(int32_t windowId)
 {
 	if (m_WindowIdToWindowInstanceMap.size() == 0)
 	{
@@ -115,7 +109,7 @@ void DemoBasic::OnWindowDestroyEndCallback(int32_t windowId)
 	}
 }
 
-void DemoBasic::OnWindowResizeCallback(Window* pWindow)
+void DemoAntiAliasTest::OnWindowResizeCallback(Window* pWindow)
 {
 }
 

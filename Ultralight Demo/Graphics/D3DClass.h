@@ -10,6 +10,7 @@ public:
 	bool Initialize();
 	~D3DClass();
 	bool IsTearingSupported();
+	bool IsSampleCountSupported(int sampleCount);
 	ComPtr<ID3D11Device> m_Device;
 	ComPtr<ID3D11DeviceContext> m_Context;
 	ComPtr<IDCompositionDevice> m_CompositionDevice;

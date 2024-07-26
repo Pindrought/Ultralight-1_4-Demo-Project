@@ -90,6 +90,7 @@ void UltralightManager::Shutdown()
 {
 	m_WindowIdToViewIdMap.clear();
 	m_ViewsMap.clear();
+	m_AcceleratedViewsMap.clear();
 	m_WindowIdToWindowPtrMap.clear();
 }
 
@@ -208,7 +209,10 @@ std::shared_ptr<UltralightView> UltralightManager::CreateUltralightView(Ultralig
 			return nullptr;
 		}
 	}
-	std::shared_ptr<UltralightView> pView = std::make_shared<UltralightView>();
+
+	//Workaround to pass private constructor into make_shared from https://stackoverflow.com/a/25069711
+	struct make_shared_enabler : public UltralightView {};
+	shared_ptr<UltralightView> pView = make_shared<make_shared_enabler>();
 	if (!pView->Initialize(parms))
 	{
 		ErrorHandler::LogCriticalError("Failed to create Ultralight View.");
@@ -222,6 +226,10 @@ std::shared_ptr<UltralightView> UltralightManager::CreateUltralightView(Ultralig
 	}
 
 	m_ViewsMap.insert(std::make_pair(pView->GetId(), pView));
+	if (parms.IsAccelerated)
+	{
+		m_AcceleratedViewsMap.insert(std::make_pair(pView->GetId(), pView));
+	}
 	return pView;
 }
 
@@ -249,6 +257,10 @@ void UltralightManager::DestroyView(shared_ptr<UltralightView> pView)
 			FatalError("Failed to find window entry in window map.");
 		}
 		windowPair->second.erase(pView->GetId());
+	}
+	if (pView->IsAccelerated())
+	{
+		m_AcceleratedViewsMap.erase(pView->GetId());
 	}
 	m_ViewsMap.erase(pView->GetId());
 }
@@ -313,6 +325,11 @@ IGPUDriverD3D11* UltralightManager::GetGPUDriver()
 unordered_map<int32_t, shared_ptr<UltralightView>> UltralightManager::GetViews()
 {
 	return m_ViewsMap;
+}
+
+unordered_map<int32_t, shared_ptr<UltralightView>> UltralightManager::GetAcceleratedViews()
+{
+	return m_AcceleratedViewsMap;
 }
 
 void UltralightManager::RefreshViewDisplaysForAnimations()

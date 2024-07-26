@@ -35,6 +35,8 @@ public:
 	std::shared_ptr<UltralightView> GetViewFromId(int32_t viewId);
 	IGPUDriverD3D11* GetGPUDriver();
 	unordered_map<int32_t, shared_ptr<UltralightView>> GetViews();
+	unordered_map<int32_t, shared_ptr<UltralightView>> GetAcceleratedViews();
+
 	void RefreshViewDisplaysForAnimations();
 	//A return value of true = the event was processed by an ultralight view.
 	bool FireKeyboardEvent(KeyboardEvent* keyboardEvent);
@@ -56,4 +58,6 @@ private:
 	unordered_map<int32_t, shared_ptr<Window>> m_WindowIdToWindowPtrMap;
 	unordered_map<int32_t, set<int32_t>> m_WindowIdToViewIdMap;
 	unordered_map<int32_t, shared_ptr<UltralightView>> m_ViewsMap;
+	unordered_map<int32_t, shared_ptr<UltralightView>> m_AcceleratedViewsMap;
+
 };

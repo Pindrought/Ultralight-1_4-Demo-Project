@@ -156,6 +156,7 @@ copy /Y "$(SolutionDir)ThirdParty\Ultralight\bin\WebCore.dll" "$(TargetDir)WebCo
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Demos\DemoAntiAliasTest\DemoAntiAliasTest.cpp" />
     <ClCompile Include="Demos\DemoBasic\DemoBasic.cpp" />
     <ClCompile Include="Demos\DemoBorderlessResizableMovable\DemoBorderlessResizableMovable.cpp" />
     <ClCompile Include="Demos\DemoBorderlessResizable\DemoBorderlessResizable.cpp" />
@@ -231,6 +232,7 @@ copy /Y "$(SolutionDir)ThirdParty\Ultralight\bin\WebCore.dll" "$(TargetDir)WebCo
     <ClCompile Include="Window\WindowHelperForBorderlessResizable.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Demos\DemoAntiAliasTest\DemoAntiAliasTest.h" />
     <ClInclude Include="Demos\DemoBasic\DemoBasic.h" />
     <ClInclude Include="Demos\DemoBorderlessResizableMovable\DemoBorderlessResizableMovable.h" />
     <ClInclude Include="Demos\DemoBorderlessResizable\DemoBorderlessResizable.h" />
