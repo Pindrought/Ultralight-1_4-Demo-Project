@@ -481,6 +481,16 @@ bool Window::IsWindowMaximized() const
 	return m_IsMaximized;
 }
 
+void Window::SetPosition(int x, int y, int width, int height)
+{
+	UINT flags = 0;
+	if (width == -1 || height == -1)
+	{
+		flags = SWP_NOSIZE;
+	}
+	SetWindowPos(m_HWND, NULL, x, y, m_Width, m_Height, flags);
+}
+
 void Window::Maximize()
 {
 	m_IsMaximized = true;
@@ -505,6 +515,11 @@ void Window::Hide()
 
 void Window::Close()
 {
+	if (m_CloseInitiated == true)
+	{
+		return;
+	}
+	m_CloseInitiated = true;
 	SendMessageA(m_HWND, WM_CLOSE, NULL, NULL);
 }
 

@@ -29,5 +29,5 @@ private:
 	ConstantBuffer<ConstantBufferType::CB_PerDrawData_2D> m_CB_PerDrawData_2D;
 	ConstantBuffer<ConstantBufferType::CB_UltralightData> m_CB_UltralightData;
 
-	Mesh2D m_QuadMeshForUltralightView;
+	Mesh2D m_QuadMeshForUltralightView; //This is also used for sprite rendering in DrawSprite()
 };

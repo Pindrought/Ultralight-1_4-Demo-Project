@@ -36,6 +36,7 @@ public:
 	LRESULT WindowProcA(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam); //This probably shouldn't be public since it should not be called outside of Window.cpp, but I don't have a great solution to hide this.
 	const list<shared_ptr<UltralightView>>& GetSortedUltralightViews();
 	bool IsWindowMaximized() const;
+	void SetPosition(int x, int y, int width = -1, int height = -1);
 	void Maximize();
 	void Restore();
 	void Show();
@@ -70,4 +71,5 @@ private:
 	//TODO: Add z-index support
 	list<shared_ptr<UltralightView>> m_UltralightViewsSorted; //Sorted based on z-index
 	std::shared_ptr<UltralightView> m_FocusedUltralightView = nullptr;
+	bool m_CloseInitiated = false;
 };

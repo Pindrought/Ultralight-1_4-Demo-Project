@@ -110,6 +110,23 @@ bool Engine::Startup()
 
 bool Engine::Tick()
 {
+	if (!TickStart())
+	{
+		return false;
+	}
+	if (!ProcessInput())
+	{
+		return false;
+	}
+	if (!TickEnd())
+	{
+		return false;
+	}
+	return true;
+}
+
+bool Engine::ProcessInput()
+{
 	//Process Input Events
 	auto& keyboard = m_InputController.m_Keyboard;
 	auto& mouse = m_InputController.m_Mouse;
@@ -124,11 +141,11 @@ bool Engine::Tick()
 			if (mouseEvent.GetType() == MouseEvent::Type::MouseMove)
 			{
 				//TODO: Maybe add error checking?
-				
+
 				Window* pWindow = GetWindowFromId(mouseEvent.GetWindowId());
 				uint16_t windowWidth = pWindow->GetWidth();
 				uint16_t windowHeight = pWindow->GetHeight();
-				if (mouseEvent.GetPosX() < windowWidth && 
+				if (mouseEvent.GetPosX() < windowWidth &&
 					mouseEvent.GetPosY() < windowHeight)
 				{
 					CursorManager::SetCursor(CursorType::ARROW);

@@ -24,7 +24,10 @@ public:
 	bool IsRunning();
 	void ProcessWindowsMessages();
 	virtual bool Startup();
-	virtual bool Tick(); //Tick is called once per frame before RenderFrame() and is where mouse/keyboard processing/redirection should occur.
+	bool Tick();
+	virtual bool TickStart() { return true;  };
+	virtual bool ProcessInput();
+	virtual bool TickEnd() { return true; };
 	virtual EZJSParm OnEventCallbackFromUltralight(int32_t viewId, string eventName, vector<EZJSParm> parameters) = 0;
 	virtual void OnWindowDestroyStartCallback(int32_t windowId) = 0;
 	virtual void OnWindowDestroyEndCallback(int32_t windowId) = 0;

@@ -28,7 +28,7 @@ bool DemoBorderlessResizableMovable::Startup()
 	m_UltralightMgr->SetViewToWindow(pView->GetId(), pWindow->GetId());
 }
 
-bool DemoBorderlessResizableMovable::Tick()
+bool DemoBorderlessResizableMovable::ProcessInput()
 {
 	//Process Input Events
 	auto& keyboard = m_InputController.m_Keyboard;
