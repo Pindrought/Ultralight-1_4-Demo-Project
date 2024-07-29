@@ -44,6 +44,8 @@ bool DemoAntiAliasTest::Startup()
 		m_Windows.push_back(pWindow);
 	}
 
+
+	//This is all to just reposition the windows so they are not stacked on top of each other
 	int windowCount = m_Windows.size();
 	int screenWidth = GetSystemMetrics(SM_CXSCREEN);
 	int screenHeight = GetSystemMetrics(SM_CYSCREEN);
