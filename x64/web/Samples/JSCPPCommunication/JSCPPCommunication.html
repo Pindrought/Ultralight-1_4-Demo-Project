@@ -1,0 +1,60 @@
+<html>
+    <head>
+        <link rel="stylesheet" href="JSCPPCommunication.css">
+    </head>
+    <body>
+        <div>
+            <span>JS->CPP Examples.</span></br>
+            <span>JS->CPP Examples 1-7 will generate some form of data and then the C++ event that is triggered will display a messagebox with the data.</span>
+        </div>
+        <div>
+            <button onclick="JS_CPP1()">JS->CPP 1</button>
+            <span>One number.</span>
+        </div>
+        <div>
+            <button onclick="JS_CPP2()">JS->CPP 2</button>
+            <span>One string.</span>
+        </div>
+        <div>
+            <button onclick="JS_CPP3()">JS->CPP 3</button>
+            <span>One boolean.</span>
+        </div>
+        <div>
+            <button onclick="JS_CPP4()">JS->CPP 4</button>
+            <span>Null value.</span>
+        </div>
+        <div>
+            <button onclick="JS_CPP5()">JS->CPP 5</button>
+            <span>Array of numbers.</span>
+        </div>
+        <div>
+            <button onclick="JS_CPP6()">JS->CPP 6</button>
+            <span>Key-value-pairs object where the keys are the different properties of the object and the values are the field values.</span>
+        </div>
+        <div>
+            <button onclick="JS_CPP7()">JS->CPP 7</button>
+            <span>Two arguments. First arg string, second arg boolean.</span>
+        </div>
+        <div>
+            <button onclick="JS_CPP8()">JS->CPP 8</button>
+            <span>This event will call an event and C++ will return the current tick count back to JS from the CallEvent function.</span><br/>
+            <span id="span_tickCount">Tick Count: ?</span>
+        </div>
+        <div>
+            <button onclick="CallEvent('CPP_JS1')">CPP->JS 1</button>
+            <span>The <b>CPP_JS1</b> event will call the <b>CPP_JS1</b> function and pass in a string.</span><br/>
+            <span id="span_CPP_JS1">String: ?</span>
+        </div>
+        <div>
+            <button onclick="CallEvent('CPP_JS2')">CPP->JS 2</button>
+            <span>The <b>CPP_JS2</b> event will call the <b>CPP_JS2</b> function and pass in a string and a number.</span><br/>
+            <span id="span_CPP_JS2">Parameters: ?</span>
+        </div>
+        <div>
+            <button onclick="CallEvent('CPP_JS3')">CPP->JS 3</button>
+            <span>The <b>CPP_JS3</b> event will call the <b>CPP_JS3</b> function and pass in an array of random numbers.</span><br/>
+            <span id="span_CPP_JS3">Parameters: ?</span>
+        </div>
+    </body>
+    <script src="JSCPPCommunication.js"></script>
+</html>

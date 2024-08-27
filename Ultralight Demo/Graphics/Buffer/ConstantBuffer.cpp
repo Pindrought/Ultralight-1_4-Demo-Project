@@ -80,3 +80,6 @@ bool ConstantBuffer<T>::ApplyChanges(int byteCount)
 template ConstantBuffer<ConstantBufferType::CB_PerFrameData_2D>;
 template ConstantBuffer<ConstantBufferType::CB_PerDrawData_2D>;
 template ConstantBuffer<ConstantBufferType::CB_UltralightData>;
+template ConstantBuffer<ConstantBufferType::CB_PerFrameData_3D>;
+template ConstantBuffer<ConstantBufferType::CB_PerDrawData_3D>;
+template ConstantBuffer<ConstantBufferType::CB_Material>;

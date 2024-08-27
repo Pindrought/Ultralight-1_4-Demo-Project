@@ -24,6 +24,8 @@ public:
 	D3D11_VIEWPORT& GetViewport();
 	void SetBackgroundColor(float r, float g, float b, float a);
 	float* GetBackgroundColor();
+	Camera* GetCamera();
+	void SetCamera(shared_ptr<Camera> camera);
 	void ResolveIfNecessary();
 	void ResetRenderTargetsForResize();
 	void UpdateViewportDimensions(UINT width, UINT height);
@@ -37,9 +39,11 @@ public:
 	void AdvanceUpdateInterval(float ms);
 	void ResetReadyForRender();
 	void SetUpdateInterval(float ms);
+	float GetFrameDeltaTime() const;
 
 	~RenderTargetContainer();
 private:
+	shared_ptr<Camera> m_ActiveCamera = nullptr;
 	bool m_IsActive = true;
 	bool m_IsWindowRenderTarget = false;
 	std::shared_ptr<RenderTarget> m_RenderTarget = nullptr;
@@ -52,5 +56,6 @@ private:
 	Window* m_WindowPtr = nullptr;
 	float m_UpdateInterval = 0; //0 = never delay update, otherwise interval is in miliseconds for how often to update
 	float m_UpdateIntervalProgress = 0;
+	float m_DeltaTime = 0; //Time between current/last ResetReadyForRender call
 };
 

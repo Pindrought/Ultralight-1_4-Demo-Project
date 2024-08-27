@@ -443,7 +443,14 @@ UltralightView::~UltralightView()
 		s_UltralightViewIDPoolManager.StoreId(m_Id);
 	}
 
-	m_NativeView->Release(); //I don't think this should be necessary, but for some reason it is when using the inspector view.
+	if (m_InspectorView != nullptr)
+	{
+	}
+	int refCount = m_NativeView->ref_count();
+	if (refCount > 1)
+		m_NativeView->Release(); //This is necessary for when an inspector view is holding a ref to this view or else this will never be cleaned up
+	//Note that in some cases there is still a crash when it comes to releasing the Ultralight views. Haven't figured out what I am doing to cause that yet.
+	
 	LOGINFO("~UltralightView() --");
 	LOGINFO(m_Name.c_str());
 	LOGINFO("\n");

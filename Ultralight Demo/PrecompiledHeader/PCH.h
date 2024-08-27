@@ -1,5 +1,6 @@
 #pragma once
 #define NOMINMAX
+
 //These are 3 helper classes that I don't feel like including in every single source file so i'm just putting it as part of the precompiled header.
 #include "StringConverter.h"
 #include "ErrorHandler.h"
@@ -11,7 +12,6 @@
 #define MYLOGGER_LOG_INFO 1
 #endif
 #include "MyLogger.h" 
-
 
 #include <fstream>
 #include <chrono>
@@ -29,6 +29,7 @@
 #include <thread>
 #include <comdef.h>
 #include <Windows.h>
+#include <filesystem>
 
 #include <dcomp.h>
 #pragma comment(lib, "dcomp")
@@ -61,8 +62,10 @@
 
 #include <DirectXTex/DirectXTex.h>
 
+class Camera;
 class D3DClass;
 class Engine;
+class Entity;
 class GraphicsContext;
 class GraphicsDevice;
 class InputController;
@@ -71,6 +74,7 @@ class MouseEvent;
 class Renderer;
 class RenderTarget;
 class RenderTargetContainer;
+class Scene;
 class ScrollEvent;
 class Texture;
 class UltralightManager;

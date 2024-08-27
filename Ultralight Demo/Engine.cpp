@@ -49,6 +49,8 @@ bool Engine::Initialize()
 
 	SetRunning(true);
 
+	m_FrameTimer.Start();
+
     return true;
 }
 
@@ -110,6 +112,9 @@ bool Engine::Startup()
 
 bool Engine::Tick()
 {
+	m_DeltaTime = m_FrameTimer.GetMilisecondsElapsed();
+	m_FrameTimer.Restart();
+
 	if (!TickStart())
 	{
 		return false;
@@ -214,20 +219,14 @@ Engine::~Engine()
 	}
 	m_WindowIdToWindowInstanceMap.clear();
 	m_UltralightMgr->Shutdown();
-	/*RetargetableGPUDriverD3D11* pR = (RetargetableGPUDriverD3D11*)m_UltralightMgr->GetGPUDriver();
-	GPUDriverD3D11* pDriver = (GPUDriverD3D11*)pR->m_CurrentGPUDriverImpl.get();*/
-	//for (int i = 0; i < 60; i++)
-	//{
-	//	Sleep(1);
-	//	RenderFrame();
-	//}
 }
 
 void Engine::RenderFrame()
 {
+	OnPreRenderFrame();
+
 	m_UltralightMgr->UpdateViews();
 
-	float deltaTime = 0;
 	vector<Window*> windowsFlaggedForRender;
 
 	for (auto& windowPair : m_WindowIdToWindowInstanceMap)
@@ -240,7 +239,7 @@ void Engine::RenderFrame()
 			continue;
 		}
 
-		pRenderTargetContainer->AdvanceUpdateInterval(deltaTime);
+		pRenderTargetContainer->AdvanceUpdateInterval(m_DeltaTime);
 		if (pRenderTargetContainer->IsReadyForRender())
 		{
 			pRenderTargetContainer->ResetReadyForRender();
@@ -250,7 +249,14 @@ void Engine::RenderFrame()
 		{
 			continue; //Do not render render targets if they are not ready to be rendered. This only happens when limiting refresh rate at render target level.
 		}
+	}
 
+	for (auto pWindow : windowsFlaggedForRender) //Render each of our scenes to our render targets where applicable
+	{
+		RenderTargetContainer* pRenderTargetContainer = pWindow->GetRenderTargetContainer();
+		m_Renderer.ClearRenderTarget(pRenderTargetContainer);
+
+		m_Renderer.RenderSceneInRenderTargetContainer(pRenderTargetContainer); //If no camera is bound with an attached scene, this will just exit
 	}
 
 	OnPreRenderULViews(); //for if we want to draw anything before the UL views have been rendered
@@ -258,8 +264,7 @@ void Engine::RenderFrame()
 	for (auto pWindow : windowsFlaggedForRender) //Render each of our ultralight views to each window
 	{
 		RenderTargetContainer* pRenderTargetContainer = pWindow->GetRenderTargetContainer();
-		m_Renderer.ClearRenderTarget(pRenderTargetContainer);
-
+		m_Renderer.PrepareFor2DRendering(pRenderTargetContainer);
 		for (shared_ptr<UltralightView> pUltralightView : pWindow->GetSortedUltralightViews())
 		{
 			m_Renderer.RenderUltralightView(pUltralightView.get());

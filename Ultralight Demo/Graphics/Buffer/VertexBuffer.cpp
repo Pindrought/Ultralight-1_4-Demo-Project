@@ -2,6 +2,7 @@
 #include "VertexBuffer.h"
 #include "Vertex.h"
 #include "../D3DClass.h"
+#include "../EZGLTF/EZGLTFTypes.h"
 
 template<class T>
 ID3D11Buffer* VertexBuffer<T>::Get() const
@@ -107,3 +108,10 @@ bool VertexBuffer<T>::Initialize(T* data,
 }
 
 template VertexBuffer<Vertex_2D>;
+
+template VertexBuffer<Vector3>;
+template VertexBuffer<Vector4>;
+template VertexBuffer<Vector3>;
+template VertexBuffer<Vector2>;
+template VertexBuffer<EZGLTF::JointIndexVec4>;
+template VertexBuffer<EZGLTF::JointWeightsVec4>;

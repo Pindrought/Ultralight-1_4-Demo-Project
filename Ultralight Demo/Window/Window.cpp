@@ -309,8 +309,9 @@ LRESULT Window::WindowProcA(HWND hwnd,
 		pEngine->CleanupWindow(m_Id);
 		UltralightManager* pUltralightManager = UltralightManager::GetInstance();
 		assert(pUltralightManager != nullptr);
-		pUltralightManager->RemoveWindowId(m_Id);
-		pEngine->OnWindowDestroyEndCallback(m_Id);
+		int id = m_Id; //Need to store the window, because it will be deallocated after RemoveWindowId is called
+		pUltralightManager->RemoveWindowId(id);
+		pEngine->OnWindowDestroyEndCallback(id);
 		return 0;
 	}
 	case WM_DWMCOMPOSITIONCHANGED:

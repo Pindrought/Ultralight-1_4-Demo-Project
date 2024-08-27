@@ -51,13 +51,12 @@ bool Texture::Initialize(const string& filePath, bool forceSRGB)
 {
 	D3DClass* pD3D = D3DClass::GetInstance();
 	ID3D11Device* pDevice = pD3D->m_Device.Get();
-	std::string fullFilePath = DirectoryHelper::GetExecutableDirectoryA() + filePath;
 	std::string ext = filePath.substr(filePath.find_last_of(".") + 1);
 	if (ext == "dds")
 	{
 		HRESULT hr = E_FAIL;
 		DirectX::ScratchImage scratch;
-		hr = DirectX::LoadFromDDSFile(StringConverter::s2ws(fullFilePath).c_str(),
+		hr = DirectX::LoadFromDDSFile(StringConverter::s2ws(filePath).c_str(),
 									  DirectX::DDS_FLAGS::DDS_FLAGS_NONE,
 									  nullptr,
 									  scratch);
@@ -92,7 +91,7 @@ bool Texture::Initialize(const string& filePath, bool forceSRGB)
 	{
 		HRESULT hr = E_FAIL;
 		DirectX::ScratchImage scratch;
-		hr = DirectX::LoadFromTGAFile(StringConverter::s2ws(fullFilePath).c_str(),
+		hr = DirectX::LoadFromTGAFile(StringConverter::s2ws(filePath).c_str(),
 									  nullptr,
 									  scratch);
 		if (FAILED(hr))
@@ -127,7 +126,7 @@ bool Texture::Initialize(const string& filePath, bool forceSRGB)
 
 		DirectX::ScratchImage scratch;
 		DirectX::TexMetadata metadata;
-		hr = DirectX::LoadFromWICFile(StringConverter::s2ws(fullFilePath).c_str(),
+		hr = DirectX::LoadFromWICFile(StringConverter::s2ws(filePath).c_str(),
 									  DirectX::WIC_FLAGS::WIC_FLAGS_FORCE_SRGB,
 									  &metadata, scratch);
 		if (FAILED(hr))

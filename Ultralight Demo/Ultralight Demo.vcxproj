@@ -162,6 +162,7 @@ copy /Y "$(SolutionDir)ThirdParty\Ultralight\bin\WebCore.dll" "$(TargetDir)WebCo
     <ClCompile Include="Demos\DemoBorderlessResizable\DemoBorderlessResizable.cpp" />
     <ClCompile Include="Demos\DemoCPPTextureInBrowser\CustomFileSystem\CustomFileSystem.cpp" />
     <ClCompile Include="Demos\DemoCPPTextureInBrowser\DemoCPPTextureInBrowser.cpp" />
+    <ClCompile Include="Demos\DemoCubeDraw\DemoCubeDraw.cpp" />
     <ClCompile Include="Demos\DemoInspector\DemoInspector.cpp" />
     <ClCompile Include="Demos\DemoJSCppCommunication\DemoJSCPPCommunication.cpp" />
     <ClCompile Include="Demos\DemoOpenFileDialog\DemoOpenFileDialog.cpp" />
@@ -173,10 +174,20 @@ copy /Y "$(SolutionDir)ThirdParty\Ultralight\bin\WebCore.dll" "$(TargetDir)WebCo
     <ClCompile Include="Graphics\Buffer\IndexBuffer.cpp" />
     <ClCompile Include="Graphics\Buffer\VertexBuffer.cpp" />
     <ClCompile Include="Graphics\D3DClass.cpp" />
+    <ClCompile Include="Graphics\EZGLTF\AnimationChannel.cpp" />
+    <ClCompile Include="Graphics\EZGLTF\GLTFLoader.cpp" />
+    <ClCompile Include="Graphics\EZGLTF\Skeleton.cpp" />
+    <ClCompile Include="Graphics\EZGLTF\TinyGLTFEnumToString.cpp" />
+    <ClCompile Include="Graphics\MeshGenerator.cpp" />
     <ClCompile Include="Graphics\Misc\PixelColor.cpp" />
     <ClCompile Include="Graphics\PipelineState.cpp" />
     <ClCompile Include="Graphics\PipelineStateBuilder.cpp" />
+    <ClCompile Include="Graphics\Renderable\Camera.cpp" />
+    <ClCompile Include="Graphics\Renderable\Entity.cpp" />
     <ClCompile Include="Graphics\Renderable\Mesh2D.cpp" />
+    <ClCompile Include="Graphics\Renderable\Model.cpp" />
+    <ClCompile Include="Graphics\Renderable\PrimitiveAttributeSet.cpp" />
+    <ClCompile Include="Graphics\Renderable\PrimitiveRef.cpp" />
     <ClCompile Include="Graphics\Renderer.cpp" />
     <ClCompile Include="Graphics\RenderTarget\RenderTarget.cpp" />
     <ClCompile Include="Graphics\RenderTarget\RenderTargetContainer.cpp" />
@@ -185,6 +196,7 @@ copy /Y "$(SolutionDir)ThirdParty\Ultralight\bin\WebCore.dll" "$(TargetDir)WebCo
     <ClCompile Include="Graphics\Texture.cpp" />
     <ClCompile Include="Misc\CursorManager.cpp" />
     <ClCompile Include="Misc\IDPoolManager.cpp" />
+    <ClCompile Include="Misc\Timer.cpp" />
     <ClCompile Include="PrecompiledHeader\DirectoryHelper.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
     </ClCompile>
@@ -238,6 +250,7 @@ copy /Y "$(SolutionDir)ThirdParty\Ultralight\bin\WebCore.dll" "$(TargetDir)WebCo
     <ClInclude Include="Demos\DemoBorderlessResizable\DemoBorderlessResizable.h" />
     <ClInclude Include="Demos\DemoCPPTextureInBrowser\CustomFileSystem\CustomFileSystem.h" />
     <ClInclude Include="Demos\DemoCPPTextureInBrowser\DemoCPPTextureInBrowser.h" />
+    <ClInclude Include="Demos\DemoCubeDraw\DemoCubeDraw.h" />
     <ClInclude Include="Demos\DemoInspector\DemoInspector.h" />
     <ClInclude Include="Demos\DemoJSCppCommunication\DemoJSCPPCommunication.h" />
     <ClInclude Include="Demos\DemoOpenFileDialog\DemoOpenFileDialog.h" />
@@ -252,11 +265,34 @@ copy /Y "$(SolutionDir)ThirdParty\Ultralight\bin\WebCore.dll" "$(TargetDir)WebCo
     <ClInclude Include="Graphics\Buffer\Vertex.h" />
     <ClInclude Include="Graphics\Buffer\VertexBuffer.h" />
     <ClInclude Include="Graphics\D3DClass.h" />
+    <ClInclude Include="Graphics\EZGLTF\AABB.h" />
+    <ClInclude Include="Graphics\EZGLTF\AnimationChannel.h" />
+    <ClInclude Include="Graphics\EZGLTF\AnimationClip.h" />
+    <ClInclude Include="Graphics\EZGLTF\EZGLTFTypes.h" />
+    <ClInclude Include="Graphics\EZGLTF\FloatKeys.h" />
+    <ClInclude Include="Graphics\EZGLTF\GLTFLoader.h" />
+    <ClInclude Include="Graphics\EZGLTF\Skeleton.h" />
+    <ClInclude Include="Graphics\EZGLTF\SkeletonNode.h" />
+    <ClInclude Include="Graphics\EZGLTF\SkeletonPose.h" />
+    <ClInclude Include="Graphics\EZGLTF\TinyGLTFEnumToString.h" />
+    <ClInclude Include="Graphics\EZGLTF\tiny_gltf\json.hpp" />
+    <ClInclude Include="Graphics\EZGLTF\tiny_gltf\stb_image.h" />
+    <ClInclude Include="Graphics\EZGLTF\tiny_gltf\stb_image_write.h" />
+    <ClInclude Include="Graphics\EZGLTF\tiny_gltf\tiny_gltf.h" />
     <ClInclude Include="Graphics\InputLayoutDescriptions.h" />
+    <ClInclude Include="Graphics\MeshGenerator.h" />
     <ClInclude Include="Graphics\Misc\PixelColor.h" />
     <ClInclude Include="Graphics\PipelineState.h" />
     <ClInclude Include="Graphics\PipelineStateBuilder.h" />
+    <ClInclude Include="Graphics\Renderable\Camera.h" />
+    <ClInclude Include="Graphics\Renderable\Entity.h" />
+    <ClInclude Include="Graphics\Renderable\Mesh.h" />
     <ClInclude Include="Graphics\Renderable\Mesh2D.h" />
+    <ClInclude Include="Graphics\Renderable\Model.h" />
+    <ClInclude Include="Graphics\Renderable\Primitive.h" />
+    <ClInclude Include="Graphics\Renderable\PrimitiveAttributeSet.h" />
+    <ClInclude Include="Graphics\Renderable\PrimitiveRef.h" />
+    <ClInclude Include="Graphics\Renderable\Scene.h" />
     <ClInclude Include="Graphics\Renderer.h" />
     <ClInclude Include="Graphics\RenderTarget\RenderTarget.h" />
     <ClInclude Include="Graphics\RenderTarget\RenderTargetContainer.h" />
@@ -265,6 +301,7 @@ copy /Y "$(SolutionDir)ThirdParty\Ultralight\bin\WebCore.dll" "$(TargetDir)WebCo
     <ClInclude Include="Graphics\Texture.h" />
     <ClInclude Include="Misc\CursorManager.h" />
     <ClInclude Include="Misc\IDPoolManager.h" />
+    <ClInclude Include="Misc\Timer.h" />
     <ClInclude Include="PrecompiledHeader\DirectoryHelper.h" />
     <ClInclude Include="PrecompiledHeader\ErrorHandler.h" />
     <ClInclude Include="PrecompiledHeader\MyLogger.h" />
@@ -300,9 +337,16 @@ copy /Y "$(SolutionDir)ThirdParty\Ultralight\bin\WebCore.dll" "$(TargetDir)WebCo
     <None Include="packages.config" />
     <None Include="PrecompiledHeader\SimpleMath.inl" />
     <None Include="Shaders\Common\Common2D.hlsli" />
+    <None Include="Shaders\Common\Common3D.hlsli" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Shaders\PixelShader\PS_2D.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">5.0</ShaderModel>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|x64'">5.0</ShaderModel>
+    </FxCompile>
+    <FxCompile Include="Shaders\PixelShader\PS_3D.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">5.0</ShaderModel>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
@@ -333,6 +377,12 @@ copy /Y "$(SolutionDir)ThirdParty\Ultralight\bin\WebCore.dll" "$(TargetDir)WebCo
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|x64'">5.0</ShaderModel>
     </FxCompile>
     <FxCompile Include="Shaders\VertexShader\VS_2D.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">5.0</ShaderModel>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Vertex</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|x64'">5.0</ShaderModel>
+    </FxCompile>
+    <FxCompile Include="Shaders\VertexShader\VS_3D.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">5.0</ShaderModel>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Vertex</ShaderType>

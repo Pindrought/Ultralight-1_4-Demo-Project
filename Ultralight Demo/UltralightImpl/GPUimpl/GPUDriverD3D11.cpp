@@ -256,9 +256,6 @@ void GPUDriverD3D11::CreateRenderBuffer(uint32_t renderBufferId, const ul::Rende
     if (render_target_entry.IsMSAARenderTarget)
     {
         renderTargetViewDesc.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE2DMS;
-    }
-
-    {
         ID3D11Device* pDevice = D3DClass::GetInstance()->m_Device.Get();
         //For MSAA Render targets, this is where we need to update the texture being stored to be a MSAA texture and move the current texture to be used for the resolve texture
         assert(textureEntry.IsRenderBuffer == true);

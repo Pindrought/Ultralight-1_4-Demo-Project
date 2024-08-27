@@ -28,8 +28,9 @@ bool DemoOverlayedCPPTextureOnDiv::Startup()
 	m_UltralightMgr->SetViewToWindow(pView->GetId(), m_PrimaryWindow->GetId());
 
 	m_CPPTexture = std::make_shared<Texture>();
-	if (!m_CPPTexture->Initialize("AIBowser.png"))
+	if (!m_CPPTexture->Initialize(DirectoryHelper::GetAssetsDirectoryA() + "AIBowser.png"))
 	{
+		FatalError("Failed to load AIBowser.png.");
 		return false;
 	}
 }

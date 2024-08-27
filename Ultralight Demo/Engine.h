@@ -4,6 +4,7 @@
 #include "Window/Window.h"
 #include "Window/InputController/InputController.h"
 #include "UltralightImpl/UltralightManager.h"
+#include "../Misc/Timer.h"
 
 struct WindowDragInfo
 {
@@ -36,6 +37,7 @@ public:
 	std::shared_ptr<Window> SpawnWindow(const WindowCreationParameters& parms);
 	bool CleanupWindow(int32_t windowId);
 	Window* GetWindowFromId(int32_t windowId);
+	virtual void OnPreRenderFrame() {};
 	void RenderFrame();
 	virtual void OnPreRenderULViews();
 	virtual void OnPostRenderULViews();
@@ -48,4 +50,7 @@ protected:
 	shared_ptr<UltralightManager> m_UltralightMgr;
 	bool m_IsRunning = false;
 	bool m_VSync = true;
+	float m_DeltaTime = 0; //Delta time between each frame - calculated at the start of each tick
+private:
+	Timer m_FrameTimer;
 };

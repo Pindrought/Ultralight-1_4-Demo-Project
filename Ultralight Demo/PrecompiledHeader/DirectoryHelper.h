@@ -4,6 +4,9 @@
 class DirectoryHelper
 {
 public:
+	static bool DirectoryExists(std::string path);
+	static std::string GetAssetsDirectoryA();
+	static std::wstring GetAssetsDirectory();
 	static std::string GetExecutableDirectoryA();
 	static std::wstring GetExecutableDirectory();
 	static std::string NormalizePathA(std::string path);
@@ -15,6 +18,8 @@ public:
 	static std::string GetWebDirectoryA();
 	static std::wstring GetWebDirectory();
 private:
+	static std::wstring s_AssetsDirectory;
+	static std::string s_AssetsDirectoryA;
 	static std::wstring s_ExecutableDirectory;
 	static std::string s_ExecutableDirectoryA;
 	static std::wstring s_WebDirectory;

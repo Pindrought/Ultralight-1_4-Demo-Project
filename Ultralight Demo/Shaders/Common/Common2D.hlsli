@@ -1,3 +1,5 @@
+#pragma pack_matrix( row_major )
+
 struct VertexShaderInput
 {
 	float3 Position : POSITION;

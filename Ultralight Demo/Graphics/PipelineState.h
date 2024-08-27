@@ -8,6 +8,7 @@ struct PipelineState
 public:
 	PipelineState() {}
 	PipelineState(std::string name);
+	void ClonePipelineStateProperties(shared_ptr<PipelineState> pipelineStateToCopy);
 	std::string Name = "Undefined";
 	ComPtr<ID3D11RasterizerState> RasterizerState = nullptr;
 	ComPtr<ID3D11SamplerState> SamplerState = nullptr;

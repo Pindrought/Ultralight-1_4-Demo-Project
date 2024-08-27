@@ -58,6 +58,10 @@ EZJSParm DemoSelector::OnEventCallbackFromUltralight(int32_t viewId, string even
 		{
 			m_SelectedDemo = DemoId::DemoCPPTextureInBrowser;
 		}
+		if (demoName == "DemoCubeDraw")
+		{
+			m_SelectedDemo = DemoId::DemoCubeDraw;
+		}
 		if (demoName == "DemoInspector")
 		{
 			m_SelectedDemo = DemoId::DemoInspector;

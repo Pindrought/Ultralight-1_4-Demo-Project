@@ -183,6 +183,16 @@ float* RenderTargetContainer::GetBackgroundColor()
     return m_BGColor;
 }
 
+Camera* RenderTargetContainer::GetCamera()
+{
+    return m_ActiveCamera.get();
+}
+
+void RenderTargetContainer::SetCamera(shared_ptr<Camera> camera)
+{
+    m_ActiveCamera = camera;
+}
+
 void RenderTargetContainer::ResolveIfNecessary()
 {
     if (m_MSAARenderTarget == nullptr)
@@ -262,7 +272,7 @@ void RenderTargetContainer::AdvanceUpdateInterval(float ms)
 {
     if (m_UpdateInterval == 0)
     {
-        m_UpdateIntervalProgress = 0;
+        m_UpdateIntervalProgress = ms;
     }
     else
     {
@@ -272,6 +282,7 @@ void RenderTargetContainer::AdvanceUpdateInterval(float ms)
 
 void RenderTargetContainer::ResetReadyForRender()
 {
+    m_DeltaTime = m_UpdateIntervalProgress;
     m_UpdateIntervalProgress = 0;
 }
 
@@ -279,6 +290,11 @@ void RenderTargetContainer::SetUpdateInterval(float ms)
 {
     m_UpdateInterval = ms;
     m_UpdateIntervalProgress = ms; //Do this to force an update automatically when we update the interval
+}
+
+float RenderTargetContainer::GetFrameDeltaTime() const
+{
+    return m_DeltaTime;
 }
 
 RenderTargetContainer::~RenderTargetContainer()
