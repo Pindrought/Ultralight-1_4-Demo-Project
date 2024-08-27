@@ -1,10 +1,13 @@
 #pragma once
 #include <string>
+#include <vector>
 
 class DirectoryHelper
 {
 public:
 	static bool DirectoryExists(std::string path);
+	static std::string GetParentDirectory(std::string path);
+	static std::vector<std::string> GetListOfDrives();
 	static std::string GetAssetsDirectoryA();
 	static std::wstring GetAssetsDirectory();
 	static std::string GetExecutableDirectoryA();

@@ -53,6 +53,11 @@ bool Entity::IsVisible() const
 void Entity::SetModel(shared_ptr<Model> model)
 {
     m_Model = model;
+
+    auto& skeleton = m_Model->GetSkeleton();
+    m_SkeletonPose.NodeTransforms.resize(skeleton.m_Nodes.size());
+    m_SkeletonPose.BoneTransforms.resize(skeleton.m_BoneTransforms.size());
+    UpdatePose();
 }
 
 void Entity::SetPosition(Vector3 pos)

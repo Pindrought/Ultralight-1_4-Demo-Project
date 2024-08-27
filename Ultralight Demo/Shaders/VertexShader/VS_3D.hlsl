@@ -14,7 +14,7 @@ VertexShaderOutput main(VertexShaderInput input)
 							  BoneTransformsCB.BoneTransforms[input.JointIndices[3]] * input.JointWeights[3];
 		float4x4 finalMatrixWVP = mul(skinMatrix, mvp);
 		output.Position = mul(float4(input.Position, 1.0f), finalMatrixWVP);
-		float4x4 finalMatrixWorld = mul(skinMatrix, model);
+		float4x4 finalMatrixWorld = mul(skinMatrix, PerDrawDataCB.Model);
 		output.NormalVS = normalize(mul(float4(input.Normal, 0.0f), finalMatrixWorld));
 	}
 	else

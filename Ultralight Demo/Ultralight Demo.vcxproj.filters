@@ -222,6 +222,9 @@
     <ClCompile Include="Graphics\EZGLTF\TinyGLTFEnumToString.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Demos\DemoGLTFViewer\DemoGLTFViewer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="PrecompiledHeader\ErrorHandler.h">
@@ -486,6 +489,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Graphics\EZGLTF\tiny_gltf\stb_image_write.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Demos\DemoGLTFViewer\DemoGLTFViewer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

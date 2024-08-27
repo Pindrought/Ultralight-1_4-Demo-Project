@@ -78,6 +78,10 @@ EZJSParm DemoSelector::OnEventCallbackFromUltralight(int32_t viewId, string even
 		{
 			m_SelectedDemo = DemoId::DemoTransparent;
 		}
+		if (demoName == "DemoGLTFViewer")
+		{
+			m_SelectedDemo = DemoId::DemoGLTFViewer;
+		}
 		if (demoName == "DemoOverlayedCPPTexture")
 		{
 			m_SelectedDemo = DemoId::DemoOverlayedCPPTexture;

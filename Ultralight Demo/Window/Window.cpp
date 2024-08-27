@@ -198,6 +198,18 @@ bool Window::Initialize(const WindowCreationParameters& parms)
 	return true;
 }
 
+void Window::Enable()
+{
+	m_IsEnabled = true;
+	EnableWindow(m_HWND, TRUE);
+}
+
+void Window::Disable()
+{
+	m_IsEnabled = false;
+	EnableWindow(m_HWND, FALSE);
+}
+
 int32_t Window::GetId() const
 {
 	return m_Id;

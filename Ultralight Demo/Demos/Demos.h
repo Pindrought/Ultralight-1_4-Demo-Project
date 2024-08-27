@@ -12,6 +12,7 @@
 #include "DemoJSCppCommunication/DemoJSCPPCommunication.h"
 #include "DemoOverlayedCPPTextureOnDiv/DemoOverlayedCPPTextureOnDiv.h"
 #include "DemoCubeDraw/DemoCubeDraw.h"
+#include "DemoGLTFViewer/DemoGLTFViewer.h"
 #include "DemoSelector/DemoSelector.h"
 
 shared_ptr<Engine> GenerateEngineInstanceForDemo(DemoSelector::DemoId demoId)
@@ -36,6 +37,9 @@ shared_ptr<Engine> GenerateEngineInstanceForDemo(DemoSelector::DemoId demoId)
 			break;*/
 	case DemoSelector::DemoId::DemoCubeDraw:
 		demoInstance = make_shared<DemoCubeDraw>();
+		break;
+	case DemoSelector::DemoId::DemoGLTFViewer:
+		demoInstance = make_shared<DemoGLTFViewer>();
 		break;
 	case DemoSelector::DemoId::DemoInspector:
 		demoInstance = make_shared<DemoInspector>();

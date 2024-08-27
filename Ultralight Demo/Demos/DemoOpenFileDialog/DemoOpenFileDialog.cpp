@@ -1,9 +1,6 @@
 #include "PCH.h"
 #include "DemoOpenFileDialog.h"
 #include "../Misc/CursorManager.h"
-#include <ShlObj.h>
-#include <filesystem>
-#pragma comment(lib, "shell32.lib")
 namespace fs = std::filesystem;
 
 bool DemoOpenFileDialog::Startup()
@@ -33,18 +30,6 @@ bool DemoOpenFileDialog::Startup()
 	m_UltralightMgr->SetViewToWindow(m_PrimaryView->GetId(), m_PrimaryWindow->GetId());
 
 	m_LastDirectoryAccessed = DirectoryHelper::GetExecutableDirectoryA();
-}
-
-std::vector<std::string> getListOfDrives() 
-{
-	std::vector<std::string> arrayOfDrives;
-	char* szDrives = new char[MAX_PATH]();
-	if (GetLogicalDriveStringsA(MAX_PATH, szDrives));
-	for (int i = 0; i < 100; i += 4)
-		if (szDrives[i] != (char)0)
-			arrayOfDrives.push_back(std::string{ szDrives[i],szDrives[i + 1],szDrives[i + 2] });
-	delete[] szDrives;
-	return arrayOfDrives;
 }
 
 EZJSParm DemoOpenFileDialog::OnEventCallbackFromUltralight(int32_t viewId, string eventName, vector<EZJSParm> parameters)
@@ -78,7 +63,7 @@ EZJSParm DemoOpenFileDialog::OnEventCallbackFromUltralight(int32_t viewId, strin
 			}
 		};
 		
-		for (auto& drive : getListOfDrives())
+		for (auto& drive : DirectoryHelper::GetListOfDrives())
 		{
 			EZJSParm outReturnVal;
 			string outException;

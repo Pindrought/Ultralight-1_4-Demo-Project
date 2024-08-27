@@ -68,6 +68,7 @@ void DemoOverlayedCPPTextureOnDiv::OnWindowDestroyStartCallback(int32_t windowId
 
 void DemoOverlayedCPPTextureOnDiv::OnWindowDestroyEndCallback(int32_t windowId)
 {
+
 	if (m_WindowIdToWindowInstanceMap.size() == 0)
 	{
 		SetRunning(false);

@@ -22,6 +22,8 @@ class Window
 public:
 	~Window();
 	bool Initialize(const WindowCreationParameters& parms);
+	void Enable();
+	void Disable();
 	int32_t GetId() const;
 	HWND GetHWND() const;
 	int32_t GetWidth() const;
@@ -49,6 +51,7 @@ private:
 	bool ResizeSwapChainAndRenderTargetContainer();
 	static int32_t GetAvailableWindowId();
 	HWND m_HWND = NULL;
+	bool m_IsEnabled = true;
 	string m_Title = "";
 	int32_t m_Id = -1;
 	int32_t m_Width = 0;

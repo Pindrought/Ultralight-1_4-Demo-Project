@@ -2,7 +2,7 @@
 #include "PCH.h"
 #include "Entity.h"
 
-class Scene
+class Scene //Most basic scene class imaginable
 {
 public:
 	vector<shared_ptr<Entity>> Entities;

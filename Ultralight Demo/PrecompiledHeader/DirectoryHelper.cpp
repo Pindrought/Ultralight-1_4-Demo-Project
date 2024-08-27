@@ -16,6 +16,38 @@ bool DirectoryHelper::DirectoryExists(std::string path)
 	return filepathExists;
 }
 
+std::string DirectoryHelper::GetParentDirectory(std::string path)
+{
+	path = NormalizePathA(path);
+
+	size_t offset = path.find_last_of('/');
+	if (offset == 2) //Drive? Ex. C:/
+	{
+		return path;
+	}
+	if (offset == path.size() - 1) //Last character? try again this isn't what we want
+	{
+		path[offset] = '\0'; //Replace last / and look again
+		offset = path.find_last_of('/');
+	}
+	
+	path = path.substr(0, offset + 1);
+
+	return path;
+}
+
+std::vector<std::string> DirectoryHelper::GetListOfDrives()
+{
+	std::vector<std::string> arrayOfDrives;
+	char* szDrives = new char[MAX_PATH]();
+	if (GetLogicalDriveStringsA(MAX_PATH, szDrives));
+	for (int i = 0; i < 100; i += 4)
+		if (szDrives[i] != (char)0)
+			arrayOfDrives.push_back(std::string{ szDrives[i],szDrives[i + 1],szDrives[i + 2] });
+	delete[] szDrives;
+	return arrayOfDrives;
+}
+
 std::string DirectoryHelper::GetAssetsDirectoryA()
 {
 	if (s_AssetsDirectoryA != "")
@@ -24,9 +56,11 @@ std::string DirectoryHelper::GetAssetsDirectoryA()
 	s_AssetsDirectoryA =  GetExecutableDirectoryA() + "Assets/";
 	if (!DirectoryExists(s_AssetsDirectoryA))
 	{
-		s_AssetsDirectoryA = GetExecutableDirectoryA() + "../Assets/";
+		string parentDir = GetParentDirectory(GetExecutableDirectoryA());
+		s_AssetsDirectoryA = parentDir + "Assets/";
 		if (!DirectoryExists(s_AssetsDirectoryA))
 		{
+			
 			FatalError("Missing assets directory. The executable directory was checked as well as the parent directory to the executable.");
 		}
 	}

@@ -126,7 +126,7 @@ input {
 #div_footerSection {
     background-color: rgb(68, 68, 68);
     display: grid;
-    grid-template-columns: minmax(0, 1fr) 80px;
+    grid-template-columns: minmax(0, 1fr) 80px 80px;
 }
 
 /* ::-webkit-scrollbar-track

@@ -19,5 +19,4 @@ private:
 	shared_ptr<Camera> m_Camera = nullptr;
 	shared_ptr<Scene> m_Scene = nullptr;
 	shared_ptr<Entity> m_CubeEntity = nullptr;
-	RenderTargetContainer* m_RenderTarget = nullptr;
 };

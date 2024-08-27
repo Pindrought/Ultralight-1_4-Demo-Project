@@ -36,36 +36,9 @@ bool DemoCubeDraw::Startup()
 	m_Camera->SetPosition({ 0, 0, 5 });
 	m_Camera->SetScene(m_Scene);
 	
-	m_RenderTarget = pWindow->GetRenderTargetContainer();
-	assert(m_RenderTarget != nullptr);
-	m_RenderTarget->SetCamera(m_Camera);
-
-	//shared_ptr<Model> cubeModel = make_shared<Model>();
-	//string errorMsg;
-	//string path = DirectoryHelper::GetAssetsDirectoryA() + "misc/cottage_blender.gltf";
-	//if (!cubeModel->Initialize(path, errorMsg))
-	//{
-	//	FatalError(errorMsg);
-	//	return false;
-	//}
-	//m_CubeEntity = make_shared<Entity>();
-	//m_CubeEntity->SetModel(cubeModel);
-
-	////I want to reposition the camera to ensure the model fits
-	////I need to calculate a bounding sphere
-	//auto& aabb = cubeModel->m_AABB;
-
-	//float radius = aabb.GetRadius();
-	//float camHeight = 0;// (cubeModel->m_AABB.MaxCoord.y - cubeModel->m_AABB.MinCoord.y) / 2 + cubeModel->m_AABB.MinCoord.y;
-	////Algorithm to determine suggested distance from camera
-	////https://stackoverflow.com/questions/21544336/how-to-position-the-camera-so-that-my-main-object-is-entirely-visible-and-fit-to
-	//float d1 = radius / sin(m_Camera->GetHorizontalFOV() / 2);
-	//float d2 = radius / sin(m_Camera->GetVerticalFOV() / 2);
-	////Multiplying the distance by 2 because it's possible for model to go off screen when rotating if it's not centered.
-	//float distance = std::max(d1, d2) * 2;
-	////
-	//DirectX::XMFLOAT3 camPos = aabb.GetCenter();
-	//m_Camera->SetPosition({ camPos.x, camPos.y, distance });
+	RenderTargetContainer* pRenderTarget = pWindow->GetRenderTargetContainer();
+	assert(pRenderTarget != nullptr);
+	pRenderTarget->SetCamera(m_Camera);
 
 	m_CubeEntity = GenerateCubeEntity();
 	if (m_CubeEntity == nullptr)
@@ -74,6 +47,8 @@ bool DemoCubeDraw::Startup()
 	}
 
 	m_Scene->Entities.push_back(m_CubeEntity);
+
+	return true;
 }
 
 void DemoCubeDraw::OnPreRenderFrame()

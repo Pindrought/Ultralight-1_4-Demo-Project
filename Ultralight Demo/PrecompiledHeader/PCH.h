@@ -6,7 +6,8 @@
 #include "ErrorHandler.h"
 #include "DirectoryHelper.h"
 #include "SimpleMath.h" //Also SimpleMath
-
+#include <ShlObj.h>
+#pragma comment(lib, "shell32.lib")
 
 #ifdef _DEBUG
 #define MYLOGGER_LOG_INFO 1

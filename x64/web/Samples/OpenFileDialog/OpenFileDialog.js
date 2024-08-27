@@ -1,9 +1,17 @@
-var currentDirectory = "";
-var IsInEngine = true;
-var selectedDirectoryEntry = null;
+var g_CurrentDirectory = "";
+var g_IsInEngine = true;
+var g_SelectedDirectoryEntry = null;
+var g_FileType = null;
 if (typeof(CallEvent) == 'undefined') {
     CallEvent = function() {};
-    IsInEngine = false;
+    g_IsInEngine = false;
+}
+
+function SetFileTypeFilter(fileType) {
+    g_FileType = fileType;
+    let input = document.getElementById("input_fileType");
+    input.value = fileType;
+    OnFilterResultsChanged();
 }
 
 function AddQuickAccessLocation(displayName, locationPath) {
@@ -24,41 +32,41 @@ function AddQuickAccessLocation(displayName, locationPath) {
 }
 
 function TryToGoUpADirectory() {
-    let lastChar = currentDirectory.slice(-1);
+    let lastChar = g_CurrentDirectory.slice(-1);
     if (lastChar !== '/' && lastChar != '\\') {
-        currentDirectory = currentDirectory + '/';
+        g_CurrentDirectory = g_CurrentDirectory + '/';
     }
-    currentDirectory = currentDirectory.replace(/\\/g, '/');
-    let lastSlashIndex = currentDirectory.lastIndexOf('/');
+    g_CurrentDirectory = g_CurrentDirectory.replace(/\\/g, '/');
+    let lastSlashIndex = g_CurrentDirectory.lastIndexOf('/');
     if (lastSlashIndex == -1) {
         return false;
     }
-    lastSlashIndex = currentDirectory.lastIndexOf('/', lastSlashIndex - 1);
+    lastSlashIndex = g_CurrentDirectory.lastIndexOf('/', lastSlashIndex - 1);
     if (lastSlashIndex == -1) {
         return false;
     }
-    let dir = currentDirectory.substring(0, lastSlashIndex + 1);
+    let dir = g_CurrentDirectory.substring(0, lastSlashIndex + 1);
     CallEvent('OpenFileDialog_OpenFolder', dir);
 }
 
 function UpdateSelectedDirectoryEntry(div) {
-    if (selectedDirectoryEntry !== null) {
-        selectedDirectoryEntry.classList.remove("selected");
+    if (g_SelectedDirectoryEntry !== null) {
+        g_SelectedDirectoryEntry.classList.remove("selected");
     }
     div.classList.add('selected');
-    selectedDirectoryEntry = div;
+    g_SelectedDirectoryEntry = div;
     let input = document.getElementById('input_selectedFile');
     input.value = div.PathShort;
 }
 
 function UpdateDirectoryLocationAndEntries(directoryLocation, subdirectoryEntries, fileEntries) {
-    selectedDirectoryEntry = null;
+    g_SelectedDirectoryEntry = null;
     directoryLocation = directoryLocation.replace(/\\/g, '/');
     let lastChar = directoryLocation.slice(-1);
     if (lastChar !== '/' && lastChar != '\\') {
         directoryLocation = directoryLocation + '/';
     }
-    currentDirectory = directoryLocation;
+    g_CurrentDirectory = directoryLocation;
     let input = document.getElementById('input_currentDirectory');
     input.value = directoryLocation;
     let div_fileView = document.getElementById('div_fileView');
@@ -130,13 +138,14 @@ function UpdateDirectoryLocationAndEntries(directoryLocation, subdirectoryEntrie
         }
     });
 
+    OnFilterResultsChanged();
     return true;
 }
 
 function OnFilterResultsChanged() {
     let input = document.getElementById('input_filterResults');
     let filterText = input.value.toUpperCase();
-    if (filterText == "") {
+    if (filterText == "" && g_FileType == null) {
         let div_fileView = document.getElementById('div_fileView'); 
         let childDivs = div_fileView.getElementsByTagName('div');
 
@@ -156,7 +165,24 @@ function OnFilterResultsChanged() {
         var childDiv = childDivs[i];
         let fileName = childDiv.PathShort.toUpperCase();
         if (fileName.includes(filterText)) {
-            childDiv.style.display = 'block';
+            if (g_FileType == null) { //This is aids to look at - I need to probably clean up later
+                childDiv.style.display = 'block';
+            }
+            else
+            {
+                if (childDiv.IsDirectory == true) {
+                    childDiv.style.display = 'block';
+                }
+                else {
+                    if (fileName.includes(g_FileType)) {
+                        childDiv.style.display = 'block';
+                    }
+                    else {
+                        childDiv.style.display = 'none';
+                    }
+                }
+            }
+            
         } else {
             childDiv.style.display = 'none';
         }
@@ -190,7 +216,7 @@ function SetCurrentDirectory(path) {
 
 window.onload = function() {
     CallEvent('OpenFileDialogLoaded');
-    if (IsInEngine == false) {
+    if (g_IsInEngine == false) {
         let array = []
         for(i=1; i<100; i++) {
             array.push("BrowserTest/File_" + i.toString() + ".png");

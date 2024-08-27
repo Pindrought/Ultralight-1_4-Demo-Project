@@ -22,7 +22,8 @@ public:
 		DemoOpenFileDialog,
 		DemoTransparent,
 		DemoOverlayedCPPTexture,
-		DemoCubeDraw
+		DemoCubeDraw,
+		DemoGLTFViewer
 	};
 	DemoId m_SelectedDemo = DemoId::None;
 	shared_ptr<Window> m_PrimaryWindow = nullptr;

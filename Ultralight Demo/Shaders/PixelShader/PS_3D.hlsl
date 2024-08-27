@@ -6,11 +6,11 @@ float4 main(VertexShaderOutput input) : SV_TARGET
 
 	if (MaterialCB.HasNormals)
 	{
-		float3 lightdir = float3(-0.2, -0.35, 0.5);
+		float3 lightdir = float3(-1.0, -0.5, -0.5);
 		lightdir = normalize(lightdir);
 		lightdir = -lightdir;
 
-		float ambientStrength = 1.0;
+		float ambientStrength = 0.65;
 		float NDotL = max(dot(input.NormalVS, lightdir), 0);
 		lightStrength = ambientStrength + NDotL * (1 - ambientStrength);
 	}
