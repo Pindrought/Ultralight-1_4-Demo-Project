@@ -4,21 +4,18 @@ VertexShaderOutput main(VertexShaderInput input)
 {
 	VertexShaderOutput output;
 	
-	//const float4x4 model = PerDrawDataCB.Model;
-	//const float4x4 model = PerObjectDataCB.Model;
 	float4x4 mvp = mul(PerDrawDataCB.Model, mul(PerFrameDataCB.View, PerFrameDataCB.Projection));
 	
 	if (MaterialCB.HasBones == true)
 	{
-		//const int boneOffset = PerObjectDataCB.BoneTransformLocation + input.InstanceID * PerObjectDataCB.BoneTransformCount;
-		//float4x4 skinMatrix = InstancedMatrixTransforms[input.JointIndices[0] + boneOffset] * input.JointWeights[0] +
-		//					  InstancedMatrixTransforms[input.JointIndices[1] + boneOffset] * input.JointWeights[1] +
-		//					  InstancedMatrixTransforms[input.JointIndices[2] + boneOffset] * input.JointWeights[2] +
-		//					  InstancedMatrixTransforms[input.JointIndices[3] + boneOffset] * input.JointWeights[3];
-		//float4x4 finalMatrixWVP = mul(mvp, skinMatrix);
-		//output.Position = mul(finalMatrixWVP, float4(input.Position, 1.0f));
-		//float4x4 finalMatrixWorld = mul(model, skinMatrix);
-		//output.NormalVS = normalize(mul(finalMatrixWorld, float4(input.Normal, 0.0f)));
+		float4x4 skinMatrix = BoneTransformsCB.BoneTransforms[input.JointIndices[0]] * input.JointWeights[0] +
+							  BoneTransformsCB.BoneTransforms[input.JointIndices[1]] * input.JointWeights[1] +
+							  BoneTransformsCB.BoneTransforms[input.JointIndices[2]] * input.JointWeights[2] +
+							  BoneTransformsCB.BoneTransforms[input.JointIndices[3]] * input.JointWeights[3];
+		float4x4 finalMatrixWVP = mul(skinMatrix, mvp);
+		output.Position = mul(float4(input.Position, 1.0f), finalMatrixWVP);
+		float4x4 finalMatrixWorld = mul(skinMatrix, model);
+		output.NormalVS = normalize(mul(float4(input.Normal, 0.0f), finalMatrixWorld));
 	}
 	else
 	{

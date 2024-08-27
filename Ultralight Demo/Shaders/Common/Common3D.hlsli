@@ -34,7 +34,7 @@ struct PerDrawData
 	float4x4 Model;
 };
 
-struct Material
+struct MaterialData
 {
 	float4 BaseColor;
 	float MetallicFactor;
@@ -45,6 +45,11 @@ struct Material
 	bool HasNormals;
 	uint Padding1;
 	uint Padding2;
+};
+
+struct BoneTransformsData
+{
+	float4x4 BoneTransforms[100];
 };
 
 cbuffer _PerFrameData : register(b0)
@@ -59,7 +64,12 @@ cbuffer _PerDrawCB : register(b1)
 
 cbuffer _MaterialCB : register(b2)
 {
-	Material MaterialCB;
+	MaterialData MaterialCB;
+}
+
+cbuffer _BoneTransformCB : register(b3)
+{
+	BoneTransformsData BoneTransformsCB;
 }
 
 Texture2D BaseColorTexture : TEXTURE : register(t0);
