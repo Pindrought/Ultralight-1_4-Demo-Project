@@ -560,10 +560,9 @@ void GPUDriverD3D11::RegisterStoredResourceEntries(StoredEntries& entries)
 uint32_t GPUDriverD3D11::RegisterCustomTextureAndReserveId(shared_ptr<Texture> texture)
 {
     uint32_t id = NextTextureId();
-    TextureEntry entry;
+    TextureEntry& entry = m_TextureMap[id];
     entry.Texture = texture->GetTextureResource();
     entry.TextureSRV = texture->GetTextureResourceView();
-    m_TextureMap[id] = entry;
     return id;
 }
 
