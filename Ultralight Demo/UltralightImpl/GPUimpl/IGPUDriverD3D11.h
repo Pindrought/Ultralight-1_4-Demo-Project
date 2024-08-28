@@ -1,5 +1,6 @@
 #pragma once
 #include <PCH.h>
+#include "../Graphics/Texture.h"
 
 struct GeometryEntry
 {
@@ -55,7 +56,7 @@ public:
     virtual void DrawCommandList() = 0;
     virtual ID3D11ShaderResourceView* GetShaderResourceView(ul::View* pView) = 0;
     virtual ID3D11Texture2D* GetTexture(ul::View* pView) = 0;
-
+    virtual uint32_t RegisterCustomTextureAndReserveId(shared_ptr<Texture> texture) = 0;
 
     //I wanted the ability to swap between gpu drivers when closing/restarting the engine class for the different demos
     //This introduced an issue though where sometimes geometry or render targets or textures were not being "destroyed" according to ultralight

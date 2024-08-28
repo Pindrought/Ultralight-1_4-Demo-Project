@@ -4,7 +4,7 @@
 #include "impl/FileSystemWin.h"
 #include "impl/FontLoaderWin.h"
 #include "impl/LoggerDefault.h"
-#include "GPUimpl/RetargetableGPUDriverD3D11.h"
+#include "GPUimpl/IGPUDriverD3D11.h"
 #include "UltralightView.h"
 
 #include "../Window/Window.h"
@@ -53,7 +53,7 @@ private:
 	unique_ptr<FontLoaderWin> m_FontLoader;
 	shared_ptr<ul::FileSystem> m_FileSystem;
 	unique_ptr<ClipboardWin> m_Clipboard;
-	shared_ptr<RetargetableGPUDriverD3D11> m_GPUDriver;
+	shared_ptr<IGPUDriverD3D11> m_GPUDriver;
 
 	unordered_map<int32_t, shared_ptr<Window>> m_WindowIdToWindowPtrMap;
 	unordered_map<int32_t, set<int32_t>> m_WindowIdToViewIdMap;

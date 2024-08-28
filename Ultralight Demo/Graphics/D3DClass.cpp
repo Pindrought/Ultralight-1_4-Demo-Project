@@ -33,7 +33,6 @@ bool D3DClass::Initialize()
 		return true; //Already initialized
 	}
 
-
 	if (!InitializeDeviceAndContext())
 		return false;
 

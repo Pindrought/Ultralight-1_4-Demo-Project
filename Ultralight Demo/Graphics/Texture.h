@@ -19,4 +19,6 @@ public:
 	ComPtr<ID3D11ShaderResourceView> m_TextureView = nullptr;
 	std::string m_Name = "";
 	bool m_MultiSampled = false;
+	int32_t m_Width = 0;
+	int32_t m_Height = 0;
 };

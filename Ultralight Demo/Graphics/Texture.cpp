@@ -44,6 +44,8 @@ bool Texture::Initialize(D3D11_TEXTURE2D_DESC desc,
 											   &m_TextureView);
 		ReturnFalseIfFail(hr, "Failed to create 2d texture shader resource view from texture description.");
 	}
+	m_Width = desc.Width;
+	m_Height = desc.Height;
 	return true;
 }
 
@@ -75,6 +77,9 @@ bool Texture::Initialize(const string& filePath, bool forceSRGB)
 		hr = pDevice->CreateTexture2D(&textureDesc, &initialData, &p2DTexture);
 		if (FAILED(hr))
 			return false;
+
+		m_Width = image->width;
+		m_Height = image->height;
 
 		m_Texture = static_cast<ID3D11Texture2D*>(p2DTexture);
 		CD3D11_SHADER_RESOURCE_VIEW_DESC srvDesc(D3D11_SRV_DIMENSION_TEXTURE2D, textureDesc.Format);
@@ -110,6 +115,9 @@ bool Texture::Initialize(const string& filePath, bool forceSRGB)
 		if (FAILED(hr))
 			return false;
 
+		m_Width = image->width;
+		m_Height = image->height;
+
 		m_Texture = static_cast<ID3D11Texture2D*>(p2DTexture);
 		CD3D11_SHADER_RESOURCE_VIEW_DESC srvDesc(D3D11_SRV_DIMENSION_TEXTURE2D, textureDesc.Format);
 		hr = pDevice->CreateShaderResourceView(m_Texture.Get(),
@@ -143,6 +151,9 @@ bool Texture::Initialize(const string& filePath, bool forceSRGB)
 		hr = pDevice->CreateTexture2D(&textureDesc, nullptr, &p2DTexture);
 		if (FAILED(hr))
 			return false;
+
+		m_Width = image->width;
+		m_Height = image->height;
 
 		m_Texture = static_cast<ID3D11Texture2D*>(p2DTexture);
 

@@ -1,10 +1,10 @@
-/******************************************************************************
- *  This file is a part of Ultralight, an ultra-portable web-browser engine.  *
- *                                                                            *
- *  See <https://ultralig.ht> for licensing and more.                         *
- *                                                                            *
- *  (C) 2023 Ultralight, Inc.                                                 *
- *****************************************************************************/
+/**************************************************************************************************
+ *  This file is a part of Ultralight, an ultra-portable web-browser engine.                      *
+ *                                                                                                *
+ *  See <https://ultralig.ht> for licensing and more.                                             *
+ *                                                                                                *
+ *  (C) 2024 Ultralight, Inc.                                                                     *
+ **************************************************************************************************/
 #pragma once
 #include <Ultralight/Defines.h>
 #include <Ultralight/String.h>
@@ -70,7 +70,7 @@ enum Cursor {
 };
 
 ///
-/// User-defined interface to listen for View-specific events.
+/// User-defined interface to handle general events for a View.
 ///
 /// @see View::set_view_listener
 ///
@@ -153,7 +153,7 @@ class UExport ViewListener {
 };
 
 ///
-/// User-defined interface to listen for load-related events for a View.
+/// User-defined interface to handle load-related events for a View.
 ///
 ///  @see View::set_load_listener
 ///
@@ -252,9 +252,11 @@ class UExport LoadListener {
 typedef uint32_t DownloadId;
 
 ///
-/// @brief  Interface for Download-related events
+/// User-defined interface to handle download-related events for a View.
 ///
-/// @note   For more info @see View::set_download_listener
+/// You must implement this interface to handle downloads initiated by a View.
+///
+/// @see View::set_download_listener
 ///
 class UExport DownloadListener {
  public:
@@ -310,9 +312,9 @@ class UExport DownloadListener {
 };
 
 ///
-/// @brief  Interface for Network-related events
+/// User-defined interface to handle network-related events for a View.
 ///
-/// @note   For more info @see View::set_network_listener
+/// @see View::set_network_listener
 ///
 class UExport NetworkListener {
  public:

@@ -1,22 +1,39 @@
-/******************************************************************************
- *  This file is a part of Ultralight, an ultra-portable web-browser engine.  *
- *                                                                            *
- *  See <https://ultralig.ht> for licensing and more.                         *
- *                                                                            *
- *  (C) 2023 Ultralight, Inc.                                                 *
- *****************************************************************************/
+/**************************************************************************************************
+ *  This file is a part of Ultralight, an ultra-portable web-browser engine.                      *
+ *                                                                                                *
+ *  See <https://ultralig.ht> for licensing and more.                                             *
+ *                                                                                                *
+ *  (C) 2024 Ultralight, Inc.                                                                     *
+ **************************************************************************************************/
 
 ///
 /// @file CAPI_View.h
 ///
-/// View is a web-page container rendered to an offscreen surface that you display yourself.
+/// Web-page container rendered to an offscreen surface.
 ///
-/// The View object is responsible for loading and rendering web-pages to an offscreen surface. It
+/// `#include <Ultralight/CAPI/CAPI_View.h>`
+///
+/// The View class is responsible for loading and rendering web-pages to an offscreen surface. It
 /// is completely isolated from the OS windowing system, you must forward all input events to it
 /// from your application.
 ///
-/// @note  The API is not thread-safe, all calls must be made on the same thread that the
-///        Renderer/App was created on.
+/// ## Creating a View
+///
+/// You can create a View by calling ulCreateView():
+///
+/// ```
+/// // Create a ULViewConfig with default values
+/// ULViewConfig view_config = ulCreateViewConfig();
+///
+/// // Create a View, 500 by 500 pixels in size, using the default Session
+/// ULView view = ulCreateView(renderer, 500, 500, view_config, NULL);
+///
+/// // Clean up the ULViewConfig
+/// ulDestroyViewConfig(view_config);
+/// ```
+///
+/// @note When using ulCreateApp(), the library will automatically create a View for you when you
+///       call ulCreateOverlay().
 ///
 #ifndef ULTRALIGHT_CAPI_VIEW_H
 #define ULTRALIGHT_CAPI_VIEW_H

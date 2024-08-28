@@ -33,6 +33,8 @@ bool DemoOverlayedCPPTextureOnDiv::Startup()
 		FatalError("Failed to load AIBowser.png.");
 		return false;
 	}
+
+	return true;
 }
 
 EZJSParm DemoOverlayedCPPTextureOnDiv::OnEventCallbackFromUltralight(int32_t viewId, string eventName, vector<EZJSParm> parameters)

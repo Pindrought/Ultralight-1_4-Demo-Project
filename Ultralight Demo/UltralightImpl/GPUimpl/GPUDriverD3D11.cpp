@@ -557,6 +557,16 @@ void GPUDriverD3D11::RegisterStoredResourceEntries(StoredEntries& entries)
     m_TextureMap = entries.TextureEntries;
 }
 
+uint32_t GPUDriverD3D11::RegisterCustomTextureAndReserveId(shared_ptr<Texture> texture)
+{
+    uint32_t id = NextTextureId();
+    TextureEntry entry;
+    entry.Texture = texture->GetTextureResource();
+    entry.TextureSRV = texture->GetTextureResourceView();
+    m_TextureMap[id] = entry;
+    return id;
+}
+
 void GPUDriverD3D11::LoadShaders()
 {
     bool result;

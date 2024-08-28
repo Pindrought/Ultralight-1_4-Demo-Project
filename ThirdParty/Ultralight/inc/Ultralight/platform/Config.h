@@ -1,10 +1,10 @@
-/******************************************************************************
- *  This file is a part of Ultralight, an ultra-portable web-browser engine.  *
- *                                                                            *
- *  See <https://ultralig.ht> for licensing and more.                         *
- *                                                                            *
- *  (C) 2023 Ultralight, Inc.                                                 *
- *****************************************************************************/
+/**************************************************************************************************
+ *  This file is a part of Ultralight, an ultra-portable web-browser engine.                      *
+ *                                                                                                *
+ *  See <https://ultralig.ht> for licensing and more.                                             *
+ *                                                                                                *
+ *  (C) 2024 Ultralight, Inc.                                                                     *
+ **************************************************************************************************/
 #pragma once
 #include <Ultralight/Defines.h>
 #include <Ultralight/String.h>
@@ -70,10 +70,16 @@ enum class EffectQuality : uint8_t {
 };
 
 ///
-/// Global config for Ultralight.
+/// Core configuration for the renderer.
 ///
-/// This can be used to configure the library by calling Platform::set_config() before creating the
-/// Renderer or App singletons.
+/// These are various configuration options that can be used to customize the behavior of the
+/// library. These options can only be set once before creating the Renderer.
+///
+/// ## Setting the Config
+/// 
+/// You should create an instance of the Config struct, set its members, and then call
+/// Platform::set_config() before creating the Renderer at the beginning of your
+/// application's lifetime.
 /// 
 /// @par Example usage
 /// ```

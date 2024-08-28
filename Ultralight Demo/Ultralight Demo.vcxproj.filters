@@ -162,12 +162,6 @@
     <ClCompile Include="Demos\DemoBorderlessResizableMovable\DemoBorderlessResizableMovable.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Demos\DemoCPPTextureInBrowser\DemoCPPTextureInBrowser.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Demos\DemoCPPTextureInBrowser\CustomFileSystem\CustomFileSystem.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Demos\DemoOpenFileDialog\DemoOpenFileDialog.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -223,6 +217,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Demos\DemoGLTFViewer\DemoGLTFViewer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Demos\DemoCPPTextureInBrowser\DemoCPPTextureInBrowser.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -389,13 +386,7 @@
     <ClInclude Include="Demos\DemoBorderlessResizableMovable\DemoBorderlessResizableMovable.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Demos\DemoCPPTextureInBrowser\DemoCPPTextureInBrowser.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="UltralightImpl\GPUimpl\IGPUDriverD3D11.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Demos\DemoCPPTextureInBrowser\CustomFileSystem\CustomFileSystem.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Demos\DemoOpenFileDialog\DemoOpenFileDialog.h">
@@ -492,6 +483,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Demos\DemoGLTFViewer\DemoGLTFViewer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Demos\DemoCPPTextureInBrowser\DemoCPPTextureInBrowser.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

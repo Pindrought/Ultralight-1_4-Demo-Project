@@ -34,6 +34,7 @@ public:
 
     virtual StoredEntries GetStoredResourceEntries() override;
     virtual void RegisterStoredResourceEntries(StoredEntries& entries) override;
+    virtual uint32_t RegisterCustomTextureAndReserveId(shared_ptr<Texture> texture) override;
 private:
     std::vector<ul::Command> m_CommandList;
 
@@ -70,4 +71,5 @@ private:
     map<uint32_t, uint32_t> m_MSAARenderTargetSampleCountLookup; //Key=RenderBufferId Value=SampleCount
     uint32_t m_CurrentlyBoundRenderTargetId = 0;
     bool m_RenderTargetForViewWithMSAAIsCurrentlyBound = false;
+    map<string, uint32_t> m_ImgSourceAliasToTextureIdMap;
 };

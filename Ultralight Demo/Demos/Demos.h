@@ -6,8 +6,7 @@
 #include "DemoBorderlessResizable/DemoBorderlessResizable.h"
 #include "DemoBorderlessResizableMovable/DemoBorderlessResizableMovable.h"
 #include "DemoTransparent/DemoTransparent.h"
-//Commenting out the CPPTextureInBrowser demo until this is fixed. Waiting on additional custom texture support for gpu driver.
-//#include "DemoCPPTextureInBrowser/DemoCPPTextureInBrowser.h"
+#include "DemoCPPTextureInBrowser/DemoCPPTextureInBrowser.h"
 #include "DemoOpenFileDialog/DemoOpenFileDialog.h"
 #include "DemoJSCppCommunication/DemoJSCPPCommunication.h"
 #include "DemoOverlayedCPPTextureOnDiv/DemoOverlayedCPPTextureOnDiv.h"
@@ -32,9 +31,9 @@ shared_ptr<Engine> GenerateEngineInstanceForDemo(DemoSelector::DemoId demoId)
 	case DemoSelector::DemoId::DemoBorderlessResizableMovable:
 		demoInstance = make_shared<DemoBorderlessResizableMovable>();
 		break;
-		/*case DemoSelector::DemoId::DemoCPPTextureInBrowser: This is currently broken - waiting on Ultralight update for custom texture support via img
-			demoEngine = make_shared<DemoCPPTextureInBrowser>();
-			break;*/
+	case DemoSelector::DemoId::DemoCPPTextureInBrowser:
+		demoInstance = make_shared<DemoCPPTextureInBrowser>();
+		break;
 	case DemoSelector::DemoId::DemoCubeDraw:
 		demoInstance = make_shared<DemoCubeDraw>();
 		break;

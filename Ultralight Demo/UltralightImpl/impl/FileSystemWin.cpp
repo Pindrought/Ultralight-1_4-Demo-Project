@@ -17,6 +17,35 @@
 
 using namespace ultralight;
 
+bool IsImgSrcPath(const ul::String& inPath, string& outImgSrcAlias)
+{
+    string path = DirectoryHelper::NormalizePathA(inPath.utf8().data());
+    size_t backslashIndex = path.find_last_of('/');
+
+    if (backslashIndex == std::string::npos) //No backslashes? I don't think this should be possible
+    {
+    }
+    else
+    {
+        if (path.length() > backslashIndex) //This should always be true?
+        {
+            string fileName = path.substr(backslashIndex + 1);
+            size_t extDot = fileName.find_last_of('.');
+            if (extDot == std::string::npos)
+            {
+                return false; //Can't be .imgsrc if no '.' in name
+            }
+            string extension = fileName.substr(extDot);
+            if (extension == ".imgsrc")
+            {
+                outImgSrcAlias = fileName.substr(0, extDot);
+                return true;
+            }
+        }
+    }
+    return false;
+}
+
 bool getFindData(LPCWSTR path, WIN32_FIND_DATAW& findData) {
     HANDLE handle = FindFirstFileW(path, &findData);
     if (handle == INVALID_HANDLE_VALUE)
@@ -60,6 +89,11 @@ FileSystemWin::~FileSystemWin() { }
 
 bool FileSystemWin::FileExists(const ul::String& path) {
     WIN32_FIND_DATAW findData;
+    string imgSrcAlias;
+    if (IsImgSrcPath(path, imgSrcAlias))
+    {
+        return true;
+    }
     return getFindData(GetRelative(path).get(), findData);
 }
 
@@ -89,6 +123,17 @@ ul::RefPtr<ul::Buffer> FileSystemWin::OpenFile(const ul::String& file_path) {
     HANDLE hMap;
     LPVOID lpBasePtr;
     LARGE_INTEGER liFileSize;
+
+    string imgSrcAlias;
+    if (IsImgSrcPath(file_path, imgSrcAlias))
+    {
+        //Per https://ultralig.ht/api/cpp/1_4_0/classultralight_1_1_image_source
+        string data = "IMGSRC-V1\n" + imgSrcAlias + "";
+        char* data_cstr = new char[data.length()];
+        memcpy(data_cstr, data.data(), data.length());
+        ul::RefPtr<ul::Buffer> buffer = ul::Buffer::Create(data_cstr, data.length(), nullptr, FileSystemWin_DestroyFileBufferCallback);
+        return buffer;
+    }
 
     hFile = CreateFile(pathStr.get(),
                        GENERIC_READ,          // dwDesiredAccess
@@ -155,13 +200,13 @@ std::unique_ptr<WCHAR[]> FileSystemWin::GetRelative(const ul::String& path) {
 }
 
 // Called from Platform.cpp -- Maybe never called actually?
-ultralight::FileSystem* CreatePlatformFileSystem(const ul::String& baseDir) {
-    std::wstring baseDirWStr(baseDir.utf16().data());
-
-    WCHAR cur_dir[_MAX_PATH];
-    GetCurrentDirectoryW(_MAX_PATH, cur_dir);
-    WCHAR absolute_dir[_MAX_PATH];
-    PathCombineW(absolute_dir, cur_dir, baseDirWStr.c_str());
-
-    return new FileSystemWin(absolute_dir);
-}
+//ultralight::FileSystem* CreatePlatformFileSystem(const ul::String& baseDir) {
+//    std::wstring baseDirWStr(baseDir.utf16().data());
+//
+//    WCHAR cur_dir[_MAX_PATH];
+//    GetCurrentDirectoryW(_MAX_PATH, cur_dir);
+//    WCHAR absolute_dir[_MAX_PATH];
+//    PathCombineW(absolute_dir, cur_dir, baseDirWStr.c_str());
+//
+//    return new FileSystemWin(absolute_dir);
+//}
