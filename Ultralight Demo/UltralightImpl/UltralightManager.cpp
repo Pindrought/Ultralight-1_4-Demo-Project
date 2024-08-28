@@ -17,22 +17,6 @@ bool UltralightManager::Initialize(UltralightOverrides* ultralightOverrides)
 	if (m_UltralightRenderer.get() != nullptr) //Already initialized?
 	{
 		return true;
-
-		//IGPUDriverD3D11::StoredEntries oldEntries = m_GPUDriver->GetStoredResourceEntries();
-		////Need to create new gpu driver and retarget to our new instance
-		//if (ulOverrides.GPUDriver == nullptr) //Default behavior, no gpu driver override
-		//{
-		//	shared_ptr<GPUDriverD3D11> impl = make_shared<GPUDriverD3D11>();
-		//	impl->RegisterStoredResourceEntries(oldEntries);
-		//	m_GPUDriver->SetGPUImpl(impl);
-		//}
-		//else
-		//{
-		//	ulOverrides.GPUDriver->RegisterStoredResourceEntries(oldEntries);
-		//	m_GPUDriver->SetGPUImpl(ulOverrides.GPUDriver);
-		//}
-
-		//return true;
 	}
 
 	//Ultralight instance initialization
@@ -61,18 +45,6 @@ bool UltralightManager::Initialize(UltralightOverrides* ultralightOverrides)
 	}
 	ul::Platform::instance().set_file_system(m_FileSystem.get());
 
-
-	//m_GPUDriver = std::make_shared<RetargetableGPUDriverD3D11>();
-
-	//if (ulOverrides.GPUDriver == nullptr) //Default behavior, no gpu driver override
-	//{
-	//	shared_ptr<GPUDriverD3D11> impl = make_shared<GPUDriverD3D11>();
-	//	m_GPUDriver->SetGPUImpl(impl);
-	//}
-	//else
-	//{
-	//	m_GPUDriver->SetGPUImpl(ulOverrides.GPUDriver);
-	//}
 	m_GPUDriver = make_shared<GPUDriverD3D11>();
 	ul::Platform::instance().set_gpu_driver(m_GPUDriver.get());
 

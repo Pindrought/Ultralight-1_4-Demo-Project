@@ -171,9 +171,6 @@
     <ClCompile Include="Demos\DemoSelector\DemoSelector.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="UltralightImpl\GPUimpl\RetargetableGPUDriverD3D11.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Demos\DemoOverlayedCPPTextureOnDiv\DemoOverlayedCPPTextureOnDiv.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -396,9 +393,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Demos\DemoSelector\DemoSelector.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="UltralightImpl\GPUimpl\RetargetableGPUDriverD3D11.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Demos\DemoOverlayedCPPTextureOnDiv\DemoOverlayedCPPTextureOnDiv.h">

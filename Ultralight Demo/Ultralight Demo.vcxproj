@@ -126,7 +126,9 @@
     <PostBuildEvent>
       <Command>copy /Y "$(SolutionDir)ThirdParty\Ultralight\bin\Ultralight.dll" "$(TargetDir)Ultralight.dll"
 copy /Y "$(SolutionDir)ThirdParty\Ultralight\bin\UltralightCore.dll" "$(TargetDir)UltralightCore.dll"
-copy /Y "$(SolutionDir)ThirdParty\Ultralight\bin\WebCore.dll" "$(TargetDir)WebCore.dll"</Command>
+
+copy /Y "$(SolutionDir)ThirdParty\Ultralight\bin\WebCore.dll" "$(TargetDir)WebCore.dll"
+xcopy /E /I /Y /Q /D "$(SolutionDir)ThirdParty\Ultralight\resources" "$(TargetDir)resources"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -152,7 +154,9 @@ copy /Y "$(SolutionDir)ThirdParty\Ultralight\bin\WebCore.dll" "$(TargetDir)WebCo
     <PostBuildEvent>
       <Command>copy /Y "$(SolutionDir)ThirdParty\Ultralight\bin\Ultralight.dll" "$(TargetDir)Ultralight.dll"
 copy /Y "$(SolutionDir)ThirdParty\Ultralight\bin\UltralightCore.dll" "$(TargetDir)UltralightCore.dll"
-copy /Y "$(SolutionDir)ThirdParty\Ultralight\bin\WebCore.dll" "$(TargetDir)WebCore.dll"</Command>
+
+copy /Y "$(SolutionDir)ThirdParty\Ultralight\bin\WebCore.dll" "$(TargetDir)WebCore.dll"
+xcopy /E /I /Y /Q /D "$(SolutionDir)ThirdParty\Ultralight\resources" "$(TargetDir)resources"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
@@ -223,7 +227,6 @@ copy /Y "$(SolutionDir)ThirdParty\Ultralight\bin\WebCore.dll" "$(TargetDir)WebCo
     <ClCompile Include="Source.cpp" />
     <ClCompile Include="UltralightImpl\EZJSParm.cpp" />
     <ClCompile Include="UltralightImpl\GPUimpl\GPUDriverD3D11.cpp" />
-    <ClCompile Include="UltralightImpl\GPUimpl\RetargetableGPUDriverD3D11.cpp" />
     <ClCompile Include="UltralightImpl\impl\ClipboardWin.cpp" />
     <ClCompile Include="UltralightImpl\impl\FileSystemWin.cpp" />
     <ClCompile Include="UltralightImpl\impl\FontLoaderWin.cpp" />
@@ -311,7 +314,6 @@ copy /Y "$(SolutionDir)ThirdParty\Ultralight\bin\WebCore.dll" "$(TargetDir)WebCo
     <ClInclude Include="UltralightImpl\EZJSParm.h" />
     <ClInclude Include="UltralightImpl\GPUimpl\GPUDriverD3D11.h" />
     <ClInclude Include="UltralightImpl\GPUimpl\IGPUDriverD3D11.h" />
-    <ClInclude Include="UltralightImpl\GPUimpl\RetargetableGPUDriverD3D11.h" />
     <ClInclude Include="UltralightImpl\impl\ClipboardWin.h" />
     <ClInclude Include="UltralightImpl\impl\FileSystemWin.h" />
     <ClInclude Include="UltralightImpl\impl\FontLoaderWin.h" />
