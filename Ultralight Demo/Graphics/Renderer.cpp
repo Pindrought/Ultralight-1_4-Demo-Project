@@ -68,6 +68,12 @@ bool Renderer::Initialize()
 		return false;
 	}
 
+	if (!m_CB_BoneTransforms.Initialize())
+	{
+		ErrorHandler::LogCriticalError("Failed to initialize bone data constant buffer.");
+		return false;
+	}
+
 	if (!PipelineStateBuilder::BuildPipelineStatesForRenderer())
 	{
 		ErrorHandler::LogCriticalError("Failed to build default pipeline states for renderer.");
@@ -397,12 +403,7 @@ bool Renderer::RenderEntity(Entity* pEntity)
 		for(auto& meshIndex : node.MeshIndices)
 		{
 			auto& mesh = pModel->m_Meshes[meshIndex];
-			m_CB_PerDrawData_3D.m_Data.ModelMatrix = node.GlobalTransform * pEntity->GetMatrix();
-			if (!m_CB_PerDrawData_3D.ApplyChanges())
-			{
-				return false;
-			}
-
+			
 			for (auto primRef : mesh->m_PrimitiveRefs)
 			{
 				auto material = primRef->m_Material;
@@ -441,9 +442,33 @@ bool Renderer::RenderEntity(Entity* pEntity)
 					matData.HasColoredVertices = FALSE;
 				}
 
+				auto& perDrawData = m_CB_PerDrawData_3D.m_Data;
 				if (prim->m_PrimaryPrimitiveAttributeSet->m_JointIndices.VertexCount() > 0)
 				{
-					matData.HasBones = TRUE; //for now ignoring skeleton
+					perDrawData.HasBones = TRUE; //for now ignoring skeleton
+					EZGLTF::SkeletonPose pose = pEntity->GetPose();
+					for (int i = 0; i < pose.BoneTransforms.size(); i++)
+					{
+						m_CB_BoneTransforms.m_Data.Bones[i] = pose.BoneTransforms[i];
+					}
+					if (m_CB_BoneTransforms.ApplyChanges())
+					{
+						pContext->VSSetConstantBuffers(3, 1, m_CB_BoneTransforms.GetAddressOf());
+					}
+					else
+					{
+						ErrorHandler::LogCriticalError("Failed to update bone data constant buffer.");
+					}
+				}
+				else
+				{
+					perDrawData.HasBones = FALSE;
+				}
+
+				perDrawData.ModelMatrix = node.GlobalTransform * pEntity->GetMatrix();
+				if (!m_CB_PerDrawData_3D.ApplyChanges())
+				{
+					return false;
 				}
 
 				if (material->BaseColorTexture != nullptr)

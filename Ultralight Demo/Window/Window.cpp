@@ -164,7 +164,6 @@ bool Window::Initialize(const WindowCreationParameters& parms)
 		m_BRWData.Hwnd = m_HWND;
 		WindowHelperForBorderlessResizable::HandleCompositionChanged(this);
 		WindowHelperForBorderlessResizable::HandleThemeChanged(this);
-
 	}
 
 	//Show/focus Window

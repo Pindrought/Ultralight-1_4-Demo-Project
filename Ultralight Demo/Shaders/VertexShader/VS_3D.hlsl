@@ -6,7 +6,7 @@ VertexShaderOutput main(VertexShaderInput input)
 	
 	float4x4 mvp = mul(PerDrawDataCB.Model, mul(PerFrameDataCB.View, PerFrameDataCB.Projection));
 	
-	if (MaterialCB.HasBones == true)
+	if (PerDrawDataCB.HasBones == true)
 	{
 		float4x4 skinMatrix = BoneTransformsCB.BoneTransforms[input.JointIndices[0]] * input.JointWeights[0] +
 							  BoneTransformsCB.BoneTransforms[input.JointIndices[1]] * input.JointWeights[1] +

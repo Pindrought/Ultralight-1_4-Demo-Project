@@ -15,6 +15,7 @@ public:
 	void OnWindowResizeCallback(Window* pWindow) override;
 private:
 	bool LoadModel(string filePath);
+	bool UpdateAnimationListForLoadedModel();
 	shared_ptr<Camera> m_Camera = nullptr;
 	shared_ptr<Scene> m_Scene = nullptr;
 	shared_ptr<Model> m_LoadedModel = nullptr;
@@ -26,5 +27,6 @@ private:
 	shared_ptr<UltralightView> m_OpenFileDialogView = nullptr;
 	shared_ptr<Window> m_OpenFileDialogWindow = nullptr;
 	string m_LastDirectoryAccessed = "";
-
+	float m_RotationSpeed = 1.0f;
+	float m_AnimationSpeed = 1.0f;
 };

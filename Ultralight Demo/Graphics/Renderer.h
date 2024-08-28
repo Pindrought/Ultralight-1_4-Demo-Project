@@ -34,6 +34,7 @@ private:
 	ConstantBuffer<ConstantBufferType::CB_PerFrameData_3D> m_CB_PerFrameData_3D;
 	ConstantBuffer<ConstantBufferType::CB_PerDrawData_3D> m_CB_PerDrawData_3D;
 	ConstantBuffer<ConstantBufferType::CB_Material> m_CB_Material;
+	ConstantBuffer<ConstantBufferType::CB_BoneData> m_CB_BoneTransforms;
 
 	float m_DeltaTime = 0; //DeltaTime for animation processing for RenderEntity calls -- Assigned at start of RenderSceneInRenderTargetContainer
 

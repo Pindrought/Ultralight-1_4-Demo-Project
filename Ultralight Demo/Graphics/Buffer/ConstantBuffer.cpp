@@ -83,3 +83,4 @@ template ConstantBuffer<ConstantBufferType::CB_UltralightData>;
 template ConstantBuffer<ConstantBufferType::CB_PerFrameData_3D>;
 template ConstantBuffer<ConstantBufferType::CB_PerDrawData_3D>;
 template ConstantBuffer<ConstantBufferType::CB_Material>;
+template ConstantBuffer<ConstantBufferType::CB_BoneData>;

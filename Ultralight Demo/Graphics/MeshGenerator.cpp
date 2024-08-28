@@ -73,6 +73,30 @@ shared_ptr<Mesh> MeshGenerator::GenerateCube(MeshGenerationOption options)
 		return nullptr;
 	}
 
+	{//Normals
+		vector<Vector3> normals_per_face;
+		normals_per_face.push_back({ 0, 0, 1 }); //Front verts
+		normals_per_face.push_back({ -1, 0, 0}); //Left verts
+		normals_per_face.push_back({ 1, 0, 0 }); //Right verts
+		normals_per_face.push_back({ 0, 0, -1 }); //Back verts
+		normals_per_face.push_back({ 0, 1, 0 }); //Top verts
+		normals_per_face.push_back({ 0, -1, 0 }); //Bottom verts
+
+		vector<Vector3> normals;
+		for (int i = 0; i < normals_per_face.size(); i++)
+		{
+			for (int v = 0; v < 4; v++) //4 verts per face
+			{
+				normals.push_back(normals_per_face[i]);
+			}
+		}
+
+		if (!attributes->m_Normals.Initialize(normals))
+		{
+			return nullptr;
+		}
+	}
+
 	if (options == MeshGenerationOption::COLOREDVERTICES)
 	{
 		vector<Vector4> colors;

@@ -21,11 +21,12 @@ bool DemoGLTFViewer::Startup()
 	}
 
 	UltralightViewCreationParameters parms;
-	parms.Height = 200;
-	parms.Width = 300;
+	parms.Height = m_PrimaryWindow->GetHeight();
+	parms.Width = m_PrimaryWindow->GetWidth();
 	parms.IsAccelerated = true;
 	parms.IsTransparent = true;
 	parms.SampleCount = 8;
+	parms.ForceMatchWindowDimensions = true;
 	m_PrimaryView = m_UltralightMgr->CreateUltralightView(parms);
 	m_PrimaryView->LoadURL("file:///Samples/GLTFViewer/GLTFViewer.html");
 	m_UltralightMgr->SetViewToWindow(m_PrimaryView->GetId(), m_PrimaryWindow->GetId());
@@ -68,7 +69,7 @@ void DemoGLTFViewer::OnPreRenderFrame()
 	//1 full rotation = 2PI
 	//m_DeltaTime = time between frames in miliseconds
 	float secondsPerRotation = 5;
-	float turnAmount = DirectX::XM_2PI * (m_DeltaTime / 1000.0f) / secondsPerRotation;
+	float turnAmount = m_RotationSpeed * DirectX::XM_2PI * (m_DeltaTime / 1000.0f) / secondsPerRotation;
 	yaw += turnAmount;
 	while (yaw > DirectX::XM_2PI) //Not really necessary, but the further we get from 0 the less accurate so trying to keep it near 0
 	{
@@ -209,6 +210,8 @@ EZJSParm DemoGLTFViewer::OnEventCallbackFromUltralight(int32_t viewId, string ev
 
 				m_OpenFileDialogWindow->Close();
 
+
+
 				EZJSParm outReturnValue;
 				string outException;
 				bool result = m_PrimaryView->CallJSFnc("UpdatePickedFilePath",
@@ -219,12 +222,54 @@ EZJSParm DemoGLTFViewer::OnEventCallbackFromUltralight(int32_t viewId, string ev
 				{
 					ErrorHandler::LogCriticalError("Issue dispatching picked file to primary view from open file dialog.");
 				}
+
+				UpdateAnimationListForLoadedModel(); //Builds & sends anim list to GLTFView Ultralight View
 			}
 		}
 		return EZJSParm();
 	}
 
-	if (eventName == "OpenFileDialog")
+	if (eventName == "GLTFViewer_Loaded")
+	{
+		UpdateAnimationListForLoadedModel();
+		return EZJSParm();
+	}
+
+	if (eventName == "GLTFViewer_PlayAnimation")
+	{
+		assert(parameters.size() == 1);
+		assert(parameters[0].GetType() == EZJSParm::Type::String);
+		string animation = parameters[0].AsString();
+
+		for (auto& anim : m_LoadedModel->m_Animations)
+		{
+			if (anim.Name == animation)
+			{
+				m_LoadedEntity->SetAnimationClip(&anim);
+				return true;
+			}
+		}
+	}
+
+	if (eventName == "GLTFViewer_UpdateAnimationSpeed")
+	{
+		assert(parameters.size() == 1);
+		assert(parameters[0].GetType() == EZJSParm::Type::Number);
+		m_AnimationSpeed = parameters[0].AsDouble();
+		m_LoadedEntity->SetAnimationSpeed(m_AnimationSpeed);
+		return true;
+	}
+
+	if (eventName == "GLTFViewer_UpdateRotationSpeed")
+	{
+		assert(parameters.size() == 1);
+		assert(parameters[0].GetType() == EZJSParm::Type::Number);
+		m_RotationSpeed = parameters[0].AsDouble();
+		return true;
+	}
+
+
+	if (eventName == "GLTFViewer_OpenFileDialog")
 	{
 		if (m_OpenFileDialogWindow == nullptr)
 		{
@@ -310,6 +355,7 @@ bool DemoGLTFViewer::LoadModel(string filePath)
 	}
 	m_LoadedModel = model;
 	m_LoadedEntity->SetModel(m_LoadedModel);
+	m_LoadedEntity->SetAnimationSpeed(m_AnimationSpeed);
 
 	//I want to reposition the camera to ensure the model fits
 	//I need to calculate a bounding sphere
@@ -327,5 +373,29 @@ bool DemoGLTFViewer::LoadModel(string filePath)
 	DirectX::XMFLOAT3 camPos = aabb.GetCenter();
 	m_Camera->SetPosition({ camPos.x, camPos.y, distance });
 
+	return true;
+}
+
+bool DemoGLTFViewer::UpdateAnimationListForLoadedModel()
+{
+	//I need to update the view with the animations for this new model.
+	EZJSParm outReturnValue;
+	string outException;
+	vector<EZJSParm> animationEntries;
+	for (auto& animation : m_LoadedModel->m_Animations)
+	{
+		animationEntries.push_back(animation.Name);
+	}
+	EZJSParm animationList(animationEntries);
+
+	bool result = m_PrimaryView->CallJSFnc("UpdateAnimationList",
+											{ animationList },
+											outReturnValue,
+											outException);
+	if (result == false)
+	{
+		ErrorHandler::LogCriticalError("Issue updating animation list.");
+		return false;
+	}
 	return true;
 }

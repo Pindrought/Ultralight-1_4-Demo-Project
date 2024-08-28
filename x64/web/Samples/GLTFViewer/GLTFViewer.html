@@ -2,9 +2,15 @@
     <head>
         <link rel="stylesheet" href="GLTFViewer.css">
     </head>
-    <body>
-        <button onclick="CallEvent('OpenFileDialog')">Click me to open the file dialog!</Button><br/>
-        <span id="span_file_name">None.</span>
+    <body style="background-color: rgba(0, 0, 0, 0);">
+        <button onclick="CallEvent('GLTFViewer_OpenFileDialog')">Click me to open the file dialog!</Button><br/>
+        <span style="width: 150px; display:inline-block;">Rotation Speed</span><input id="input_rotation_speed" type="range" min="0" max="3" step="0.025" value="1" style="margin-top: 15px;" onchange="UpdateRotationSpeed()" oninput="UpdateRotationSpeed()"/><br/>
+        <span style="width: 150px; display:inline-block;">Animation Speed</span><input id="input_animation_speed" type="range" min="0" max="3" step="0.025" value="1" style="margin-top: 15px;" onchange="UpdateAnimationSpeed()" oninput="UpdateAnimationSpeed()"/><br/>
+        
+        <span>File: </span><span id="span_file_name">None.</span><br/>
+        <div id="div_animation_list">
+
+        </div>
     </body>
     <script src="GLTFViewer.js"></script>
 </html>

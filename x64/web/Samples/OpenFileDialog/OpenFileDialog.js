@@ -61,10 +61,10 @@ function UpdateSelectedDirectoryEntry(div) {
 
 function UpdateDirectoryLocationAndEntries(directoryLocation, subdirectoryEntries, fileEntries) {
     g_SelectedDirectoryEntry = null;
-    directoryLocation = directoryLocation.replace(/\\/g, '/');
+    directoryLocation = directoryLocation.replace(/\\/g, '/'); //Replace \\ with /
     let lastChar = directoryLocation.slice(-1);
     if (lastChar !== '/' && lastChar != '\\') {
-        directoryLocation = directoryLocation + '/';
+        directoryLocation = directoryLocation + '/'; //I always want directory location to end with /
     }
     g_CurrentDirectory = directoryLocation;
     let input = document.getElementById('input_currentDirectory');

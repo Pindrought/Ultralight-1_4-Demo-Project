@@ -20,6 +20,11 @@ EZGLTF::AnimationClip* Entity::GetActiveAnimationClip()
     return m_ActiveAnimation;
 }
 
+void Entity::SetAnimationClip(EZGLTF::AnimationClip* clip)
+{
+    m_ActiveAnimation = clip;
+}
+
 Matrix Entity::GetMatrix()
 {
     return m_WorldMatrix;
@@ -48,6 +53,11 @@ Vector3 Entity::GetScale()
 bool Entity::IsVisible() const
 {
     return m_IsVisible;
+}
+
+void Entity::SetAnimationSpeed(float animationSpeed)
+{
+    m_AnimationSpeed = animationSpeed;
 }
 
 void Entity::SetModel(shared_ptr<Model> model)

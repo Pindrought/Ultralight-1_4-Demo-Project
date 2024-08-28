@@ -32,6 +32,7 @@ struct PerFrameData
 struct PerDrawData
 {
 	float4x4 Model;
+	bool HasBones;
 };
 
 struct MaterialData
@@ -41,10 +42,10 @@ struct MaterialData
 	float RoughnessFactor;
 	bool HasBaseColorTexture;
 	bool HasColoredVertices;
-	bool HasBones;
 	bool HasNormals;
 	uint Padding1;
 	uint Padding2;
+	uint Padding3;
 };
 
 struct BoneTransformsData

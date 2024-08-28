@@ -33,6 +33,7 @@ namespace ConstantBufferType
 	struct CB_PerDrawData_3D
 	{
 		Matrix ModelMatrix;
+		BOOL HasBones = FALSE;
 	};
 
 	struct CB_Material
@@ -46,11 +47,15 @@ namespace ConstantBufferType
 		float RoughnessFactor = 0.0f;
 		BOOL HasBaseColorTexture = FALSE;
 		BOOL HasColoredVertices = FALSE;
-		//
-		BOOL HasBones = FALSE;
 		BOOL HasNormals = FALSE;
 		uint32_t Padding1 = 0;
 		uint32_t Padding2 = 0;
+		uint32_t Padding3 = 0;
+	};
+
+	struct CB_BoneData
+	{
+		Matrix Bones[100];
 	};
 
 }

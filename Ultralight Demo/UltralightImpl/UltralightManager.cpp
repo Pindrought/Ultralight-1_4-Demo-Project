@@ -398,8 +398,8 @@ bool UltralightManager::FireMouseEvent(MouseEvent* mouseEvent)
 		worldMatrix = worldMatrix.Invert();
 
 		Vector2 result = result.Transform(mouseCoords, worldMatrix);
-		if (result.x >= 0 && result.x <= 1 &&
-			result.y >= 0 && result.y <= 1) //Was mouse event inside the rectangle of the html view?
+		if (result.x >= 0 && result.x < 1 &&
+			result.y >= 0 && result.y < 1) //Was mouse event inside the rectangle of the html view?
 		{
 			if (mouseEvent->GetType() == MouseEvent::Type::MouseDown || mouseEvent->GetType() == MouseEvent::Type::MouseUp)
 			{
