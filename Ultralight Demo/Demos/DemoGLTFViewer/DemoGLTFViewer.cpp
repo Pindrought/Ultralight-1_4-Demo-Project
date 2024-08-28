@@ -251,6 +251,15 @@ EZJSParm DemoGLTFViewer::OnEventCallbackFromUltralight(int32_t viewId, string ev
 		}
 	}
 
+	if (eventName == "GLTFViewer_StopAnimation")
+	{
+		if (m_LoadedEntity != nullptr)
+		{
+			m_LoadedEntity->SetAnimationClip(nullptr);
+		}
+		return true;
+	}
+
 	if (eventName == "GLTFViewer_UpdateAnimationSpeed")
 	{
 		assert(parameters.size() == 1);

@@ -62,6 +62,7 @@ void Entity::SetAnimationSpeed(float animationSpeed)
 
 void Entity::SetModel(shared_ptr<Model> model)
 {
+    m_ActiveAnimation = nullptr;
     m_Model = model;
 
     auto& skeleton = m_Model->GetSkeleton();
