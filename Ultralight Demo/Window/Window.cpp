@@ -11,6 +11,7 @@ static IDPoolManager<int32_t> s_WindowsIDManager;
 
 Window::~Window()
 {
+	BOOL result = UnregisterClassA(m_WindowClassName.c_str(), GetModuleHandle(NULL));
 }
 
 bool Window::Initialize(const WindowCreationParameters& parms)
@@ -131,11 +132,15 @@ bool Window::Initialize(const WindowCreationParameters& parms)
 	{
 		LOGINFO("WINDOW EXISTING HANDLE CLEANED UP.");
 		DestroyWindow(m_HWND);
-		UnregisterClassA(m_WindowClassName.c_str(), GetModuleHandle(NULL));
+		BOOL result = UnregisterClassA(m_WindowClassName.c_str(), GetModuleHandle(NULL));
 		m_HWND = NULL;
 	}
 
-	RegisterWindowClass();
+	if (!RegisterWindowClass())
+	{
+		return false;
+	}
+
 
 	//Create Window
 	m_HWND = CreateWindowExA(extendedWindowsStyle, //Extended Windows style. For other options, see: https://msdn.microsoft.com/en-us/library/windows/desktop/ff700543(v=vs.85).aspx
@@ -677,7 +682,7 @@ LRESULT CALLBACK HandleMessageSetup(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM 
 	}
 }
 
-void Window::RegisterWindowClass()
+bool Window::RegisterWindowClass()
 {
 	WNDCLASSEXA wc = {}; //Our Window Class (This has to be filled before our window can be created) See: https://msdn.microsoft.com/en-us/library/windows/desktop/ms633577(v=vs.85).aspx
 	if (m_DirectCompositionEnabled)
@@ -699,8 +704,13 @@ void Window::RegisterWindowClass()
 	wc.lpszMenuName = NULL; //Pointer to a null terminated character string for the menu. We are not using a menu yet, so this will be NULL.
 	wc.lpszClassName = m_WindowClassName.c_str(); //Pointer to null terminated string of our class name for this window.
 	wc.cbSize = sizeof(WNDCLASSEXA); //Need to fill in the size of our struct for cbSize
-	RegisterClassExA(&wc); // Register the class so that it is usable.
+	ATOM result = RegisterClassExA(&wc); // Register the class so that it is usable.
+	if (result == 0)
+	{
+		return false;
+	}
 	LOGINFO("REGISTERED WINDOW CLASS.");
+	return true;
 }
 
 bool Window::ResizeSwapChainAndRenderTargetContainer()

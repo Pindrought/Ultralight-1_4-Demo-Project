@@ -47,7 +47,7 @@ public:
 private:
 	bool InitializeSwapchain();
 	bool InitializeRenderTargetContainer();
-	void RegisterWindowClass();
+	bool RegisterWindowClass();
 	bool ResizeSwapChainAndRenderTargetContainer();
 	static int32_t GetAvailableWindowId();
 	HWND m_HWND = NULL;
