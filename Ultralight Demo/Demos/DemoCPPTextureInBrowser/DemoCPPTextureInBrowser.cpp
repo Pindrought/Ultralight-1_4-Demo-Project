@@ -7,7 +7,7 @@ bool DemoCPPTextureInBrowser::Startup()
 	windowParms.Width = 800;
 	windowParms.Height = 600;
 	windowParms.Style = WindowStyle::Resizable | WindowStyle::ExitButton | WindowStyle::MaximizeAvailable;
-	windowParms.Title = "Overlayed CPP Texture Example";
+	windowParms.Title = "C++ Texture In Browser Demo";
 	shared_ptr<Window> pWindow = SpawnWindow(windowParms);
 	if (pWindow == nullptr)
 	{
