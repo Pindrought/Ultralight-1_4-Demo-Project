@@ -13,5 +13,7 @@ public:
 	void OnWindowResizeCallback(Window* pWindow) override;
 private:
 	WeakWrapper<Window> m_MainWindow;
+	WeakWrapper<UltralightView> m_MainView;
 	WeakWrapper<Window> m_InspectorWindow;
+	WeakWrapper<UltralightView> m_InspectorView;
 };

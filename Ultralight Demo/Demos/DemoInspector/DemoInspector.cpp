@@ -25,9 +25,10 @@ bool DemoInspector::Startup()
 	mainViewParms.ForceMatchWindowDimensions = true;
 	mainViewParms.IsTransparent = true;
 
-	WeakWrapper<UltralightView> pView = m_UltralightMgr->CreateUltralightView(mainViewParms);
-	pView->LoadURL("http://www.google.com");
-	m_UltralightMgr->SetViewToWindow(pView->GetId(), m_MainWindow->GetId());
+	m_MainView = m_UltralightMgr->CreateUltralightView(mainViewParms);
+	assert(!m_MainView.expired());
+	m_MainView->LoadURL("http://www.google.com");
+	m_UltralightMgr->SetViewToWindow(m_MainView->GetId(), m_MainWindow->GetId());
 
 	//Inspector view creation
 	WindowCreationParameters inspectorWindowParms;
@@ -49,11 +50,11 @@ bool DemoInspector::Startup()
 	inspectorViewParms.IsAccelerated = false; //Use GPU Rendering?
 	inspectorViewParms.ForceMatchWindowDimensions = true;
 	inspectorViewParms.IsTransparent = false;
-	inspectorViewParms.InspectionTarget = pView;
+	inspectorViewParms.InspectionTarget = m_MainView;
 
-	WeakWrapper<UltralightView> pInspectorView = m_UltralightMgr->CreateUltralightView(inspectorViewParms);
+	m_InspectorView = m_UltralightMgr->CreateUltralightView(inspectorViewParms);
 	//Note that m_UltralightMgr->CreateUltralightView will call CreateLocalInspectorView on the inspection target when that parameter is passed into the creation parms.
-	m_UltralightMgr->SetViewToWindow(pInspectorView->GetId(), m_InspectorWindow->GetId());
+	m_UltralightMgr->SetViewToWindow(m_InspectorView->GetId(), m_InspectorWindow->GetId());
 
 	return true;
 
@@ -67,8 +68,11 @@ EZJSParm DemoInspector::OnEventCallbackFromUltralight(int32_t viewId, string eve
 void DemoInspector::OnWindowDestroyStartCallback(int32_t windowId)
 {
 	WeakWrapper<Window> pWindow = WindowManager::GetWindow(windowId);
-	pWindow->DestroyAllViewsLinkedToThisWindow();
-	if (!m_MainWindow.expired())
+	m_UltralightMgr->DestroyView(m_InspectorView); //Regardless of which window is destroyed first
+	m_UltralightMgr->DestroyView(m_MainView);      //Going to try to delete inspector view then main view
+	WindowManager::DestroyAllWindows();
+	//pWindow->DestroyAllViewsLinkedToThisWindow();
+	/*if (!m_MainWindow.expired())
 	{
 		if (m_MainWindow->GetId() == windowId)
 		{
@@ -88,7 +92,7 @@ void DemoInspector::OnWindowDestroyStartCallback(int32_t windowId)
 				m_MainWindow->Close();
 			}
 		}
-	}
+	}*/
 }
 
 void DemoInspector::OnWindowDestroyEndCallback(int32_t windowId)

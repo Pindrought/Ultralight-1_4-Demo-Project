@@ -43,11 +43,12 @@ void WindowManager::DestroyWindow(int32_t id)
 	pEngine->GetInputController()->ClearEventsForWindow(id);
 
 	::DestroyWindow(s_WindowIdToWindowPtrMap[id]->GetHWND());
+	
+	pUltralightManager->RemoveWindowId(id);
 	msg = strfmt("WindowManager::DestroyWindow --> Removing From Map (%d)", id);
 	LOGINFO(msg.c_str());
 	s_WindowIdToWindowPtrMap.erase(id);
 
-	pUltralightManager->RemoveWindowId(id);
 	pEngine->OnWindowDestroyEndCallback(id);
 }
 

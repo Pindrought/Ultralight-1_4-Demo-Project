@@ -28,14 +28,15 @@ public:
 	void RemoveWindowId(int32_t windowId);
 	WeakWrapper<UltralightView> CreateUltralightView(UltralightViewCreationParameters parms);
 	void DestroyView(WeakWrapper<UltralightView> pView);
+	void DestroyAllViews();
 	static UltralightManager* GetInstance();
 	static shared_ptr<UltralightManager> GetInstanceShared();
 
-	std::vector<std::shared_ptr<UltralightView>> GetViewsForWindow(int32_t windowId);
+	vector<WeakWrapper<UltralightView>> GetViewsForWindow(int32_t windowId);
 	WeakWrapper<UltralightView> GetViewFromId(int32_t viewId);
 	IGPUDriverD3D11* GetGPUDriver();
-	unordered_map<int32_t, shared_ptr<UltralightView>> GetViews();
-	unordered_map<int32_t, shared_ptr<UltralightView>> GetAcceleratedViews();
+	unordered_map<int32_t, WeakWrapper<UltralightView>> GetViews();
+	unordered_map<int32_t, WeakWrapper<UltralightView>> GetAcceleratedViews();
 
 	void RefreshViewDisplaysForAnimations();
 	//A return value of true = the event was processed by an ultralight view.
@@ -57,6 +58,8 @@ private:
 
 	unordered_map<int32_t, WeakWrapper<Window>> m_WindowIdToWindowPtrMap;
 	unordered_map<int32_t, set<int32_t>> m_WindowIdToViewIdMap;
-	unordered_map<int32_t, shared_ptr<UltralightView>> m_ViewsMap;
-	unordered_map<int32_t, shared_ptr<UltralightView>> m_AcceleratedViewsMap;
+
+	unordered_map<int32_t, WeakWrapper<UltralightView>> m_WeakViewsMap;
+	unordered_map<int32_t, shared_ptr<UltralightView>> m_OwnedViewsMap;
+	unordered_map<int32_t, WeakWrapper<UltralightView>> m_WeakAcceleratedViewsMap;
 };

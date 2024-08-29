@@ -64,8 +64,9 @@ bool UltralightManager::Initialize(UltralightOverrides* ultralightOverrides)
 void UltralightManager::Shutdown()
 {
 	m_WindowIdToViewIdMap.clear();
-	m_ViewsMap.clear();
-	m_AcceleratedViewsMap.clear();
+	m_WeakViewsMap.clear();
+	m_WeakViewsMap.clear();
+	m_OwnedViewsMap.clear();
 	m_WindowIdToWindowPtrMap.clear();
 }
 
@@ -93,8 +94,8 @@ void UltralightManager::RemoveViewFromWindow(int32_t viewId, int32_t windowId)
 	{
 		windowIter->second.erase(viewId);
 	}
-	auto viewIter = m_ViewsMap.find(viewId);
-	if (viewIter != m_ViewsMap.end())
+	auto viewIter = m_OwnedViewsMap.find(viewId);
+	if (viewIter != m_OwnedViewsMap.end())
 	{
 		viewIter->second->SetToWindow(-1);
 	}
@@ -116,8 +117,8 @@ void UltralightManager::RemoveViewFromWindow(int32_t viewId, int32_t windowId)
 void UltralightManager::SetViewToWindow(int32_t viewId, int32_t windowId)
 {
 	//TODO: Add error checking
-	auto viewIter = m_ViewsMap.find(viewId);
-	if (viewIter == m_ViewsMap.end())
+	auto viewIter = m_OwnedViewsMap.find(viewId);
+	if (viewIter == m_OwnedViewsMap.end())
 	{
 		return; //This shouldn't happen doesn't make sense
 	}
@@ -201,16 +202,19 @@ WeakWrapper<UltralightView> UltralightManager::CreateUltralightView(UltralightVi
 		parms.InspectionTarget->GetView()->CreateLocalInspectorView();
 	}
 
-	m_ViewsMap.insert(std::make_pair(pView->GetId(), pView));
+	m_OwnedViewsMap.insert(std::make_pair(pView->GetId(), pView));
+	m_WeakViewsMap.insert(make_pair(pView->GetId(), pView));
 	if (parms.IsAccelerated)
 	{
-		m_AcceleratedViewsMap.insert(std::make_pair(pView->GetId(), pView));
+		m_WeakAcceleratedViewsMap.insert(std::make_pair(pView->GetId(), pView));
 	}
 	return pView;
 }
 
 void UltralightManager::DestroyView(WeakWrapper<UltralightView> pView)
 {
+	if (pView.expired()) //Has this already been destroyed? skip
+		return;
 	//CODENOTE[HIGH] - NEED TO REVIEW THE ORDER OF ALL OF THIS AND FIX IT
 	if (pView->m_DestructionInitiated)
 	{
@@ -239,10 +243,25 @@ void UltralightManager::DestroyView(WeakWrapper<UltralightView> pView)
 			FatalError("Failed to find window entry in window map.");
 		}
 		windowPair->second.erase(pView->GetId());
+		pView->SetToWindow(-1);
 	}
 
-	m_AcceleratedViewsMap.erase(pView->GetId());
-	m_ViewsMap.erase(pView->GetId());
+	m_WeakAcceleratedViewsMap.erase(pView->GetId());
+	m_WeakViewsMap.erase(pView->GetId());
+	m_OwnedViewsMap.erase(pView->GetId());
+}
+
+void UltralightManager::DestroyAllViews()
+{
+	vector<WeakWrapper<UltralightView>> viewsToDestroy;
+	for (auto iter : m_OwnedViewsMap)
+	{
+		viewsToDestroy.push_back(iter.second);
+	}
+	for (auto view : viewsToDestroy)
+	{
+		DestroyView(view);
+	}
 }
 
 UltralightManager* UltralightManager::GetInstance()
@@ -267,17 +286,18 @@ shared_ptr<UltralightManager> UltralightManager::GetInstanceShared()
 	return s_Instance;
 }
 
-vector<shared_ptr<UltralightView>> UltralightManager::GetViewsForWindow(int32_t windowId)
+vector<WeakWrapper<UltralightView>> UltralightManager::GetViewsForWindow(int32_t windowId)
 {
+	//CODENOTE[LOW] Optimize this
 	//TODO: Error checking and optimize these unnecessary lookups
-	vector<shared_ptr<UltralightView>> views;
+	vector<WeakWrapper<UltralightView>> views;
 	auto windowIter = m_WindowIdToViewIdMap.find(windowId);
 	if (windowIter != m_WindowIdToViewIdMap.end())
 	{
 		for (auto viewId : windowIter->second)
 		{
-			auto viewIter = m_ViewsMap.find(viewId);
-			if (viewIter != m_ViewsMap.end())
+			auto viewIter = m_OwnedViewsMap.find(viewId);
+			if (viewIter != m_OwnedViewsMap.end())
 			{
 				views.push_back(viewIter->second);
 			}
@@ -288,9 +308,9 @@ vector<shared_ptr<UltralightView>> UltralightManager::GetViewsForWindow(int32_t 
 
 WeakWrapper<UltralightView> UltralightManager::GetViewFromId(int32_t viewId)
 {
-	//TODO: Error checking
-	auto iter = m_ViewsMap.find(viewId);
-	if (iter == m_ViewsMap.end())
+	//CODENOTE[LOW] Error checking?
+	auto iter = m_OwnedViewsMap.find(viewId);
+	if (iter == m_OwnedViewsMap.end())
 	{
 		return weak_ptr<UltralightView>();
 	}
@@ -302,19 +322,19 @@ IGPUDriverD3D11* UltralightManager::GetGPUDriver()
 	return m_GPUDriver.get();
 }
 
-unordered_map<int32_t, shared_ptr<UltralightView>> UltralightManager::GetViews()
+unordered_map<int32_t, WeakWrapper<UltralightView>> UltralightManager::GetViews()
 {
-	return m_ViewsMap;
+	return m_WeakViewsMap;
 }
 
-unordered_map<int32_t, shared_ptr<UltralightView>> UltralightManager::GetAcceleratedViews()
+unordered_map<int32_t, WeakWrapper<UltralightView>> UltralightManager::GetAcceleratedViews()
 {
-	return m_AcceleratedViewsMap;
+	return m_WeakAcceleratedViewsMap;
 }
 
 void UltralightManager::RefreshViewDisplaysForAnimations()
 {
-	for (auto view : m_ViewsMap)
+	for (auto view : m_OwnedViewsMap)
 	{
 		//LOGINFO("Ultralight display refresh");
 		m_UltralightRenderer->RefreshDisplay(view.second->GetView()->display_id());
@@ -450,7 +470,7 @@ bool UltralightManager::FireScrollEvent(ScrollEvent* scrollEvent)
 WeakWrapper<UltralightView> UltralightManager::GetUltralightViewFromNativeViewPtr(ul::View* pNativeView)
 {
 	//TODO: Inefficient lookup, maybe add another map for this lookup?
-	for (auto mapPair : m_ViewsMap)
+	for (auto mapPair : m_WeakViewsMap)
 	{
 		auto pView = mapPair.second;
 		ul::View* pULView = pView->GetView();
