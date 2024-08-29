@@ -21,11 +21,11 @@ private:
 	shared_ptr<Model> m_LoadedModel = nullptr;
 	shared_ptr<Entity> m_LoadedEntity = nullptr;
 
-	shared_ptr<Window> m_PrimaryWindow = nullptr;
-	shared_ptr<UltralightView> m_PrimaryView = nullptr;
+	WeakWrapper<Window> m_PrimaryWindow;
+	WeakWrapper<UltralightView> m_PrimaryView;
 
-	shared_ptr<UltralightView> m_OpenFileDialogView = nullptr;
-	shared_ptr<Window> m_OpenFileDialogWindow = nullptr;
+	WeakWrapper<Window> m_OpenFileDialogWindow;
+	WeakWrapper<UltralightView> m_OpenFileDialogView;
 	string m_LastDirectoryAccessed = "";
 	float m_RotationSpeed = 1.0f;
 	float m_AnimationSpeed = 1.0f;

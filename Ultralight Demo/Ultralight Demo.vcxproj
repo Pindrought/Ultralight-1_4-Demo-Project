@@ -245,6 +245,7 @@ xcopy /E /I /Y /Q /D "$(SolutionDir)ThirdParty\Ultralight\resources" "$(TargetDi
     <ClCompile Include="Window\InputController\ScrollEvent.cpp" />
     <ClCompile Include="Window\Window.cpp" />
     <ClCompile Include="Window\WindowHelperForBorderlessResizable.cpp" />
+    <ClCompile Include="Window\WindowManager.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Demos\DemoAntiAliasTest\DemoAntiAliasTest.h" />
@@ -311,6 +312,7 @@ xcopy /E /I /Y /Q /D "$(SolutionDir)ThirdParty\Ultralight\resources" "$(TargetDi
     <ClInclude Include="PrecompiledHeader\PCH.h" />
     <ClInclude Include="PrecompiledHeader\SimpleMath.h" />
     <ClInclude Include="PrecompiledHeader\StringConverter.h" />
+    <ClInclude Include="PrecompiledHeader\WeakWrapper.h" />
     <ClInclude Include="UltralightImpl\EZJSParm.h" />
     <ClInclude Include="UltralightImpl\GPUimpl\GPUDriverD3D11.h" />
     <ClInclude Include="UltralightImpl\GPUimpl\IGPUDriverD3D11.h" />
@@ -333,6 +335,7 @@ xcopy /E /I /Y /Q /D "$(SolutionDir)ThirdParty\Ultralight\resources" "$(TargetDi
     <ClInclude Include="Window\InputController\ScrollEvent.h" />
     <ClInclude Include="Window\Window.h" />
     <ClInclude Include="Window\WindowHelperForBorderlessResizable.h" />
+    <ClInclude Include="Window\WindowManager.h" />
     <ClInclude Include="Window\WindowStyle.h" />
   </ItemGroup>
   <ItemGroup>

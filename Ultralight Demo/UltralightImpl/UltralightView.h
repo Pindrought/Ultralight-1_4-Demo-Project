@@ -16,7 +16,7 @@ struct UltralightViewCreationParameters
 	bool ForceMatchWindowDimensions = false;
 	bool IsAccelerated = false;
 	bool IsTransparent = false;
-	std::shared_ptr<UltralightView> InspectionTarget = nullptr; //This is only for when creating an inspector view. For normal views, this should always be null.
+	WeakWrapper<UltralightView> InspectionTarget; //This is only for when creating an inspector view. For normal views, this should always be null.
 };
 
 class UltralightView
@@ -30,7 +30,7 @@ public:
 	int32_t GetId();
 	bool UpdateStorageTexture();
 	ID3D11ShaderResourceView* GetTextureSRV();
-	shared_ptr<UltralightView> GetInspectorView();
+	WeakWrapper<UltralightView> GetInspectorView();
 	uint32_t GetWidth() const;
 	uint32_t GetHeight() const;
 	uint32_t GetSampleCount() const;
@@ -70,10 +70,9 @@ private:
 	uint32_t m_SampleCount = 1;
 	bool m_InputEnabled = true;
 	bool m_IsVisible = true;
-	bool m_IsInspectorView = false;
-	bool m_HasInspectorView = false;
-	shared_ptr<UltralightView> m_InspectionTarget = nullptr; //Only time this is not null is when this is an inspector view.
-	shared_ptr<UltralightView> m_InspectorView = nullptr; //If this view is being inspected by another view, this will reference the inspector view.
+	bool m_DestructionInitiated = false;
+	WeakWrapper<UltralightView> m_InspectionTarget; //Only time this is not null is when this is an inspector view.
+	WeakWrapper<UltralightView> m_InspectorView; //If this view is being inspected by another view, this will reference the inspector view.
 	bool m_ForceMatchWindowDimensions = false;
 	std::shared_ptr<Texture> m_StorageTexture = nullptr; //This is the storage texture used only by the CPU renderer
 	ComPtr<ID3D11Texture2D> m_TempTexture = nullptr; //This is a temporary texture used to store last img during a resize

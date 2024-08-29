@@ -11,9 +11,9 @@ public:
 	void OnWindowDestroyEndCallback(int32_t windowId) override;
 	void OnWindowResizeCallback(Window* pWindow) override;
 private:
-	shared_ptr<UltralightView> m_PrimaryView = nullptr;
-	shared_ptr<UltralightView> m_OpenFileDialogView = nullptr;
-	std::shared_ptr<Window> m_PrimaryWindow = nullptr;
-	shared_ptr<Window> m_OpenFileDialogWindow = nullptr;
+	WeakWrapper<UltralightView> m_PrimaryView;
+	WeakWrapper<UltralightView> m_OpenFileDialogView;
+	WeakWrapper<Window> m_PrimaryWindow;
+	WeakWrapper<Window> m_OpenFileDialogWindow;
 	string m_LastDirectoryAccessed = "";
 };

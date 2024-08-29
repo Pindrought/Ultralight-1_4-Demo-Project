@@ -6,6 +6,8 @@
 #include "ErrorHandler.h"
 #include "DirectoryHelper.h"
 #include "SimpleMath.h" //Also SimpleMath
+#include "WeakWrapper.h" //I don't want to have to lock every time for weak_ptr
+
 #include <ShlObj.h>
 #pragma comment(lib, "shell32.lib")
 
@@ -92,6 +94,7 @@ using std::set;
 using std::shared_ptr;
 using std::unique_ptr;
 using std::unordered_map;
+using std::weak_ptr;
 using std::make_pair;
 using std::make_shared;
 using Microsoft::WRL::ComPtr;
@@ -99,3 +102,5 @@ using Microsoft::WRL::ComPtr;
 namespace ul = ultralight;
 
 using namespace DirectX::SimpleMath;
+
+string GetThreadText();

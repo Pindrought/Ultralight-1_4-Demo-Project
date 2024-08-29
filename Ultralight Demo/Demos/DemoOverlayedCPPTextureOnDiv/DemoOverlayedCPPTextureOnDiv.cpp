@@ -9,8 +9,8 @@ bool DemoOverlayedCPPTextureOnDiv::Startup()
 	windowParms.Height = 600;
 	windowParms.Style = WindowStyle::Resizable | WindowStyle::ExitButton | WindowStyle::MaximizeAvailable;
 	windowParms.Title = "Overlayed CPP Texture Example";
-	m_PrimaryWindow = SpawnWindow(windowParms);
-	if (m_PrimaryWindow == nullptr)
+	m_PrimaryWindow = WindowManager::SpawnWindow(windowParms);
+	if (m_PrimaryWindow.expired())
 	{
 		FatalError("Failed to initialize primary window. Program must now abort.");
 		return false;
@@ -23,7 +23,7 @@ bool DemoOverlayedCPPTextureOnDiv::Startup()
 	parms.ForceMatchWindowDimensions = true;
 	parms.IsTransparent = true;
 
-	shared_ptr<UltralightView> pView = m_UltralightMgr->CreateUltralightView(parms);
+	WeakWrapper<UltralightView> pView = m_UltralightMgr->CreateUltralightView(parms);
 	pView->LoadURL("file:///Samples/OverlayedCPPTextureOnDiv/OverlayedCPPTextureOnDiv.html");
 	m_UltralightMgr->SetViewToWindow(pView->GetId(), m_PrimaryWindow->GetId());
 
@@ -60,7 +60,7 @@ EZJSParm DemoOverlayedCPPTextureOnDiv::OnEventCallbackFromUltralight(int32_t vie
 
 void DemoOverlayedCPPTextureOnDiv::OnWindowDestroyStartCallback(int32_t windowId)
 {
-	Window* pWindow = GetWindowFromId(windowId);
+	WeakWrapper<Window> pWindow = WindowManager::GetWindow(windowId);
 	auto pViews = pWindow->GetSortedUltralightViews();
 	for (auto pView : pViews)
 	{
@@ -71,7 +71,7 @@ void DemoOverlayedCPPTextureOnDiv::OnWindowDestroyStartCallback(int32_t windowId
 void DemoOverlayedCPPTextureOnDiv::OnWindowDestroyEndCallback(int32_t windowId)
 {
 
-	if (m_WindowIdToWindowInstanceMap.size() == 0)
+	if (WindowManager::GetWindowCount() == 0)
 	{
 		SetRunning(false);
 	}

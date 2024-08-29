@@ -12,6 +12,6 @@ public:
 	void OnWindowDestroyEndCallback(int32_t windowId) override;
 	void OnWindowResizeCallback(Window* pWindow) override;
 private:
-	shared_ptr<Window> m_MainWindow = nullptr;
-	shared_ptr<Window> m_InspectorWindow = nullptr;
+	WeakWrapper<Window> m_MainWindow;
+	WeakWrapper<Window> m_InspectorWindow;
 };

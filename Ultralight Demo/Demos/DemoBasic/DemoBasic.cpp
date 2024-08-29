@@ -9,8 +9,8 @@ bool DemoBasic::Startup()
 	windowParms.Height = 600;
 	windowParms.Style = WindowStyle::Resizable | WindowStyle::ExitButton | WindowStyle::MaximizeAvailable;
 	windowParms.Title = "GPU Renderer";
-	shared_ptr<Window> pWindow = SpawnWindow(windowParms);
-	if (pWindow == nullptr)
+	WeakWrapper<Window> pWindow = WindowManager::SpawnWindow(windowParms);
+	if (pWindow.expired())
 	{
 		FatalError("Failed to initialize primary window. Program must now abort.");
 		return false;
@@ -24,7 +24,7 @@ bool DemoBasic::Startup()
 	parms.IsTransparent = true;
 	parms.SampleCount = 8;
 
-	shared_ptr<UltralightView> pView = m_UltralightMgr->CreateUltralightView(parms);
+	WeakWrapper<UltralightView> pView = m_UltralightMgr->CreateUltralightView(parms);
 	pView->LoadURL("http://www.google.com");
 	m_UltralightMgr->SetViewToWindow(pView->GetId(), pWindow->GetId());
 
@@ -34,7 +34,7 @@ bool DemoBasic::Startup()
 		windowParms.Height = 600;
 		windowParms.Style = WindowStyle::Resizable | WindowStyle::ExitButton | WindowStyle::MaximizeAvailable;
 		windowParms.Title = "CPU Renderer";
-		shared_ptr<Window> pWindow = SpawnWindow(windowParms);
+		WeakWrapper<Window> pWindow = WindowManager::SpawnWindow(windowParms);
 
 		UltralightViewCreationParameters parms;
 		parms.Width = pWindow->GetWidth();
@@ -43,7 +43,7 @@ bool DemoBasic::Startup()
 		parms.ForceMatchWindowDimensions = true;
 		parms.IsTransparent = true;
 
-		shared_ptr<UltralightView> pView = m_UltralightMgr->CreateUltralightView(parms);
+		WeakWrapper<UltralightView> pView = m_UltralightMgr->CreateUltralightView(parms);
 		pView->LoadURL("http://www.google.com");
 		m_UltralightMgr->SetViewToWindow(pView->GetId(), pWindow->GetId());
 	}
@@ -57,17 +57,13 @@ EZJSParm DemoBasic::OnEventCallbackFromUltralight(int32_t viewId, string eventNa
 
 void DemoBasic::OnWindowDestroyStartCallback(int32_t windowId)
 {
-	Window* pWindow = GetWindowFromId(windowId);
-	auto pViews = pWindow->GetSortedUltralightViews();
-	for (auto pView : pViews)
-	{
-		m_UltralightMgr->DestroyView(pView);
-	}
+	WeakWrapper<Window> pWindow = WindowManager::GetWindow(windowId);
+	pWindow->DestroyAllViewsLinkedToThisWindow();
 }
 
 void DemoBasic::OnWindowDestroyEndCallback(int32_t windowId)
 {
-	if (m_WindowIdToWindowInstanceMap.size() == 0)
+	if (WindowManager::GetWindowCount() == 0)
 	{
 		SetRunning(false);
 	}

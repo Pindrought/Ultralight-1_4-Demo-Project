@@ -19,6 +19,7 @@ class Window
 {
 	friend class UltralightManager;
 	friend class WindowHelperForBorderlessResizable;
+	friend class WindowManager;
 public:
 	~Window();
 	bool Initialize(const WindowCreationParameters& parms);
@@ -36,7 +37,7 @@ public:
 	IDXGISwapChain1* GetSwapChainPtr();
 	RenderTargetContainer* GetRenderTargetContainer();
 	LRESULT WindowProcA(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam); //This probably shouldn't be public since it should not be called outside of Window.cpp, but I don't have a great solution to hide this.
-	const list<shared_ptr<UltralightView>>& GetSortedUltralightViews();
+	const list<WeakWrapper<UltralightView>>& GetSortedUltralightViews();
 	bool IsWindowMaximized() const;
 	void SetPosition(int x, int y, int width = -1, int height = -1);
 	void Maximize();
@@ -44,6 +45,7 @@ public:
 	void Show();
 	void Hide();
 	void Close();
+	void DestroyAllViewsLinkedToThisWindow();
 private:
 	bool InitializeSwapchain();
 	bool InitializeRenderTargetContainer();
@@ -64,7 +66,7 @@ private:
 	bool m_DirectCompositionEnabled = false;
 	ComPtr<IDCompositionTarget> m_DirectCompositionTarget = nullptr;
 	ComPtr<IDCompositionVisual> m_DirectCompositionVisual = nullptr;
-	
+	bool m_DestructionInitiated = false;
 	bool m_IsBorderlessResizable = false; //If borderless resizable, there is lots of extra work
 	BorderlessResizableWindowData m_BRWData;
 
@@ -72,7 +74,7 @@ private:
 	ComPtr<IDXGISwapChain1> m_SwapChain = nullptr;
 	shared_ptr<RenderTargetContainer> m_RenderTargetContainer = nullptr;
 	//TODO: Add z-index support
-	list<shared_ptr<UltralightView>> m_UltralightViewsSorted; //Sorted based on z-index
-	std::shared_ptr<UltralightView> m_FocusedUltralightView = nullptr;
+	list<WeakWrapper<UltralightView>> m_UltralightViewsSorted; //Sorted based on z-index
+	WeakWrapper<UltralightView> m_FocusedUltralightView;
 	bool m_CloseInitiated = false;
 };

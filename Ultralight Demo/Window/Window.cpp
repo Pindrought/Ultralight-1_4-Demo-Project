@@ -11,7 +11,13 @@ static IDPoolManager<int32_t> s_WindowsIDManager;
 
 Window::~Window()
 {
+	//CODENOTE[LOW] for some reason I don't know if this is even working sometimes
+	//registering a class is saying name already exists
+	//it's fine for now i'll just ignore that specific error there are more important issues
 	BOOL result = UnregisterClassA(m_WindowClassName.c_str(), GetModuleHandle(NULL));
+	s_WindowsIDManager.StoreId(m_Id);
+	string msg = strfmt("~Window(%d)", m_Id);
+	LOGINFO(msg.c_str());
 }
 
 bool Window::Initialize(const WindowCreationParameters& parms)
@@ -128,10 +134,11 @@ bool Window::Initialize(const WindowCreationParameters& parms)
 		extendedWindowsStyle |= WS_EX_TOPMOST;
 	}
 
+
 	if (m_HWND != NULL)
 	{
 		LOGINFO("WINDOW EXISTING HANDLE CLEANED UP.");
-		DestroyWindow(m_HWND);
+		::DestroyWindow(m_HWND);
 		BOOL result = UnregisterClassA(m_WindowClassName.c_str(), GetModuleHandle(NULL));
 		m_HWND = NULL;
 	}
@@ -315,19 +322,7 @@ LRESULT Window::WindowProcA(HWND hwnd,
 		return 0;
 	case WM_CLOSE: //Window closed
 	{
-		auto pEngine = Engine::GetInstance();
-		pEngine->OnWindowDestroyStartCallback(m_Id);
-
-		pEngine->GetInputController()->ClearEventsForWindow(m_Id);
-
-		DestroyWindow(hwnd);
-		s_WindowsIDManager.StoreId(GetId());
-		pEngine->CleanupWindow(m_Id);
-		UltralightManager* pUltralightManager = UltralightManager::GetInstance();
-		assert(pUltralightManager != nullptr);
-		int id = m_Id; //Need to store the window, because it will be deallocated after RemoveWindowId is called
-		pUltralightManager->RemoveWindowId(id);
-		pEngine->OnWindowDestroyEndCallback(id);
+		WindowManager::DestroyWindow(m_Id);
 		return 0;
 	}
 	case WM_DWMCOMPOSITIONCHANGED:
@@ -488,7 +483,7 @@ LRESULT Window::WindowProcA(HWND hwnd,
 	}
 }
 
-const list<shared_ptr<UltralightView>>& Window::GetSortedUltralightViews()
+const list<WeakWrapper<UltralightView>>& Window::GetSortedUltralightViews()
 {
 	return m_UltralightViewsSorted;
 }
@@ -538,6 +533,21 @@ void Window::Close()
 	}
 	m_CloseInitiated = true;
 	SendMessageA(m_HWND, WM_CLOSE, NULL, NULL);
+}
+
+void Window::DestroyAllViewsLinkedToThisWindow()
+{
+	vector<WeakWrapper<UltralightView>> viewsToDestroy;
+	for (auto view : m_UltralightViewsSorted)
+	{
+		viewsToDestroy.push_back(view);
+	}
+	UltralightManager* pUltralightMgr = UltralightManager::GetInstance();
+	assert(pUltralightMgr != nullptr);
+	for (auto view : viewsToDestroy)
+	{
+		pUltralightMgr->DestroyView(view);
+	}
 }
 
 bool Window::InitializeSwapchain()

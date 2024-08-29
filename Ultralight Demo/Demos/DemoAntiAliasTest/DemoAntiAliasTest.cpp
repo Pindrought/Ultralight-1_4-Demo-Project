@@ -9,7 +9,6 @@ bool DemoAntiAliasTest::Startup()
 	windowParms.Height = 330;
 	windowParms.Style = WindowStyle::Resizable | WindowStyle::ExitButton | WindowStyle::MaximizeAvailable;
 	
-
 	UltralightViewCreationParameters parms;
 	parms.Width = windowParms.Width;
 	parms.Height = windowParms.Height;
@@ -17,7 +16,7 @@ bool DemoAntiAliasTest::Startup()
 	parms.ForceMatchWindowDimensions = true;
 	parms.IsTransparent = true;
 
-	for (int sampleCount = 1; sampleCount <= 8; sampleCount *= 2)
+	for (int sampleCount = 1; sampleCount <= 1; sampleCount *= 2)
 	{
 		if (sampleCount > 1)
 		{
@@ -30,15 +29,15 @@ bool DemoAntiAliasTest::Startup()
 		windowParms.Title = "SampleCount = ";
 		windowParms.Title += std::to_string(sampleCount);
 
-		shared_ptr<Window> pWindow = SpawnWindow(windowParms);
-		if (pWindow == nullptr)
+		WeakWrapper<Window> pWindow = WindowManager::SpawnWindow(windowParms);
+		if (pWindow.expired())
 		{
 			FatalError("Failed to initialize window. Program must now abort.");
 			return false;
 		}
 
 		parms.SampleCount = sampleCount;
-		shared_ptr<UltralightView> pView = m_UltralightMgr->CreateUltralightView(parms);
+		WeakWrapper<UltralightView> pView = m_UltralightMgr->CreateUltralightView(parms);
 		pView->LoadURL("file:///Samples/AntiAliasTest/AntiAliasTest.html");
 		m_UltralightMgr->SetViewToWindow(pView->GetId(), pWindow->GetId());
 		m_Windows.push_back(pWindow);
@@ -78,29 +77,14 @@ EZJSParm DemoAntiAliasTest::OnEventCallbackFromUltralight(int32_t viewId, string
 
 void DemoAntiAliasTest::OnWindowDestroyStartCallback(int32_t windowId)
 {
-	Window* pWindow = GetWindowFromId(windowId);
-	auto pViews = pWindow->GetSortedUltralightViews();
-	for (auto pView : pViews)
-	{
-		m_UltralightMgr->DestroyView(pView);
-	}
-	for (int i = 0; i < m_Windows.size(); i++)
-	{
-		if (m_Windows[i]->GetId() == windowId)
-		{
-			m_Windows.erase(m_Windows.begin() + i);
-			break;
-		}
-	}
-	for (int i = 0; i < m_Windows.size(); i++)
-	{
-		m_Windows[i]->Close();
-	}
+	WeakWrapper<Window> pWindow = WindowManager::GetWindow(windowId);
+	pWindow->DestroyAllViewsLinkedToThisWindow();
+	WindowManager::DestroyAllWindows();
 }
 
 void DemoAntiAliasTest::OnWindowDestroyEndCallback(int32_t windowId)
 {
-	if (m_WindowIdToWindowInstanceMap.size() == 0)
+	if (WindowManager::GetWindowCount() == 0)
 	{
 		SetRunning(false);
 	}

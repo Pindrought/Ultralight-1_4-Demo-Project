@@ -26,5 +26,5 @@ public:
 		DemoGLTFViewer
 	};
 	DemoId m_SelectedDemo = DemoId::None;
-	shared_ptr<Window> m_PrimaryWindow = nullptr;
+	WeakWrapper<Window> m_PrimaryWindow;
 };

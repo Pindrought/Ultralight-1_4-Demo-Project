@@ -24,15 +24,15 @@ public:
 	ul::Renderer* GetRendererPtr();
 	void RemoveViewFromWindow(int32_t viewId, int32_t windowId);
 	void SetViewToWindow(int32_t viewId, int32_t windowId);
-	void RegisterWindow(std::shared_ptr<Window> pWindow);
+	void RegisterWindow(WeakWrapper<Window> pWindow);
 	void RemoveWindowId(int32_t windowId);
-	std::shared_ptr<UltralightView> CreateUltralightView(UltralightViewCreationParameters parms);
-	void DestroyView(shared_ptr<UltralightView> pView);
+	WeakWrapper<UltralightView> CreateUltralightView(UltralightViewCreationParameters parms);
+	void DestroyView(WeakWrapper<UltralightView> pView);
 	static UltralightManager* GetInstance();
 	static shared_ptr<UltralightManager> GetInstanceShared();
 
 	std::vector<std::shared_ptr<UltralightView>> GetViewsForWindow(int32_t windowId);
-	std::shared_ptr<UltralightView> GetViewFromId(int32_t viewId);
+	WeakWrapper<UltralightView> GetViewFromId(int32_t viewId);
 	IGPUDriverD3D11* GetGPUDriver();
 	unordered_map<int32_t, shared_ptr<UltralightView>> GetViews();
 	unordered_map<int32_t, shared_ptr<UltralightView>> GetAcceleratedViews();
@@ -42,7 +42,7 @@ public:
 	bool FireKeyboardEvent(KeyboardEvent* keyboardEvent);
 	bool FireMouseEvent(MouseEvent* mouseEvent);
 	bool FireScrollEvent(ScrollEvent* scrollEvent);
-	shared_ptr<UltralightView> GetUltralightViewFromNativeViewPtr(ul::View* pNativeView);
+	WeakWrapper<UltralightView> GetUltralightViewFromNativeViewPtr(ul::View* pNativeView);
 
 	~UltralightManager();
 private:
@@ -55,9 +55,8 @@ private:
 	unique_ptr<ClipboardWin> m_Clipboard;
 	shared_ptr<IGPUDriverD3D11> m_GPUDriver;
 
-	unordered_map<int32_t, shared_ptr<Window>> m_WindowIdToWindowPtrMap;
+	unordered_map<int32_t, WeakWrapper<Window>> m_WindowIdToWindowPtrMap;
 	unordered_map<int32_t, set<int32_t>> m_WindowIdToViewIdMap;
 	unordered_map<int32_t, shared_ptr<UltralightView>> m_ViewsMap;
 	unordered_map<int32_t, shared_ptr<UltralightView>> m_AcceleratedViewsMap;
-
 };

@@ -219,6 +219,9 @@
     <ClCompile Include="Demos\DemoCPPTextureInBrowser\DemoCPPTextureInBrowser.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Window\WindowManager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="PrecompiledHeader\ErrorHandler.h">
@@ -480,6 +483,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Demos\DemoCPPTextureInBrowser\DemoCPPTextureInBrowser.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Window\WindowManager.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="PrecompiledHeader\WeakWrapper.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

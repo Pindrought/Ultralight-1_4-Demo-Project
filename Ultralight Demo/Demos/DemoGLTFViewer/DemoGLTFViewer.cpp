@@ -13,8 +13,8 @@ bool DemoGLTFViewer::Startup()
 	windowParms.Height = 600;
 	windowParms.Style = WindowStyle::Resizable | WindowStyle::ExitButton | WindowStyle::MaximizeAvailable;
 	windowParms.Title = "Demo GLTF Viewer";
-	m_PrimaryWindow = SpawnWindow(windowParms);
-	if (m_PrimaryWindow == nullptr)
+	m_PrimaryWindow = WindowManager::SpawnWindow(windowParms);
+	if (m_PrimaryWindow.expired())
 	{
 		FatalError("Failed to initialize primary window. Program must now abort.");
 		return false;
@@ -83,9 +83,9 @@ EZJSParm DemoGLTFViewer::OnEventCallbackFromUltralight(int32_t viewId, string ev
 {
 	if (eventName == "OpenFileDialogLoaded")
 	{
-		shared_ptr<UltralightView> pView = m_UltralightMgr->GetViewFromId(viewId);
+		WeakWrapper<UltralightView> pView = m_UltralightMgr->GetViewFromId(viewId);
 
-		auto AddQuickAccessPath = [](UltralightView* pView, string displayPath, int directoryID, string appendedPath = "")
+		auto AddQuickAccessPath = [](WeakWrapper<UltralightView> pView, string displayPath, int directoryID, string appendedPath = "")
 			{
 				CHAR directoryPathLong[MAX_PATH];
 
@@ -124,12 +124,12 @@ EZJSParm DemoGLTFViewer::OnEventCallbackFromUltralight(int32_t viewId, string ev
 			}
 		}
 
-		AddQuickAccessPath(pView.get(), "User", CSIDL_PROFILE);
-		AddQuickAccessPath(pView.get(), "Downloads", CSIDL_PROFILE, "\\Downloads");
-		AddQuickAccessPath(pView.get(), "My Documents", CSIDL_PERSONAL);
-		AddQuickAccessPath(pView.get(), "My Music", CSIDL_MYMUSIC);
-		AddQuickAccessPath(pView.get(), "My Videos", CSIDL_MYVIDEO);
-		AddQuickAccessPath(pView.get(), "Desktop", CSIDL_DESKTOP);
+		AddQuickAccessPath(pView, "User", CSIDL_PROFILE);
+		AddQuickAccessPath(pView, "Downloads", CSIDL_PROFILE, "\\Downloads");
+		AddQuickAccessPath(pView, "My Documents", CSIDL_PERSONAL);
+		AddQuickAccessPath(pView, "My Music", CSIDL_MYMUSIC);
+		AddQuickAccessPath(pView, "My Videos", CSIDL_MYVIDEO);
+		AddQuickAccessPath(pView, "Desktop", CSIDL_DESKTOP);
 
 		{
 			EZJSParm outReturnValue;
@@ -168,7 +168,7 @@ EZJSParm DemoGLTFViewer::OnEventCallbackFromUltralight(int32_t viewId, string ev
 						}
 					}
 
-					shared_ptr<UltralightView> pView = m_UltralightMgr->GetViewFromId(viewId);
+					WeakWrapper<UltralightView> pView = m_UltralightMgr->GetViewFromId(viewId);
 					EZJSParm outReturnVal;
 					string outException;
 					bool result = pView->CallJSFnc("UpdateDirectoryLocationAndEntries",
@@ -280,7 +280,7 @@ EZJSParm DemoGLTFViewer::OnEventCallbackFromUltralight(int32_t viewId, string ev
 
 	if (eventName == "GLTFViewer_OpenFileDialog")
 	{
-		if (m_OpenFileDialogWindow == nullptr)
+		if (m_OpenFileDialogWindow.expired())
 		{
 			int monitorWidth = GetSystemMetrics(SM_CXSCREEN);
 			int monitorHeight = GetSystemMetrics(SM_CYSCREEN);
@@ -291,9 +291,9 @@ EZJSParm DemoGLTFViewer::OnEventCallbackFromUltralight(int32_t viewId, string ev
 			windowParms.Style = WindowStyle::Resizable | WindowStyle::ExitButton | WindowStyle::MaximizeAvailable;
 			windowParms.Title = "OpenFileDialog File Selection";
 			windowParms.ParentWindow = m_PrimaryWindow->GetHWND(); //By setting the parent, this window will always be on top.
-			shared_ptr<Window> pWindow = SpawnWindow(windowParms);
+			WeakWrapper<Window> pWindow = WindowManager::SpawnWindow(windowParms);
 			m_OpenFileDialogWindow = pWindow;
-			if (m_OpenFileDialogWindow == nullptr)
+			if (m_OpenFileDialogWindow.expired())
 			{
 				FatalError("Failed to initialize open file dialog window. Program must now abort.");
 			}
@@ -321,29 +321,20 @@ EZJSParm DemoGLTFViewer::OnEventCallbackFromUltralight(int32_t viewId, string ev
 
 void DemoGLTFViewer::OnWindowDestroyStartCallback(int32_t windowId)
 {
-	Window* pWindow = GetWindowFromId(windowId);
-	if (m_OpenFileDialogWindow != nullptr)
+	WeakWrapper<Window> pWindow = WindowManager::GetWindow(windowId);
+	if (!m_OpenFileDialogWindow.expired())
 	{
 		if (windowId == m_OpenFileDialogWindow->GetId())
 		{
-			m_OpenFileDialogWindow = nullptr;
 			m_PrimaryWindow->Enable();
 		}
 	}
-	auto pViews = pWindow->GetSortedUltralightViews();
-	for (auto pView : pViews)
-	{
-		if (pView == m_OpenFileDialogView) //Technically this is inefficient. Could keep the view alive and just reassign it to window, but this is simpler to manage.
-		{
-			m_OpenFileDialogView = nullptr;
-		}
-		m_UltralightMgr->DestroyView(pView);
-	}
+	pWindow->DestroyAllViewsLinkedToThisWindow();
 }
 
 void DemoGLTFViewer::OnWindowDestroyEndCallback(int32_t windowId)
 {
-	if (m_WindowIdToWindowInstanceMap.size() == 0)
+	if (WindowManager::GetWindowCount() == 0)
 	{
 		SetRunning(false);
 	}

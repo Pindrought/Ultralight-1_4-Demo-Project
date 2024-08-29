@@ -12,24 +12,23 @@ bool DemoJSCPPCommunication::Startup()
 	windowParms.Height = screenHeight - 100;
 	windowParms.Style = WindowStyle::Resizable | WindowStyle::ExitButton | WindowStyle::MaximizeAvailable;
 	windowParms.Title = "Default Title - Primary Window";
-	shared_ptr<Window> pWindow = SpawnWindow(windowParms);
-	m_PrimaryWindow = pWindow;
-	if (m_PrimaryWindow == nullptr)
+	m_PrimaryWindow = WindowManager::SpawnWindow(windowParms);
+	if (m_PrimaryWindow.expired())
 	{
 		FatalError("Failed to initialize primary window. Program must now abort.");
 		return false;
 	}
 
 	UltralightViewCreationParameters parms;
-	parms.Width = pWindow->GetWidth();
-	parms.Height = pWindow->GetHeight();
+	parms.Width = m_PrimaryWindow->GetWidth();
+	parms.Height = m_PrimaryWindow->GetHeight();
 	parms.IsAccelerated = false;
 	parms.ForceMatchWindowDimensions = true;
 	parms.IsTransparent = true;
 
-	shared_ptr<UltralightView> pView = m_UltralightMgr->CreateUltralightView(parms);
+	WeakWrapper<UltralightView> pView = m_UltralightMgr->CreateUltralightView(parms);
 	pView->LoadURL("file:///Samples/JSCPPCommunication/JSCPPCommunication.html");
-	m_UltralightMgr->SetViewToWindow(pView->GetId(), pWindow->GetId());
+	m_UltralightMgr->SetViewToWindow(pView->GetId(), m_PrimaryWindow->GetId());
 }
 
 EZJSParm DemoJSCPPCommunication::OnEventCallbackFromUltralight(int32_t viewId, string eventName, vector<EZJSParm> parameters)
@@ -171,7 +170,7 @@ EZJSParm DemoJSCPPCommunication::OnEventCallbackFromUltralight(int32_t viewId, s
 	}
 	/////////////////
 	//For these below events, we'll need to CallJSFnc on the view, so go ahead and get the view ptr from the view id
-	shared_ptr<UltralightView> pView = m_UltralightMgr->GetViewFromId(viewId);
+	WeakWrapper<UltralightView> pView = m_UltralightMgr->GetViewFromId(viewId);
 
 	if (eventName == "CPP_JS1")
 	{ //Send a string
@@ -223,7 +222,7 @@ EZJSParm DemoJSCPPCommunication::OnEventCallbackFromUltralight(int32_t viewId, s
 
 void DemoJSCPPCommunication::OnWindowDestroyStartCallback(int32_t windowId)
 {
-	Window* pWindow = GetWindowFromId(windowId);
+	WeakWrapper<Window> pWindow = WindowManager::GetWindow(windowId);
 	auto pViews = pWindow->GetSortedUltralightViews();
 	for (auto pView : pViews)
 	{
@@ -233,7 +232,7 @@ void DemoJSCPPCommunication::OnWindowDestroyStartCallback(int32_t windowId)
 
 void DemoJSCPPCommunication::OnWindowDestroyEndCallback(int32_t windowId)
 {
-	if (m_WindowIdToWindowInstanceMap.size() == 0)
+	if (WindowManager::GetWindowCount() == 0)
 	{
 		SetRunning(false);
 	}

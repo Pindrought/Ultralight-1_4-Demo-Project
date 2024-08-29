@@ -107,7 +107,7 @@ ID3D11ShaderResourceView* UltralightView::GetTextureSRV()
 	}
 }
 
-shared_ptr<UltralightView> UltralightView::GetInspectorView()
+WeakWrapper<UltralightView> UltralightView::GetInspectorView()
 {
 	return m_InspectorView;
 }
@@ -236,7 +236,7 @@ bool UltralightView::IsInputEnabled() const
 
 bool UltralightView::IsInspectorView() const
 {
-	return m_IsInspectorView;
+	return m_InspectionTarget.expired() == false;
 }
 
 bool UltralightView::IsVisible() const
@@ -246,7 +246,7 @@ bool UltralightView::IsVisible() const
 
 bool UltralightView::HasInspectorView() const
 {
-	return m_HasInspectorView;
+	return  m_InspectorView.expired() == false;
 }
 
 void UltralightView::SetInputEnabled(bool enabled)
@@ -422,8 +422,8 @@ void UltralightView::SetToWindow(int32_t windowId)
 	}
 
 	Engine* pEngine = Engine::GetInstance();
-	Window* pWindow = pEngine->GetWindowFromId(windowId);
-	assert(pWindow != nullptr);
+	WeakWrapper<Window> pWindow = WindowManager::GetWindow(windowId);
+	assert(!pWindow.expired());
 	if (m_ForceMatchWindowDimensions)
 	{
 		if (pWindow->GetWidth() != m_Width ||
@@ -451,9 +451,8 @@ UltralightView::~UltralightView()
 		m_NativeView->Release(); //This is necessary for when an inspector view is holding a ref to this view or else this will never be cleaned up
 	//Note that in some cases there is still a crash when it comes to releasing the Ultralight views. Haven't figured out what I am doing to cause that yet.
 	
-	LOGINFO("~UltralightView() --");
-	LOGINFO(m_Name.c_str());
-	LOGINFO("\n");
+	string msg = strfmt("~UltralightView(%s)", m_Name.c_str());
+	LOGINFO(msg.c_str());
 }
 
 bool UltralightView::Initialize(UltralightViewCreationParameters params)
@@ -473,11 +472,6 @@ bool UltralightView::Initialize(UltralightViewCreationParameters params)
 	m_ForceMatchWindowDimensions = params.ForceMatchWindowDimensions;
 	m_Id = s_UltralightViewIDPoolManager.GetNextId();
 	m_InspectionTarget = params.InspectionTarget;
-	if (m_InspectionTarget != nullptr)
-	{
-		m_IsInspectorView = true;
-		m_InspectionTarget->m_HasInspectorView = true;
-	}
 
 	ultralight::ViewConfig config;
 

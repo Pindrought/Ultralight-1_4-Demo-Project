@@ -12,8 +12,8 @@ bool DemoSelector::Startup()
 	windowParms.Height = screenHeight - 100;
 	windowParms.Style = WindowStyle::Resizable | WindowStyle::ExitButton | WindowStyle::MaximizeAvailable;
 	windowParms.Title = "Demo Selector";
-	m_PrimaryWindow = SpawnWindow(windowParms);
-	if (m_PrimaryWindow == nullptr)
+	m_PrimaryWindow = WindowManager::SpawnWindow(windowParms);
+	if (m_PrimaryWindow.expired())
 	{
 		FatalError("Failed to initialize primary window. Program must now abort.");
 		return false;
@@ -26,7 +26,7 @@ bool DemoSelector::Startup()
 	parms.ForceMatchWindowDimensions = true;
 	parms.IsTransparent = true;
 
-	shared_ptr<UltralightView> pView = m_UltralightMgr->CreateUltralightView(parms);
+	WeakWrapper<UltralightView> pView = m_UltralightMgr->CreateUltralightView(parms);
 	pView->LoadURL("file:///Samples/DemoSelector/DemoSelector.html");
 	m_UltralightMgr->SetViewToWindow(pView->GetId(), m_PrimaryWindow->GetId());
 }
@@ -96,7 +96,7 @@ EZJSParm DemoSelector::OnEventCallbackFromUltralight(int32_t viewId, string even
 
 void DemoSelector::OnWindowDestroyStartCallback(int32_t windowId)
 {
-	Window* pWindow = GetWindowFromId(windowId);
+	WeakWrapper<Window> pWindow = WindowManager::GetWindow(windowId);
 	auto pViews = pWindow->GetSortedUltralightViews();
 	for (auto pView : pViews)
 	{
@@ -106,7 +106,7 @@ void DemoSelector::OnWindowDestroyStartCallback(int32_t windowId)
 
 void DemoSelector::OnWindowDestroyEndCallback(int32_t windowId)
 {
-	if (m_WindowIdToWindowInstanceMap.size() == 0)
+	if (WindowManager::GetWindowCount() == 0)
 	{
 		SetRunning(false);
 	}

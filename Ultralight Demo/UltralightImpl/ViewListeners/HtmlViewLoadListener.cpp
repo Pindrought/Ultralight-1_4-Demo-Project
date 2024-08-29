@@ -28,10 +28,11 @@ JSValueRef CallEvent(JSContextRef ctx, JSObjectRef function,
                      JSObjectRef thisObject, size_t argumentCount,
                      const JSValueRef arguments[], JSValueRef* exception)
 {
-    //propertyNameBuffer.reserve(100);
 
     if (argumentCount > 0)
     {
+        /*string threadInfo = GetThreadText();
+        LOGINFO(threadInfo.c_str());*/
         int32_t* pViewId = (int32_t*)JSObjectGetPrivate(function);
 
         if (pViewId == nullptr)
@@ -87,6 +88,15 @@ JSValueRef CallEvent(JSContextRef ctx, JSObjectRef function,
     return JSValueMakeNull(ctx);
 }
 
+JSValueRef PrintTest(JSContextRef ctx, JSObjectRef function,
+                     JSObjectRef thisObject, size_t argumentCount,
+                     const JSValueRef arguments[], JSValueRef* exception)
+{
+    string msg = strfmt("Tick Count [%d]\n", GetTickCount());
+    OutputDebugStringA(msg.c_str());
+    return JSValueMakeNull(ctx);
+}
+
 void HtmlViewLoadListener::OnWindowObjectReady(ultralight::View* caller,
                                                uint64_t frame_id,
                                                bool is_main_frame,
@@ -109,6 +119,13 @@ void HtmlViewLoadListener::OnWindowObjectReady(ultralight::View* caller,
         JSObjectRef globalObj = JSContextGetGlobalObject(ctx);
         JSObjectSetProperty(ctx, globalObj, name, nativeFnc, 0, 0);
         JSStringRelease(name);
+        {
+            JSStringRef name = JSStringCreateWithUTF8CString("PrintTest");
+            JSObjectRef globalObj = JSContextGetGlobalObject(ctx);
+            JSObjectRef fnc = JSObjectMakeFunctionWithCallback(ctx, name, PrintTest);
+            JSObjectSetProperty(ctx, globalObj, name, fnc, 0, 0);
+            JSStringRelease(name);
+        }
     }
 }
 

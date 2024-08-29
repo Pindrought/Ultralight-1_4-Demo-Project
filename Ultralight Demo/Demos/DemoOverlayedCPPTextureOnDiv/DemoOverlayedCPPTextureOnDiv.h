@@ -16,7 +16,7 @@ public:
 	void OnWindowResizeCallback(Window* pWindow) override;
 	void OnPostRenderULViews() override; //This is where we draw our C++ texture into the render target
 
-	shared_ptr<Window> m_PrimaryWindow = nullptr;
+	WeakWrapper<Window> m_PrimaryWindow;
 	struct DivRectData
 	{
 		float X = 0;

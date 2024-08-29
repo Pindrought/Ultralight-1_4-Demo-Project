@@ -73,7 +73,7 @@ void UltralightManager::UpdateViews()
 {
 	//LOGINFO("Ultralight->Update()");
 	m_UltralightRenderer->Update();
-	//LOGINFO("Ultralight->Render()");
+	//LOGINFO("Ultralight->Render() --> Ultralight->DrawCommandList()");
 	m_UltralightRenderer->Render();
 	//LOGINFO("GPUDriver->DrawCommandList() Start");
 	m_GPUDriver->DrawCommandList();
@@ -100,8 +100,8 @@ void UltralightManager::RemoveViewFromWindow(int32_t viewId, int32_t windowId)
 	}
 	Engine* pEngine = Engine::GetInstance();
 	assert(pEngine != nullptr);
-	Window* pWindow = pEngine->GetWindowFromId(windowId);
-	assert(pWindow != nullptr);
+	WeakWrapper<Window> pWindow = WindowManager::GetWindow(windowId);
+	assert(!pWindow.expired());
 	auto& viewList = pWindow->m_UltralightViewsSorted;
 	for (auto listIter = viewList.begin(); listIter != viewList.end(); listIter++)
 	{
@@ -137,12 +137,13 @@ void UltralightManager::SetViewToWindow(int32_t viewId, int32_t windowId)
 	
 	Engine* pEngine = Engine::GetInstance();
 	assert(pEngine != nullptr);
-	Window* pWindow = pEngine->GetWindowFromId(windowId);
-	assert(pWindow != nullptr);
+	WeakWrapper<Window> pWindow = WindowManager::GetWindow(windowId);
+	assert(!pWindow.expired());
 	auto& viewList = pWindow->m_UltralightViewsSorted;
 	bool viewInserted = false;
 	for (auto listIter = viewList.begin(); listIter != viewList.end(); listIter++)
 	{
+		//CODENOTE[LOW] I am not sure why get() is necessary here, but I am too tired to worry about it right now.
 		if (listIter->get()->m_Position.z >= pView->m_Position.z)
 		{
 			viewList.insert(listIter, pView);
@@ -156,7 +157,7 @@ void UltralightManager::SetViewToWindow(int32_t viewId, int32_t windowId)
 	}
 }
 
-void UltralightManager::RegisterWindow(std::shared_ptr<Window> pWindow)
+void UltralightManager::RegisterWindow(WeakWrapper<Window> pWindow)
 {
 	m_WindowIdToViewIdMap.insert(make_pair(pWindow->GetId(), set<int32_t>()));
 	m_WindowIdToWindowPtrMap.insert(make_pair(pWindow->GetId(), pWindow));
@@ -169,19 +170,19 @@ void UltralightManager::RemoveWindowId(int32_t windowId)
 	m_WindowIdToWindowPtrMap.erase(windowId);
 }
 
-std::shared_ptr<UltralightView> UltralightManager::CreateUltralightView(UltralightViewCreationParameters parms)
+WeakWrapper<UltralightView> UltralightManager::CreateUltralightView(UltralightViewCreationParameters parms)
 {
 	if (parms.InspectionTarget != nullptr)
 	{
 		if (parms.InspectionTarget->IsInspectorView())
 		{
 			ErrorHandler::LogCriticalError("Attempted to create inspector view over another inspector view.");
-			return nullptr;
+			return WeakWrapper<UltralightView>();
 		}
 		if (parms.InspectionTarget->HasInspectorView())
 		{
 			ErrorHandler::LogCriticalError("Attempted to create inspector view for view that already contains an inspector view.");
-			return nullptr;
+			return WeakWrapper<UltralightView>();
 		}
 	}
 
@@ -191,7 +192,7 @@ std::shared_ptr<UltralightView> UltralightManager::CreateUltralightView(Ultralig
 	if (!pView->Initialize(parms))
 	{
 		ErrorHandler::LogCriticalError("Failed to create Ultralight View.");
-		return nullptr;
+		return WeakWrapper<UltralightView>();
 	}
 
 	if (parms.InspectionTarget != nullptr)
@@ -208,15 +209,21 @@ std::shared_ptr<UltralightView> UltralightManager::CreateUltralightView(Ultralig
 	return pView;
 }
 
-void UltralightManager::DestroyView(shared_ptr<UltralightView> pView)
+void UltralightManager::DestroyView(WeakWrapper<UltralightView> pView)
 {
+	//CODENOTE[HIGH] - NEED TO REVIEW THE ORDER OF ALL OF THIS AND FIX IT
+	if (pView->m_DestructionInitiated)
+	{
+		return;
+	}
+	pView->m_DestructionInitiated = true;
 	//Need to remove all references to this view
 	int32_t windowId = pView->GetWindowId();
 	if (pView->IsInspectorView())
 	{
 		if (pView->m_InspectionTarget->m_InspectorView == pView) //This should always be true
 		{
-			pView->m_InspectionTarget->m_InspectorView = nullptr;
+			pView->m_InspectionTarget->m_InspectorView = WeakWrapper<UltralightView>();
 		}
 		else
 		{
@@ -233,10 +240,8 @@ void UltralightManager::DestroyView(shared_ptr<UltralightView> pView)
 		}
 		windowPair->second.erase(pView->GetId());
 	}
-	if (pView->IsAccelerated())
-	{
-		m_AcceleratedViewsMap.erase(pView->GetId());
-	}
+
+	m_AcceleratedViewsMap.erase(pView->GetId());
 	m_ViewsMap.erase(pView->GetId());
 }
 
@@ -281,13 +286,13 @@ vector<shared_ptr<UltralightView>> UltralightManager::GetViewsForWindow(int32_t 
 	return views;
 }
 
-std::shared_ptr<UltralightView> UltralightManager::GetViewFromId(int32_t viewId)
+WeakWrapper<UltralightView> UltralightManager::GetViewFromId(int32_t viewId)
 {
 	//TODO: Error checking
 	auto iter = m_ViewsMap.find(viewId);
 	if (iter == m_ViewsMap.end())
 	{
-		return nullptr;
+		return weak_ptr<UltralightView>();
 	}
 	return iter->second;
 }
@@ -320,7 +325,7 @@ bool UltralightManager::FireKeyboardEvent(KeyboardEvent* keyboardEvent)
 {
 	int32_t windowId = keyboardEvent->GetWindowId();
 	Engine* pEngine = Engine::GetInstance();
-	Window* pWindow = pEngine->GetWindowFromId(keyboardEvent->GetWindowId());
+	WeakWrapper<Window> pWindow = WindowManager::GetWindow(keyboardEvent->GetWindowId());
 
 	if (pWindow->m_FocusedUltralightView != nullptr)
 	{
@@ -338,7 +343,7 @@ bool UltralightManager::FireMouseEvent(MouseEvent* mouseEvent)
 
 	int32_t windowId = mouseEvent->GetWindowId();
 	Engine* pEngine = Engine::GetInstance();
-	Window* pWindow = pEngine->GetWindowFromId(mouseEvent->GetWindowId());
+	WeakWrapper<Window> pWindow = WindowManager::GetWindow(mouseEvent->GetWindowId());
 
 	if (mouseEvent->GetType() == MouseEvent::Type::MouseUp) //Mouse up events will always get redirected to the focused view (if one is focused)
 	{
@@ -354,7 +359,7 @@ bool UltralightManager::FireMouseEvent(MouseEvent* mouseEvent)
 	bool dispatchedToHtml = false;
 	for (auto iter = pViews.begin(); iter != pViews.end(); iter++)
 	{
-		shared_ptr<UltralightView> pView = *iter;
+		WeakWrapper<UltralightView> pView = *iter;
 		if (pView->IsVisible() == false)
 		{
 			continue;
@@ -422,7 +427,7 @@ bool UltralightManager::FireMouseEvent(MouseEvent* mouseEvent)
 		{
 			pWindow->m_FocusedUltralightView->m_NativeView->Unfocus();
 		}
-		pWindow->m_FocusedUltralightView = nullptr;
+		pWindow->m_FocusedUltralightView = WeakWrapper<UltralightView>();
 	}
 	return dispatchedToHtml;
 }
@@ -431,7 +436,7 @@ bool UltralightManager::FireScrollEvent(ScrollEvent* scrollEvent)
 {
 	int32_t windowId = scrollEvent->GetWindowId();
 	Engine* pEngine = Engine::GetInstance();
-	Window* pWindow = pEngine->GetWindowFromId(scrollEvent->GetWindowId());
+	WeakWrapper<Window> pWindow = WindowManager::GetWindow(scrollEvent->GetWindowId());
 
 	if (pWindow->m_FocusedUltralightView != nullptr)
 	{
@@ -442,7 +447,7 @@ bool UltralightManager::FireScrollEvent(ScrollEvent* scrollEvent)
 	return false;
 }
 
-shared_ptr<UltralightView> UltralightManager::GetUltralightViewFromNativeViewPtr(ul::View* pNativeView)
+WeakWrapper<UltralightView> UltralightManager::GetUltralightViewFromNativeViewPtr(ul::View* pNativeView)
 {
 	//TODO: Inefficient lookup, maybe add another map for this lookup?
 	for (auto mapPair : m_ViewsMap)
@@ -455,7 +460,7 @@ shared_ptr<UltralightView> UltralightManager::GetUltralightViewFromNativeViewPtr
 		}
 	}
 	ErrorHandler::LogCriticalError("UltralightManager::GetUltralightViewFromNativeViewPtr() failed.");
-	return nullptr;
+	return WeakWrapper<UltralightView>();
 }
 
 UltralightManager::~UltralightManager()

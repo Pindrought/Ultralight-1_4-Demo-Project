@@ -9,8 +9,8 @@ bool DemoBorderlessResizableMovable::Startup()
 	windowParms.Height = 600;
 	windowParms.Style = WindowStyle::Resizable | WindowStyle::NoBorder;
 	windowParms.Title = "Default Title";
-	shared_ptr<Window> pWindow = SpawnWindow(windowParms);
-	if (pWindow == nullptr)
+	WeakWrapper<Window> pWindow = WindowManager::SpawnWindow(windowParms);
+	if (pWindow.expired())
 	{
 		FatalError("Failed to initialize primary window. Program must now abort.");
 		return false;
@@ -23,7 +23,7 @@ bool DemoBorderlessResizableMovable::Startup()
 	parms.ForceMatchWindowDimensions = true;
 	parms.IsTransparent = true;
 
-	shared_ptr<UltralightView> pView = m_UltralightMgr->CreateUltralightView(parms);
+	WeakWrapper<UltralightView> pView = m_UltralightMgr->CreateUltralightView(parms);
 	pView->LoadURL("file:///Samples/BorderlessWindow/BorderlessWindow.html");
 	m_UltralightMgr->SetViewToWindow(pView->GetId(), pWindow->GetId());
 }
@@ -42,7 +42,7 @@ bool DemoBorderlessResizableMovable::ProcessInput()
 			if (mouseEvent.GetType() == MouseEvent::Type::MouseUp)
 			{
 				m_WindowDragInfo.DragInProgress = false;
-				m_WindowDragInfo.pWindowBeingDragged = nullptr;
+				m_WindowDragInfo.pWindowBeingDragged = weak_ptr<Window>();
 			}
 			if (mouseEvent.GetType() == MouseEvent::Type::MouseMoveRaw)
 			{
@@ -69,7 +69,7 @@ bool DemoBorderlessResizableMovable::ProcessInput()
 			if (mouseEvent.GetType() == MouseEvent::Type::MouseMove)
 			{
 				//TODO: Maybe add error checking?
-				Window* pWindow = GetWindowFromId(mouseEvent.GetWindowId());
+				WeakWrapper<Window> pWindow = WindowManager::GetWindow(mouseEvent.GetWindowId());
 				uint16_t windowWidth = pWindow->GetWidth();
 				uint16_t windowHeight = pWindow->GetHeight();
 				if (mouseEvent.GetPosX() < windowWidth &&
@@ -97,8 +97,8 @@ bool DemoBorderlessResizableMovable::ProcessInput()
 
 EZJSParm DemoBorderlessResizableMovable::OnEventCallbackFromUltralight(int32_t viewId, string eventName, vector<EZJSParm> parameters)
 {
-	shared_ptr<UltralightView> pView = m_UltralightMgr->GetViewFromId(viewId);
-	assert(pView != nullptr);
+	WeakWrapper<UltralightView> pView = m_UltralightMgr->GetViewFromId(viewId);
+	assert(!pView.expired());
 
 	if (eventName == "RequestTitle") //BorderlessWindow.html calls this on load to fill span for title
 	{
@@ -109,7 +109,7 @@ EZJSParm DemoBorderlessResizableMovable::OnEventCallbackFromUltralight(int32_t v
 	{
 		int32_t windowId = pView->GetWindowId();
 		assert(windowId != -1);
-		Window* pWindow = GetWindowFromId(windowId);
+		WeakWrapper<Window> pWindow = WindowManager::GetWindow(windowId);
 		pWindow->Close();
 		return nullptr;
 	}
@@ -118,7 +118,7 @@ EZJSParm DemoBorderlessResizableMovable::OnEventCallbackFromUltralight(int32_t v
 	{
 		int32_t windowId = pView->GetWindowId();
 		assert(windowId != -1);
-		Window* pWindow = GetWindowFromId(windowId);
+		WeakWrapper<Window> pWindow = WindowManager::GetWindow(windowId);
 		if (pWindow->IsWindowMaximized())
 		{
 			pWindow->Restore();
@@ -134,7 +134,7 @@ EZJSParm DemoBorderlessResizableMovable::OnEventCallbackFromUltralight(int32_t v
 	{
 		auto pView = m_UltralightMgr->GetViewFromId(viewId);
 		int32_t windowId = pView->GetWindowId();
-		auto pWindow = m_WindowIdToWindowInstanceMap[windowId];
+		WeakWrapper<Window> pWindow = WindowManager::GetWindow(windowId);
 		if (pWindow->IsWindowMaximized() == false)
 		{
 			//pWindow->StartDrag();
@@ -143,7 +143,6 @@ EZJSParm DemoBorderlessResizableMovable::OnEventCallbackFromUltralight(int32_t v
 				//TODO: Add error checking
 				auto pView = m_UltralightMgr->GetViewFromId(viewId);
 				int32_t windowId = pView->GetWindowId();
-				auto pWindow = m_WindowIdToWindowInstanceMap[windowId];
 				HWND hwnd = pWindow->GetHWND();
 				RECT rect = { NULL };
 				if (GetWindowRect(hwnd, &rect))
@@ -164,17 +163,13 @@ EZJSParm DemoBorderlessResizableMovable::OnEventCallbackFromUltralight(int32_t v
 
 void DemoBorderlessResizableMovable::OnWindowDestroyStartCallback(int32_t windowId)
 {
-	Window* pWindow = GetWindowFromId(windowId);
-	auto pViews = pWindow->GetSortedUltralightViews();
-	for (auto pView : pViews)
-	{
-		m_UltralightMgr->DestroyView(pView);
-	}
+	WeakWrapper<Window> pWindow =  WindowManager::GetWindow(windowId);
+	pWindow->DestroyAllViewsLinkedToThisWindow();
 }
 
 void DemoBorderlessResizableMovable::OnWindowDestroyEndCallback(int32_t windowId)
 {
-	if (m_WindowIdToWindowInstanceMap.size() == 0)
+	if (WindowManager::GetWindowCount() == 0)
 	{
 		SetRunning(false);
 	}

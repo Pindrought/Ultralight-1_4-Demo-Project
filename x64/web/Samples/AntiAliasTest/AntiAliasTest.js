@@ -10,7 +10,6 @@ window.onload = function() {
     circle2.style.width = '200px';
     circle2.style.height = '200px';
     
-
     let updateCircle = function(circle) {
         let currWidth = parseInt(circle.style.width, 10)
         if (currWidth < minSize) {
@@ -21,7 +20,8 @@ window.onload = function() {
         }
         circle.style.width = (currWidth + circle.deltaSize) + 'px';
         circle.style.height = circle.style.width;
-        CallEvent('CircleUpdate', Math.random());
+        //CallEvent('CircleUpdate', Math.random());
+        PrintTest();
     }
 
     var intervalId = window.setInterval(function(){

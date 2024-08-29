@@ -51,17 +51,17 @@ void HtmlViewListener::OnChangeCursor(ul::View* caller, ul::Cursor cursor)
 void HtmlViewListener::OnAddConsoleMessage(ul::View* caller,
                                                const ultralight::ConsoleMessage& message)
 {
-    std::string msg = strfmt("Javascript Error on line [%d] column [%d] in file [%s].\nError: [%s].\n",
-                                   message.line_number(),
-                                   message.column_number(),
-                                   message.source_id().utf8().data(),
-                                   message.message().utf8().data());
-    LOGINFO(msg.c_str());
+    //std::string msg = strfmt("Javascript Error on line [%d] column [%d] in file [%s].\nError: [%s].\n",
+    //                               message.line_number(),
+    //                               message.column_number(),
+    //                               message.source_id().utf8().data(),
+    //                               message.message().utf8().data());
+    //LOGINFO(msg.c_str());
 }
 
 ul::RefPtr<ul::View> HtmlViewListener::OnCreateInspectorView(ul::View* caller, bool is_local, const ul::String& inspected_url)
 {
     UltralightManager* pManager = UltralightManager::GetInstance();
-    shared_ptr<UltralightView> targetView = pManager->GetUltralightViewFromNativeViewPtr(caller);
+    WeakWrapper<UltralightView> targetView = pManager->GetUltralightViewFromNativeViewPtr(caller);
     return targetView->GetInspectorView()->GetViewRefPtr();
 }

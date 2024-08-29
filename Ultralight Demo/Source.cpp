@@ -9,14 +9,22 @@
 #include <PCH.h>
 #include "ErrorHandler.h"
 #include "Engine.h"
-
 #include "Demos/Demos.h"
+
+string GetThreadText()
+{
+	std::size_t intRepresentation = std::hash<std::thread::id>()(std::this_thread::get_id());
+	string msg = strfmt("Thread [%d]", intRepresentation);
+	return msg;
+}
 
 int WINAPI wWinMain(_In_ HINSTANCE hInstance,
 					_In_opt_ HINSTANCE hPrevInstance,
 					_In_ PWSTR pCmdLine,
 					_In_ int nCmdShow)
 {
+	LOGINFO(GetThreadText().c_str());
+
 	HRESULT hr = CoInitializeEx(NULL,
 								COINIT_MULTITHREADED);
 	FatalErrorIfFail(hr, "Failed to Initialize the COM Library. Program will now abort.");
@@ -28,6 +36,7 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance,
 			DemoSelector engine;
 			if (engine.Initialize())
 			{
+
 				while (engine.IsRunning())
 				{
 					engine.ProcessWindowsMessages();

@@ -91,8 +91,8 @@ bool Engine::Startup()
 	windowParms.Height = 600;
 	windowParms.Style = WindowStyle::Resizable | WindowStyle::ExitButton | WindowStyle::MaximizeAvailable;
 	windowParms.Title = "Default Title";
-	shared_ptr<Window> pWindow = SpawnWindow(windowParms);
-	if (pWindow == nullptr)
+	WeakWrapper<Window> pWindow = WindowManager::SpawnWindow(windowParms);
+	if (pWindow.expired())
 	{
 		FatalError("Failed to initialize primary window. Program must now abort.");
 		return false;
@@ -105,7 +105,7 @@ bool Engine::Startup()
 	parms.ForceMatchWindowDimensions = true;
 	parms.IsTransparent = true;
 
-	shared_ptr<UltralightView> pView = m_UltralightMgr->CreateUltralightView(parms);
+	WeakWrapper<UltralightView> pView = m_UltralightMgr->CreateUltralightView(parms);
 	pView->LoadURL("http://www.google.com");
 	m_UltralightMgr->SetViewToWindow(pView->GetId(), pWindow->GetId());
 }
@@ -147,7 +147,7 @@ bool Engine::ProcessInput()
 			{
 				//TODO: Maybe add error checking?
 
-				Window* pWindow = GetWindowFromId(mouseEvent.GetWindowId());
+				WeakWrapper<Window> pWindow = WindowManager::GetWindow(mouseEvent.GetWindowId());
 				uint16_t windowWidth = pWindow->GetWidth();
 				uint16_t windowHeight = pWindow->GetHeight();
 				if (mouseEvent.GetPosX() < windowWidth &&
@@ -178,46 +178,12 @@ void Engine::SetRunning(bool running)
 	m_IsRunning = running;
 }
 
-shared_ptr<Window> Engine::SpawnWindow(const WindowCreationParameters& parms)
-{
-	std::shared_ptr<Window> window = std::make_shared<Window>();
-	if (!window->Initialize(parms))
-	{
-		return nullptr;
-	}
-
-	m_WindowIdToWindowInstanceMap[window->GetId()] = window;
-	m_UltralightMgr->RegisterWindow(window);
-
-	return window;
-}
-
-bool Engine::CleanupWindow(int32_t windowId)
-{
-	//TODO: Error checking
-	m_WindowIdToWindowInstanceMap.erase(windowId);
-	return true;
-}
-
-Window* Engine::GetWindowFromId(int32_t windowId)
-{
-	//TODO: Maybe add some error checking to just crash if not found
-	auto iter = m_WindowIdToWindowInstanceMap.find(windowId);
-	if (iter != m_WindowIdToWindowInstanceMap.end())
-	{
-		return iter->second.get();
-	}
-	FatalError("Window not found in call to GetWindowFromId()");
-	return nullptr;
-}
-
 Engine::~Engine()
 {
 	if (s_Instance == this)
 	{
 		s_Instance = nullptr;
 	}
-	m_WindowIdToWindowInstanceMap.clear();
 	m_UltralightMgr->Shutdown();
 }
 
@@ -227,9 +193,10 @@ void Engine::RenderFrame()
 
 	m_UltralightMgr->UpdateViews();
 
-	vector<Window*> windowsFlaggedForRender;
+	vector<WeakWrapper<Window>> windowsFlaggedForRender;
 
-	for (auto& windowPair : m_WindowIdToWindowInstanceMap)
+	auto& windowMap = WindowManager::GetWindowMap();
+	for (auto& windowPair : windowMap)
 	{
 		int32_t windowId = windowPair.first;
 		std::shared_ptr<Window> pWindow = windowPair.second;
@@ -243,7 +210,7 @@ void Engine::RenderFrame()
 		if (pRenderTargetContainer->IsReadyForRender())
 		{
 			pRenderTargetContainer->ResetReadyForRender();
-			windowsFlaggedForRender.push_back(pWindow.get());
+			windowsFlaggedForRender.push_back(pWindow);
 		}
 		else
 		{
@@ -265,7 +232,7 @@ void Engine::RenderFrame()
 	{
 		RenderTargetContainer* pRenderTargetContainer = pWindow->GetRenderTargetContainer();
 		m_Renderer.PrepareFor2DRendering(pRenderTargetContainer);
-		for (shared_ptr<UltralightView> pUltralightView : pWindow->GetSortedUltralightViews())
+		for (WeakWrapper<UltralightView> pUltralightView : pWindow->GetSortedUltralightViews())
 		{
 			m_Renderer.RenderUltralightView(pUltralightView.get());
 		}

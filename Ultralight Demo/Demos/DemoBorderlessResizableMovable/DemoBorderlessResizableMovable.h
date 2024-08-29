@@ -16,7 +16,7 @@ public:
 	struct WindowDragInfo
 	{
 		bool DragInProgress = false;
-		shared_ptr<Window> pWindowBeingDragged = nullptr;
+		WeakWrapper<Window> pWindowBeingDragged;
 		POINT DragStartMousePosition;
 		POINT DragStartWindowPosition;
 	};

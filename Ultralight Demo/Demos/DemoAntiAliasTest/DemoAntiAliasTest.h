@@ -11,5 +11,5 @@ public:
 	void OnWindowDestroyEndCallback(int32_t windowId) override;
 	void OnWindowResizeCallback(Window* pWindow) override;
 private:
-	vector<shared_ptr<Window>> m_Windows;
+	vector<WeakWrapper<Window>> m_Windows;
 };

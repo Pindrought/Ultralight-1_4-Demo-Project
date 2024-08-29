@@ -10,8 +10,8 @@ bool DemoCubeDraw::Startup()
 	windowParms.Height = 600;
 	windowParms.Style = WindowStyle::Resizable | WindowStyle::ExitButton | WindowStyle::MaximizeAvailable;
 	windowParms.Title = "Demo Cube Draw";
-	shared_ptr<Window> pWindow = SpawnWindow(windowParms);
-	if (pWindow == nullptr)
+	WeakWrapper<Window> pWindow = WindowManager::SpawnWindow(windowParms);
+	if (pWindow.expired())
 	{
 		FatalError("Failed to initialize primary window. Program must now abort.");
 		return false;
@@ -23,7 +23,7 @@ bool DemoCubeDraw::Startup()
 	parms.IsAccelerated = true;
 	parms.IsTransparent = true;
 	parms.SampleCount = 8;
-	shared_ptr<UltralightView> pView = m_UltralightMgr->CreateUltralightView(parms);
+	WeakWrapper<UltralightView> pView = m_UltralightMgr->CreateUltralightView(parms);
 	pView->LoadURL("file:///Samples/CubeDraw/CubeDraw.html");
 	m_UltralightMgr->SetViewToWindow(pView->GetId(), pWindow->GetId());
 
@@ -107,17 +107,13 @@ EZJSParm DemoCubeDraw::OnEventCallbackFromUltralight(int32_t viewId, string even
 
 void DemoCubeDraw::OnWindowDestroyStartCallback(int32_t windowId)
 {
-	Window* pWindow = GetWindowFromId(windowId);
-	auto pViews = pWindow->GetSortedUltralightViews();
-	for (auto pView : pViews)
-	{
-		m_UltralightMgr->DestroyView(pView);
-	}
+	WeakWrapper<Window> pWindow = WindowManager::GetWindow(windowId);
+	pWindow->DestroyAllViewsLinkedToThisWindow();
 }
 
 void DemoCubeDraw::OnWindowDestroyEndCallback(int32_t windowId)
 {
-	if (m_WindowIdToWindowInstanceMap.size() == 0)
+	if (WindowManager::GetWindowCount() == 0)
 	{
 		SetRunning(false);
 	}
