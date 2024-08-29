@@ -114,10 +114,10 @@ ID3D11Resource* RenderTargetContainer::GetTextureResource()
 
 shared_ptr<Texture> RenderTargetContainer::GetTextureSharedPtr()
 {
-    if (m_MSAARenderTarget != nullptr)
+    /*if (m_MSAARenderTarget != nullptr)
     {
         return m_MSAARenderTarget->GetSharedTexturePtr();
-    }
+    }*/
     if (m_RenderTarget != nullptr)
     {
         return m_RenderTarget->GetSharedTexturePtr();

@@ -39,8 +39,8 @@ bool DemoGLTFViewer::Startup()
 	m_Camera->SetPosition({ 0, 0, 5 });
 	m_Camera->SetScene(m_Scene);
 
-	RenderTargetContainer* pRenderTarget = m_PrimaryWindow->GetRenderTargetContainer();
-	assert(pRenderTarget != nullptr);
+	WeakWrapper<RenderTargetContainer> pRenderTarget = m_PrimaryWindow->GetRenderTargetContainer();
+	assert(!pRenderTarget.expired());
 	pRenderTarget->SetCamera(m_Camera);
 
 	m_LoadedEntity = make_shared<Entity>();

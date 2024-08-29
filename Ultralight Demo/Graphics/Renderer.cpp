@@ -94,14 +94,14 @@ D3DClass* Renderer::GetD3D()
 	return m_D3D.get();
 }
 
-void Renderer::ActivateRenderTarget(RenderTargetContainer* pRenderTargetContainer)
+void Renderer::ActivateRenderTarget(WeakWrapper<RenderTargetContainer> pRenderTargetContainer)
 {
 	m_D3D->m_Context->OMSetRenderTargets(1, 
 										 pRenderTargetContainer->GetRenderTargetViewAddressOf(), 
 										 pRenderTargetContainer->GetDepthStencilView());
 }
 
-void Renderer::ClearRenderTarget(RenderTargetContainer* pRenderTargetContainer)
+void Renderer::ClearRenderTarget(WeakWrapper<RenderTargetContainer> pRenderTargetContainer)
 {
 	ActivatePipelineState(nullptr);
 	ID3D11DeviceContext* pContext = m_D3D->m_Context.Get();
@@ -136,7 +136,7 @@ void Renderer::ClearRenderTarget(RenderTargetContainer* pRenderTargetContainer)
 								 pRenderTargetContainer->GetDepthStencilView());
 }
 
-void Renderer::PrepareFor2DRendering(RenderTargetContainer* pRenderTargetContainer)
+void Renderer::PrepareFor2DRendering(WeakWrapper<RenderTargetContainer> pRenderTargetContainer)
 {
 	ActivatePipelineState(nullptr);
 	ID3D11DeviceContext* pContext = m_D3D->m_Context.Get();
@@ -296,7 +296,7 @@ void Renderer::RenderUltralightView(UltralightView* pUltralightView)
 	pContext->DrawIndexed(m_QuadMeshForUltralightView.GetIndexCount(), 0, 0);
 }
 
-bool Renderer::RenderSceneInRenderTargetContainer(RenderTargetContainer* pRenderTargetContainer)
+bool Renderer::RenderSceneInRenderTargetContainer(WeakWrapper<RenderTargetContainer> pRenderTargetContainer)
 {
 	Camera* pCamera = pRenderTargetContainer->GetCamera();
 	if (pCamera == nullptr)

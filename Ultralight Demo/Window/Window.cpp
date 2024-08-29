@@ -285,10 +285,10 @@ IDXGISwapChain1* Window::GetSwapChainPtr()
 	return m_SwapChain.Get();
 }
 
-RenderTargetContainer* Window::GetRenderTargetContainer()
+WeakWrapper<RenderTargetContainer> Window::GetRenderTargetContainer()
 {
 	assert(m_RenderTargetContainer != nullptr);
-	return m_RenderTargetContainer.get();
+	return m_RenderTargetContainer;
 }
 
 LRESULT Window::WindowProcA(HWND hwnd,

@@ -12,6 +12,7 @@
 #include "DemoOverlayedCPPTextureOnDiv/DemoOverlayedCPPTextureOnDiv.h"
 #include "DemoCubeDraw/DemoCubeDraw.h"
 #include "DemoGLTFViewer/DemoGLTFViewer.h"
+#include "DemoMultipleCubesEmbedded/DemoMultipleCubesEmbedded.h"
 #include "DemoSelector/DemoSelector.h"
 
 shared_ptr<Engine> GenerateEngineInstanceForDemo(DemoSelector::DemoId demoId)
@@ -54,6 +55,9 @@ shared_ptr<Engine> GenerateEngineInstanceForDemo(DemoSelector::DemoId demoId)
 		break;
 	case DemoSelector::DemoId::DemoOverlayedCPPTexture:
 		demoInstance = make_shared<DemoOverlayedCPPTextureOnDiv>();
+		break;
+	case DemoSelector::DemoId::DemoMultipleCubesEmbedded:
+		demoInstance = make_shared<DemoMultipleCubesEmbedded>();
 		break;
 	}
 	return demoInstance;

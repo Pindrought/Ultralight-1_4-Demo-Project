@@ -11,14 +11,14 @@ public:
 	static Renderer* GetInstance();
 	bool Initialize();
 	D3DClass* GetD3D();
-	void ActivateRenderTarget(RenderTargetContainer* pRenderTargetContainer);
-	void ClearRenderTarget(RenderTargetContainer* pRenderTargetContainer);
-	void PrepareFor2DRendering(RenderTargetContainer* pRenderTargetContainer);
+	void ActivateRenderTarget(WeakWrapper<RenderTargetContainer> pRenderTargetContainer);
+	void ClearRenderTarget(WeakWrapper<RenderTargetContainer> pRenderTargetContainer);
+	void PrepareFor2DRendering(WeakWrapper<RenderTargetContainer> pRenderTargetContainer);
 	void ActivatePipelineState(shared_ptr<PipelineState> pipelineState);
 	shared_ptr<PipelineState> GetPipelineState(string name);
 	void RegisterPipelineState(std::shared_ptr<PipelineState> pipelineState);
 	void RenderUltralightView(UltralightView* pUltralightView);
-	bool RenderSceneInRenderTargetContainer(RenderTargetContainer* pRenderTargetContainer);
+	bool RenderSceneInRenderTargetContainer(WeakWrapper<RenderTargetContainer> pRenderTargetContainer);
 	void DrawSprite(Texture* pTexture, float x, float y, float z, float width, float height);
 	bool RenderEntity(Entity* pEntity);
 	~Renderer();

@@ -26,6 +26,8 @@ bool Engine::Initialize()
 		return false;
 	}
 
+	m_OffScreenRenderTargetContainers.clear();
+
 	s_Instance = this;
 	CursorManager::Initialize(); //Used by ultralight for assigning cursor
 
@@ -194,13 +196,14 @@ void Engine::RenderFrame()
 	m_UltralightMgr->UpdateViews();
 
 	vector<WeakWrapper<Window>> windowsFlaggedForRender;
+	vector<WeakWrapper<RenderTargetContainer>> renderTargetsFlaggedForRender;
 
 	auto& windowMap = WindowManager::GetWindowMap();
 	for (auto& windowPair : windowMap)
 	{
 		int32_t windowId = windowPair.first;
 		std::shared_ptr<Window> pWindow = windowPair.second;
-		RenderTargetContainer* pRenderTargetContainer = pWindow->GetRenderTargetContainer();
+		WeakWrapper<RenderTargetContainer> pRenderTargetContainer = pWindow->GetRenderTargetContainer();
 		if (!pRenderTargetContainer->IsActive())
 		{
 			continue;
@@ -211,6 +214,7 @@ void Engine::RenderFrame()
 		{
 			pRenderTargetContainer->ResetReadyForRender();
 			windowsFlaggedForRender.push_back(pWindow);
+			renderTargetsFlaggedForRender.push_back(pRenderTargetContainer);
 		}
 		else
 		{
@@ -218,19 +222,36 @@ void Engine::RenderFrame()
 		}
 	}
 
-	for (auto pWindow : windowsFlaggedForRender) //Render each of our scenes to our render targets where applicable
+	for (auto& offscreenRenderTargets : m_OffScreenRenderTargetContainers)
 	{
-		RenderTargetContainer* pRenderTargetContainer = pWindow->GetRenderTargetContainer();
-		m_Renderer.ClearRenderTarget(pRenderTargetContainer);
+		if (!offscreenRenderTargets->IsActive())
+		{
+			continue;
+		}
 
-		m_Renderer.RenderSceneInRenderTargetContainer(pRenderTargetContainer); //If no camera is bound with an attached scene, this will just exit
+		offscreenRenderTargets->AdvanceUpdateInterval(m_DeltaTime);
+		if (offscreenRenderTargets->IsReadyForRender())
+		{
+			offscreenRenderTargets->ResetReadyForRender();
+			renderTargetsFlaggedForRender.push_back(offscreenRenderTargets);
+		}
+		else
+		{
+			continue; //Do not render render targets if they are not ready to be rendered. This only happens when limiting refresh rate at render target level.
+		}
+	}
+
+	for (auto rt : renderTargetsFlaggedForRender) //Render each of our scenes to our render targets where applicable
+	{
+		m_Renderer.ClearRenderTarget(rt);
+		m_Renderer.RenderSceneInRenderTargetContainer(rt); //If no camera is bound with an attached scene, this will just exit
 	}
 
 	OnPreRenderULViews(); //for if we want to draw anything before the UL views have been rendered
 
 	for (auto pWindow : windowsFlaggedForRender) //Render each of our ultralight views to each window
 	{
-		RenderTargetContainer* pRenderTargetContainer = pWindow->GetRenderTargetContainer();
+		WeakWrapper<RenderTargetContainer> pRenderTargetContainer = pWindow->GetRenderTargetContainer();
 		m_Renderer.PrepareFor2DRendering(pRenderTargetContainer);
 		for (WeakWrapper<UltralightView> pUltralightView : pWindow->GetSortedUltralightViews())
 		{
@@ -240,12 +261,14 @@ void Engine::RenderFrame()
 
 	OnPostRenderULViews(); //for if we want to draw anything after the UL views have been rendered
 
+	for (auto rt : renderTargetsFlaggedForRender)
+	{
+		rt->ResolveIfNecessary();
+	}
+
 	//Present each window's render target
 	for (auto pWindow : windowsFlaggedForRender)
 	{
-		RenderTargetContainer* pRenderTargetContainer = pWindow->GetRenderTargetContainer();
-		pRenderTargetContainer->ResolveIfNecessary();
-
 		auto pSwapChain = pWindow->GetSwapChainPtr();
 		if (m_VSync == false)
 		{

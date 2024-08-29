@@ -36,8 +36,8 @@ bool DemoCubeDraw::Startup()
 	m_Camera->SetPosition({ 0, 0, 5 });
 	m_Camera->SetScene(m_Scene);
 	
-	RenderTargetContainer* pRenderTarget = pWindow->GetRenderTargetContainer();
-	assert(pRenderTarget != nullptr);
+	WeakWrapper<RenderTargetContainer> pRenderTarget = pWindow->GetRenderTargetContainer();
+	assert(!pRenderTarget.expired());
 	pRenderTarget->SetCamera(m_Camera);
 
 	m_CubeEntity = GenerateCubeEntity();

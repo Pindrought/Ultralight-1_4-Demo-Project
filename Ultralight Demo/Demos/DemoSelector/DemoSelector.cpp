@@ -86,6 +86,10 @@ EZJSParm DemoSelector::OnEventCallbackFromUltralight(int32_t viewId, string even
 		{
 			m_SelectedDemo = DemoId::DemoOverlayedCPPTexture;
 		}
+		if (demoName == "DemoMultipleCubesEmbedded")
+		{
+			m_SelectedDemo = DemoId::DemoMultipleCubesEmbedded;
+		}
 		if (m_SelectedDemo != DemoId::None)
 		{
 			m_PrimaryWindow->Close();

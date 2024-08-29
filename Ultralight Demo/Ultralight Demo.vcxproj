@@ -169,6 +169,7 @@ xcopy /E /I /Y /Q /D "$(SolutionDir)ThirdParty\Ultralight\resources" "$(TargetDi
     <ClCompile Include="Demos\DemoGLTFViewer\DemoGLTFViewer.cpp" />
     <ClCompile Include="Demos\DemoInspector\DemoInspector.cpp" />
     <ClCompile Include="Demos\DemoJSCppCommunication\DemoJSCPPCommunication.cpp" />
+    <ClCompile Include="Demos\DemoMultipleCubesEmbedded\DemoMultipleCubesEmbedded.cpp" />
     <ClCompile Include="Demos\DemoOpenFileDialog\DemoOpenFileDialog.cpp" />
     <ClCompile Include="Demos\DemoOverlayedCPPTextureOnDiv\DemoOverlayedCPPTextureOnDiv.cpp" />
     <ClCompile Include="Demos\DemoSelector\DemoSelector.cpp" />
@@ -257,6 +258,7 @@ xcopy /E /I /Y /Q /D "$(SolutionDir)ThirdParty\Ultralight\resources" "$(TargetDi
     <ClInclude Include="Demos\DemoGLTFViewer\DemoGLTFViewer.h" />
     <ClInclude Include="Demos\DemoInspector\DemoInspector.h" />
     <ClInclude Include="Demos\DemoJSCppCommunication\DemoJSCPPCommunication.h" />
+    <ClInclude Include="Demos\DemoMultipleCubesEmbedded\DemoMultipleCubesEmbedded.h" />
     <ClInclude Include="Demos\DemoOpenFileDialog\DemoOpenFileDialog.h" />
     <ClInclude Include="Demos\DemoOverlayedCPPTextureOnDiv\DemoOverlayedCPPTextureOnDiv.h" />
     <ClInclude Include="Demos\Demos.h" />

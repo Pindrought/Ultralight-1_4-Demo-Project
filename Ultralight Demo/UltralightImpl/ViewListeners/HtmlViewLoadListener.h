@@ -6,7 +6,7 @@ class HtmlViewLoadListener : public ultralight::LoadListener
 public:
 	HtmlViewLoadListener();
 
-	virtual ~HtmlViewLoadListener() {}
+	virtual ~HtmlViewLoadListener() { LOGINFO("~HtmlViewLoadListener()"); }
 	void OnFinishLoading(ul::View* caller, uint64_t frame_id, bool is_main_frame, const ul::String& url) override;
 	virtual void OnDOMReady(ultralight::View* caller, uint64_t frame_id, bool is_main_frame, const ul::String& url) override;
 	virtual void OnWindowObjectReady(ultralight::View* caller, uint64_t frame_id, bool is_main_frame, const ul::String& url) override;

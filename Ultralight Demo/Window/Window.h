@@ -35,7 +35,7 @@ public:
 	void StartDrag();
 	void StopDrag();
 	IDXGISwapChain1* GetSwapChainPtr();
-	RenderTargetContainer* GetRenderTargetContainer();
+	WeakWrapper<RenderTargetContainer> GetRenderTargetContainer();
 	LRESULT WindowProcA(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam); //This probably shouldn't be public since it should not be called outside of Window.cpp, but I don't have a great solution to hide this.
 	const list<WeakWrapper<UltralightView>>& GetSortedUltralightViews();
 	bool IsWindowMaximized() const;
