@@ -83,7 +83,15 @@ void DemoOverlayedCPPTextureOnDiv::OnWindowResizeCallback(Window* pWindow)
 
 void DemoOverlayedCPPTextureOnDiv::OnPostRenderULViews()
 {
+	if (m_PrimaryWindow.expired())
+	{
+		return;
+	}
 	WeakWrapper<RenderTargetContainer> pRenderTarget = m_PrimaryWindow->GetRenderTargetContainer();
+	if (pRenderTarget.expired())
+	{
+		return;
+	}
 	assert(pRenderTarget != nullptr);
 	m_Renderer.ActivateRenderTarget(pRenderTarget);
 	m_Renderer.DrawSprite(m_CPPTexture.get(),
