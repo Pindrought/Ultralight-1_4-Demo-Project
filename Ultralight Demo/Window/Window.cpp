@@ -705,7 +705,7 @@ bool Window::RegisterWindowClass()
 	wc.lpszClassName = m_WindowClassName.c_str(); //Pointer to null terminated string of our class name for this window.
 	wc.cbSize = sizeof(WNDCLASSEXA); //Need to fill in the size of our struct for cbSize
 	ATOM result = RegisterClassExA(&wc); // Register the class so that it is usable.
-	if (result == 0)
+	if (result == 0 && GetLastError() != ERROR_CLASS_ALREADY_EXISTS)
 	{
 		return false;
 	}
