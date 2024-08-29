@@ -89,11 +89,11 @@ FileSystemWin::~FileSystemWin() { }
 
 bool FileSystemWin::FileExists(const ul::String& path) {
     WIN32_FIND_DATAW findData;
-    /*string imgSrcAlias;
+    string imgSrcAlias;
     if (IsImgSrcPath(path, imgSrcAlias))
     {
         return true;
-    }*/
+    }
     return getFindData(GetRelative(path).get(), findData);
 }
 
@@ -124,16 +124,16 @@ ul::RefPtr<ul::Buffer> FileSystemWin::OpenFile(const ul::String& file_path) {
     LPVOID lpBasePtr;
     LARGE_INTEGER liFileSize;
 
-    //string imgSrcAlias;
-    //if (IsImgSrcPath(file_path, imgSrcAlias))
-    //{
-    //    //Per https://ultralig.ht/api/cpp/1_4_0/classultralight_1_1_image_source
-    //    string data = "IMGSRC-V1\n" + imgSrcAlias + "";
-    //    char* data_cstr = new char[data.length()];
-    //    memcpy(data_cstr, data.data(), data.length());
-    //    ul::RefPtr<ul::Buffer> buffer = ul::Buffer::Create(data_cstr, data.length(), nullptr, FileSystemWin_DestroyFileBufferCallback);
-    //    return buffer;
-    //}
+    string imgSrcAlias;
+    if (IsImgSrcPath(file_path, imgSrcAlias))
+    {
+        //Per https://ultralig.ht/api/cpp/1_4_0/classultralight_1_1_image_source
+        string data = "IMGSRC-V1\n" + imgSrcAlias + "";
+        char* data_cstr = new char[data.length()];
+        memcpy(data_cstr, data.data(), data.length());
+        ul::RefPtr<ul::Buffer> buffer = ul::Buffer::Create(data_cstr, data.length(), nullptr, FileSystemWin_DestroyFileBufferCallback);
+        return buffer;
+    }
 
     hFile = CreateFile(pathStr.get(),
                        GENERIC_READ,          // dwDesiredAccess

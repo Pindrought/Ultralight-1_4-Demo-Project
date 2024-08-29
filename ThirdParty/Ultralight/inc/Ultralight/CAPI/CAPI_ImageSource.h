@@ -47,8 +47,8 @@
 /// specified texture ID and UV coordinates. You should bind your own texture when the specified
 /// texture ID is used.
 ///
-//// @note If the GPU renderer is not enabled for the View or pixel data is needed for other
-///        purposes, the library will sample the backing bitmap instead.
+/// If the GPU renderer is not enabled for the View or pixel data is needed for other purposes, the
+/// library will sample the backing bitmap instead.
 ///
 /// ## Creating from a Bitmap
 ///
