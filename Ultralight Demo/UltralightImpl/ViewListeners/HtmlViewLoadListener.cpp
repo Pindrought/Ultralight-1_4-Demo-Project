@@ -35,6 +35,12 @@ JSValueRef CallEvent(JSContextRef ctx, JSObjectRef function,
         LOGINFO(threadInfo.c_str());*/
         int32_t* pViewId = (int32_t*)JSObjectGetPrivate(function);
 
+        UltralightManager* pUltralightManager = UltralightManager::GetInstance();
+        if (pUltralightManager->IsViewFlaggedForDeletion(*pViewId))
+        {
+            return JSValueMakeNull(ctx);
+        }
+
         if (pViewId == nullptr)
         {
             JSRetainPtr<JSStringRef> msg = adopt(JSStringCreateWithUTF8CString("Could not resolve view id from CallEvent."));
@@ -114,7 +120,7 @@ void HtmlViewLoadListener::OnWindowObjectReady(ultralight::View* caller,
             classFncDef.callAsFunction = CallEvent;
             m_ClassRefFncCallback = JSClassCreate(&classFncDef);
         }
-        JSObjectRef nativeFnc = JSObjectMake(ctx, m_ClassRefFncCallback, &m_Id);
+        JSObjectRef nativeFnc = JSObjectMake(ctx, m_ClassRefFncCallback, m_Id.get());
         JSStringRef name = JSStringCreateWithUTF8CString("CallEvent");
         JSObjectRef globalObj = JSContextGetGlobalObject(ctx);
         JSObjectSetProperty(ctx, globalObj, name, nativeFnc, 0, 0);
@@ -129,7 +135,7 @@ void HtmlViewLoadListener::OnWindowObjectReady(ultralight::View* caller,
     }
 }
 
-void HtmlViewLoadListener::AssignViewId(int32_t id)
+void HtmlViewLoadListener::AssignViewId(shared_ptr<int32_t> id)
 {
     m_Id = id;
 }

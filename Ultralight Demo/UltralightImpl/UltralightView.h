@@ -51,7 +51,6 @@ public:
 	bool Resize(uint32_t width, uint32_t height);
 	void SetPosition(DirectX::XMFLOAT3 pos);
 	bool CallJSFnc(std::string inFunctionName, std::initializer_list<EZJSParm> inParmList, EZJSParm& outReturnValue, std::string& outException);
-
 	bool CallJSFnc(std::string inFunctionName, vector<EZJSParm>& inParmList, EZJSParm& outReturnValue, std::string& outException);
 	~UltralightView();
 private:

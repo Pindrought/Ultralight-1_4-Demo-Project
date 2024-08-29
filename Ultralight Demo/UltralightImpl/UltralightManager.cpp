@@ -79,11 +79,21 @@ void UltralightManager::UpdateViews()
 	//LOGINFO("GPUDriver->DrawCommandList() Start");
 	m_GPUDriver->DrawCommandList();
 	//LOGINFO("GPUDriver->DrawCommandList() Finished");
+	for (auto id : m_UltralightViewIdReferencesFlaggedForDeletion)
+	{
+		m_UltralightViewIdReferenceForLoadListener.erase(id);
+	}
+	m_UltralightViewIdReferencesFlaggedForDeletion.clear();
 }
 
 ul::Renderer* UltralightManager::GetRendererPtr()
 {
 	return m_UltralightRenderer.get();
+}
+
+bool UltralightManager::IsViewFlaggedForDeletion(int32_t viewId)
+{
+	return m_UltralightViewIdReferencesFlaggedForDeletion.contains(viewId);
 }
 
 void UltralightManager::RemoveViewFromWindow(int32_t viewId, int32_t windowId)
@@ -196,6 +206,11 @@ WeakWrapper<UltralightView> UltralightManager::CreateUltralightView(UltralightVi
 		return WeakWrapper<UltralightView>();
 	}
 
+	int32_t id = pView->GetId();
+	auto& refEntry = m_UltralightViewIdReferenceForLoadListener[id];
+	refEntry = make_shared<int32_t>(id);
+	pView->m_LoadListener->AssignViewId(refEntry);
+
 	if (parms.InspectionTarget != nullptr)
 	{
 		parms.InspectionTarget->m_InspectorView = pView;
@@ -246,6 +261,7 @@ void UltralightManager::DestroyView(WeakWrapper<UltralightView> pView)
 		pView->SetToWindow(-1);
 	}
 
+	m_UltralightViewIdReferencesFlaggedForDeletion.insert(pView->GetId());
 	m_WeakAcceleratedViewsMap.erase(pView->GetId());
 	m_WeakViewsMap.erase(pView->GetId());
 	m_OwnedViewsMap.erase(pView->GetId());

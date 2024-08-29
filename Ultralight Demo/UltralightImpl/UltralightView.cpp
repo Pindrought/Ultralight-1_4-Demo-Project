@@ -521,7 +521,6 @@ bool UltralightView::Initialize(UltralightViewCreationParameters params)
 	m_NativeView->set_view_listener(m_ViewListener.get());
 
 	m_LoadListener = std::make_unique<HtmlViewLoadListener>();
-	m_LoadListener->AssignViewId(m_Id);
 	m_NativeView->set_load_listener(m_LoadListener.get());
 
 	return true;

@@ -21,7 +21,7 @@ window.onload = function() {
         circle.style.width = (currWidth + circle.deltaSize) + 'px';
         circle.style.height = circle.style.width;
         //CallEvent('CircleUpdate', Math.random());
-        PrintTest();
+        //PrintTest();
     }
 
     var intervalId = window.setInterval(function(){

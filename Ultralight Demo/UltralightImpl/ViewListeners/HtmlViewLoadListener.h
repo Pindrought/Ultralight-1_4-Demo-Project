@@ -10,8 +10,8 @@ public:
 	void OnFinishLoading(ul::View* caller, uint64_t frame_id, bool is_main_frame, const ul::String& url) override;
 	virtual void OnDOMReady(ultralight::View* caller, uint64_t frame_id, bool is_main_frame, const ul::String& url) override;
 	virtual void OnWindowObjectReady(ultralight::View* caller, uint64_t frame_id, bool is_main_frame, const ul::String& url) override;
-	void AssignViewId(int32_t id);
+	void AssignViewId(shared_ptr<int32_t> id);
 private:
-	int m_Id = -1;
+	shared_ptr<int32_t> m_Id = nullptr;
 	static JSClassRef m_ClassRefFncCallback;
 };

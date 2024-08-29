@@ -22,6 +22,7 @@ public:
 	void Shutdown();
 	void UpdateViews();
 	ul::Renderer* GetRendererPtr();
+	bool IsViewFlaggedForDeletion(int32_t viewId);
 	void RemoveViewFromWindow(int32_t viewId, int32_t windowId);
 	void SetViewToWindow(int32_t viewId, int32_t windowId);
 	void RegisterWindow(WeakWrapper<Window> pWindow);
@@ -62,4 +63,7 @@ private:
 	unordered_map<int32_t, WeakWrapper<UltralightView>> m_WeakViewsMap;
 	unordered_map<int32_t, shared_ptr<UltralightView>> m_OwnedViewsMap;
 	unordered_map<int32_t, WeakWrapper<UltralightView>> m_WeakAcceleratedViewsMap;
+
+	unordered_map<int32_t, shared_ptr<int32_t>> m_UltralightViewIdReferenceForLoadListener;
+	set<int32_t> m_UltralightViewIdReferencesFlaggedForDeletion;
 };
