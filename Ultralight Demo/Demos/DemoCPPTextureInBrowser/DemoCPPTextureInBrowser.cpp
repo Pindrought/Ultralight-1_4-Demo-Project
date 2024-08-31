@@ -30,9 +30,9 @@ bool DemoCPPTextureInBrowser::Startup()
 	bounds.right = 1.0f;
 	bounds.bottom = 1.0f; 
 	ul::RefPtr<ul::ImageSource> imgSource = ul::ImageSource::CreateFromTexture(m_Texture->m_Width,
-																			   m_Texture->m_Height,
-																			   reservedTextureId,
-																			   bounds);
+																				m_Texture->m_Height,
+																				reservedTextureId,
+																				bounds);
 
 	ul::ImageSourceProvider& provider = ul::ImageSourceProvider::instance();
 	provider.AddImageSource("AIBowser", imgSource);
