@@ -16,7 +16,7 @@ bool DemoAntiAliasTest::Startup()
 	parms.ForceMatchWindowDimensions = true;
 	parms.IsTransparent = true;
 
-	for (int sampleCount = 1; sampleCount <= 1; sampleCount *= 2)
+	for (int sampleCount = 1; sampleCount <= 8; sampleCount *= 2)
 	{
 		if (sampleCount > 1)
 		{
