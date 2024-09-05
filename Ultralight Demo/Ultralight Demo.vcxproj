@@ -72,11 +72,11 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <IncludePath>$(ProjectDir)PrecompiledHeader;$(SolutionDir)ThirdParty\Ultralight\Include;$(SolutionDir)ThirdParty\DirectXTex\inc;$(IncludePath)</IncludePath>
+    <IncludePath>$(ProjectDir)PrecompiledHeader;$(SolutionDir)ThirdParty\Ultralight\Include;$(SolutionDir)ThirdParty\DirectXTex\inc;$(SolutionDir)ThirdParty\tiny_gltf\inc;$(IncludePath)</IncludePath>
     <LibraryPath>$(SolutionDir)ThirdParty\Ultralight\lib;$(SolutionDir)ThirdParty\DirectXTex\lib\$(Configuration)\;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <IncludePath>$(ProjectDir)PrecompiledHeader;$(SolutionDir)ThirdParty\Ultralight\Include;$(SolutionDir)ThirdParty\DirectXTex\inc;$(IncludePath)</IncludePath>
+    <IncludePath>$(ProjectDir)PrecompiledHeader;$(SolutionDir)ThirdParty\Ultralight\Include;$(SolutionDir)ThirdParty\DirectXTex\inc;$(SolutionDir)ThirdParty\tiny_gltf\inc;$(IncludePath)</IncludePath>
     <LibraryPath>$(SolutionDir)ThirdParty\Ultralight\lib;$(SolutionDir)ThirdParty\DirectXTex\lib\$(Configuration)\;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
@@ -281,10 +281,6 @@ xcopy /E /I /Y /Q /D "$(SolutionDir)ThirdParty\Ultralight\resources" "$(TargetDi
     <ClInclude Include="Graphics\EZGLTF\SkeletonNode.h" />
     <ClInclude Include="Graphics\EZGLTF\SkeletonPose.h" />
     <ClInclude Include="Graphics\EZGLTF\TinyGLTFEnumToString.h" />
-    <ClInclude Include="Graphics\EZGLTF\tiny_gltf\json.hpp" />
-    <ClInclude Include="Graphics\EZGLTF\tiny_gltf\stb_image.h" />
-    <ClInclude Include="Graphics\EZGLTF\tiny_gltf\stb_image_write.h" />
-    <ClInclude Include="Graphics\EZGLTF\tiny_gltf\tiny_gltf.h" />
     <ClInclude Include="Graphics\InputLayoutDescriptions.h" />
     <ClInclude Include="Graphics\MeshGenerator.h" />
     <ClInclude Include="Graphics\Misc\PixelColor.h" />

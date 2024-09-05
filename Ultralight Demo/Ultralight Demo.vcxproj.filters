@@ -467,19 +467,7 @@
     <ClInclude Include="Graphics\EZGLTF\GLTFLoader.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Graphics\EZGLTF\tiny_gltf\tiny_gltf.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Graphics\EZGLTF\TinyGLTFEnumToString.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Graphics\EZGLTF\tiny_gltf\json.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Graphics\EZGLTF\tiny_gltf\stb_image.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Graphics\EZGLTF\tiny_gltf\stb_image_write.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Demos\DemoGLTFViewer\DemoGLTFViewer.h">
