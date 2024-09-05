@@ -57,8 +57,8 @@ EZJSParm DemoBasic::OnEventCallbackFromUltralight(int32_t viewId, string eventNa
 
 void DemoBasic::OnWindowDestroyStartCallback(int32_t windowId)
 {
-	WeakWrapper<Window> pWindow = WindowManager::GetWindow(windowId);
-	pWindow->DestroyAllViewsLinkedToThisWindow();
+	m_UltralightMgr->DestroyAllViews();
+	WindowManager::DestroyAllWindows();
 }
 
 void DemoBasic::OnWindowDestroyEndCallback(int32_t windowId)

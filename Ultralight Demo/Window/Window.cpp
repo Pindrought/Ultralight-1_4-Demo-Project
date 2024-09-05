@@ -372,9 +372,6 @@ LRESULT Window::WindowProcA(HWND hwnd,
 		   Block them to prevent drawing borders over the client area. */
 		return 0;
 
-
-
-
 	//Mouse Messages
 	case WM_MOUSEMOVE:
 		mouse.OnWindowsMouseMessage(m_Id, uMsg, wParam, lParam);
