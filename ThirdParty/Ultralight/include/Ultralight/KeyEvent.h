@@ -30,8 +30,8 @@ class UExport KeyEvent {
     /// Key-Down event type. This type does **not** trigger accelerator commands in WebCore (eg, 
     /// Ctrl+C for copy is an accelerator command).
     ///
-    /// @warning  You should probably use kType_RawKeyDown instead. This type is only here for historic
-    ///           compatibility with WebCore's key event types.
+    /// @warning  You should probably use kType_RawKeyDown instead. This type is only here for
+    ///           historic compatibility with WebCore's key event types.
     ///
     kType_KeyDown,
 
@@ -147,6 +147,7 @@ class UExport KeyEvent {
   /// Whether or not the pressed key is a "system key". This is a Windows-only concept and should
   /// be "false" for all non-Windows platforms. For more information, see the following link:
   ///   <http://msdn.microsoft.com/en-us/library/ms646286(VS.85).aspx>
+  ///
   bool is_system_key;
 };
 

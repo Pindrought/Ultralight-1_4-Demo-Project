@@ -21,11 +21,8 @@ class ScrollEvent {
   /// The scroll event granularity type
   ///
   enum Type {
-    /// The delta value is interpreted as number of pixels
-    kType_ScrollByPixel,
-
-    /// The delta value is interpreted as number of pages
-    kType_ScrollByPage,
+    kType_ScrollByPixel, ///< The delta value will be interpreted as number of pixels to scroll.
+    kType_ScrollByPage,  ///< The delta value will be interpreted as number of pages to scroll.
   };
 
   ///

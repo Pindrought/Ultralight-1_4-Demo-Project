@@ -22,7 +22,7 @@ bool DemoBasic::Startup()
 	UltralightViewCreationParameters parms;
 	parms.Width = pWindow->GetWidth();
 	parms.Height = pWindow->GetHeight();
-	parms.IsAccelerated = true;
+	parms.IsAccelerated = false;
 	parms.ForceMatchWindowDimensions = true;
 	parms.IsTransparent = true;
 	parms.SampleCount = 8;
@@ -31,7 +31,7 @@ bool DemoBasic::Startup()
 	pView->LoadURL(url);
 	m_UltralightMgr->SetViewToWindow(pView->GetId(), pWindow->GetId());
 
-	{
+	/*{
 		WindowCreationParameters windowParms;
 		windowParms.Width = 800;
 		windowParms.Height = 600;
@@ -49,7 +49,7 @@ bool DemoBasic::Startup()
 		WeakWrapper<UltralightView> pView = m_UltralightMgr->CreateUltralightView(parms);
 		pView->LoadURL(url);
 		m_UltralightMgr->SetViewToWindow(pView->GetId(), pWindow->GetId());
-	}
+	}*/
 
 }
 
