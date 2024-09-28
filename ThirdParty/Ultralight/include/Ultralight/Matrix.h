@@ -17,7 +17,7 @@ namespace ultralight {
 ///
 struct UExport Matrix4x4 {
   ///
-  /// Raw 4x4 matrix as an array
+  /// Raw 4x4 matrix as an array in column-major order.
   ///
   float data[16];
 
@@ -33,6 +33,9 @@ struct UExport Matrix4x4 {
 struct UExport alignas(16) Matrix {
   typedef double Aligned4x4[4][4];
 
+  ///
+  /// Raw matrix data in column-major order (eg, `data[column][row]`)
+  ///
   Aligned4x4 data;
 
   ///

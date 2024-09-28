@@ -99,3 +99,50 @@ uint32_t MouseEvent::GetWindowId() const
 {
 	return m_WindowId;
 }
+
+string MouseEvent::ToString() const
+{
+	string typeStr = "";
+	switch (m_Type)
+	{
+	case MouseEvent::Type::MouseDown:
+		typeStr = "MouseDown";
+		break;
+	case MouseEvent::Type::MouseMove:
+		typeStr = "MouseMove";
+		break;
+	case MouseEvent::Type::MouseMoveRaw:
+		typeStr = "MouseMoveRaw";
+		break;
+	case MouseEvent::Type::MouseUp:
+		typeStr = "MouseUp";
+		break;
+	default:
+		typeStr = "Unknown Type";
+		break;
+	}
+	string buttonStr = "";
+	switch (m_Button)
+	{
+	case MouseEvent::Button::None:
+		buttonStr = "None";
+		break;
+	case MouseEvent::Button::Left:
+		buttonStr = "Left";
+		break;
+	case MouseEvent::Button::Middle:
+		buttonStr = "Middle";
+		break;
+	case MouseEvent::Button::Right:
+		buttonStr = "Right";
+		break;
+	default:
+		buttonStr = "Unknown Button";
+	}
+
+	string msg = strfmt("Button [%s] Type [%s] X,Y [%d %d] Window [%d]",
+						buttonStr.c_str(),
+						typeStr.c_str(),
+						m_X, m_Y, m_WindowId);
+	return msg;
+}

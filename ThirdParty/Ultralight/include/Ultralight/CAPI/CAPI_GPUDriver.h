@@ -144,7 +144,7 @@ typedef enum {
 } ULShaderType;
 
 ///
-/// Raw 4x4 matrix as an array of floats
+/// Raw 4x4 matrix as an array of floats in column-major order.
 ///
 typedef struct {
   float data[16];

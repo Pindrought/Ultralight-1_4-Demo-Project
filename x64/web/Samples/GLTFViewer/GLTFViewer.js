@@ -6,6 +6,7 @@ if (typeof(CallEvent) == 'undefined') {
 
 function UpdatePickedFilePath(filePath) {
     let span = document.getElementById("span_file_name");
+    filePath = filePath.split('/').pop(); //Extract just the file name
     span.innerText = filePath;
     return true;
 }

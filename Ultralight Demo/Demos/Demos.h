@@ -15,6 +15,8 @@
 #include "DemoMultipleCubesEmbedded/DemoMultipleCubesEmbedded.h"
 #include "DemoSelector/DemoSelector.h"
 
+#include "DemoCrashTestSelect/DemoCrashTestSelect.h"
+
 shared_ptr<Engine> GenerateEngineInstanceForDemo(DemoSelector::DemoId demoId)
 {
 	shared_ptr<Engine> demoInstance = nullptr;
@@ -59,6 +61,9 @@ shared_ptr<Engine> GenerateEngineInstanceForDemo(DemoSelector::DemoId demoId)
 	case DemoSelector::DemoId::DemoMultipleCubesEmbedded:
 		demoInstance = make_shared<DemoMultipleCubesEmbedded>();
 		break;
+
+	case DemoSelector::DemoId::DemoCrashTestSelect:
+		demoInstance = make_shared<DemoCrashTestSelect>();
 	}
 	return demoInstance;
 }

@@ -225,6 +225,9 @@
     <ClCompile Include="Demos\DemoMultipleCubesEmbedded\DemoMultipleCubesEmbedded.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Demos\DemoCrashTestSelect\DemoCrashTestSelect.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="PrecompiledHeader\ErrorHandler.h">
@@ -483,6 +486,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Demos\DemoMultipleCubesEmbedded\DemoMultipleCubesEmbedded.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Demos\DemoCrashTestSelect\DemoCrashTestSelect.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

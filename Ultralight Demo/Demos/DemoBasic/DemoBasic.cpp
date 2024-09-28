@@ -5,8 +5,7 @@
 bool DemoBasic::Startup()
 {
 	string url = "http://www.google.com";
-	//string url = "https://upload.wikimedia.org/wikipedia/commons/3/3f/CIA_WorldFactBook-Political_world.svg";
-
+	
 	WindowCreationParameters windowParms;
 	windowParms.Width = 800;
 	windowParms.Height = 600;
@@ -22,16 +21,16 @@ bool DemoBasic::Startup()
 	UltralightViewCreationParameters parms;
 	parms.Width = pWindow->GetWidth();
 	parms.Height = pWindow->GetHeight();
-	parms.IsAccelerated = false;
+	parms.IsAccelerated = true;
 	parms.ForceMatchWindowDimensions = true;
-	parms.IsTransparent = true;
+	parms.IsTransparent = false;
 	parms.SampleCount = 8;
 
 	WeakWrapper<UltralightView> pView = m_UltralightMgr->CreateUltralightView(parms);
 	pView->LoadURL(url);
 	m_UltralightMgr->SetViewToWindow(pView->GetId(), pWindow->GetId());
 
-	/*{
+	{
 		WindowCreationParameters windowParms;
 		windowParms.Width = 800;
 		windowParms.Height = 600;
@@ -49,7 +48,7 @@ bool DemoBasic::Startup()
 		WeakWrapper<UltralightView> pView = m_UltralightMgr->CreateUltralightView(parms);
 		pView->LoadURL(url);
 		m_UltralightMgr->SetViewToWindow(pView->GetId(), pWindow->GetId());
-	}*/
+	}
 
 }
 

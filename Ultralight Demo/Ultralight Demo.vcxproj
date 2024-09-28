@@ -165,6 +165,7 @@ xcopy /E /I /Y /Q /D "$(SolutionDir)ThirdParty\Ultralight\resources" "$(TargetDi
     <ClCompile Include="Demos\DemoBorderlessResizableMovable\DemoBorderlessResizableMovable.cpp" />
     <ClCompile Include="Demos\DemoBorderlessResizable\DemoBorderlessResizable.cpp" />
     <ClCompile Include="Demos\DemoCPPTextureInBrowser\DemoCPPTextureInBrowser.cpp" />
+    <ClCompile Include="Demos\DemoCrashTestSelect\DemoCrashTestSelect.cpp" />
     <ClCompile Include="Demos\DemoCubeDraw\DemoCubeDraw.cpp" />
     <ClCompile Include="Demos\DemoGLTFViewer\DemoGLTFViewer.cpp" />
     <ClCompile Include="Demos\DemoInspector\DemoInspector.cpp" />
@@ -254,6 +255,7 @@ xcopy /E /I /Y /Q /D "$(SolutionDir)ThirdParty\Ultralight\resources" "$(TargetDi
     <ClInclude Include="Demos\DemoBorderlessResizableMovable\DemoBorderlessResizableMovable.h" />
     <ClInclude Include="Demos\DemoBorderlessResizable\DemoBorderlessResizable.h" />
     <ClInclude Include="Demos\DemoCPPTextureInBrowser\DemoCPPTextureInBrowser.h" />
+    <ClInclude Include="Demos\DemoCrashTestSelect\DemoCrashTestSelect.h" />
     <ClInclude Include="Demos\DemoCubeDraw\DemoCubeDraw.h" />
     <ClInclude Include="Demos\DemoGLTFViewer\DemoGLTFViewer.h" />
     <ClInclude Include="Demos\DemoInspector\DemoInspector.h" />

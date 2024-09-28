@@ -78,7 +78,6 @@ EZJSParm DemoAntiAliasTest::OnEventCallbackFromUltralight(int32_t viewId, string
 void DemoAntiAliasTest::OnWindowDestroyStartCallback(int32_t windowId)
 {
 	m_UltralightMgr->DestroyAllViews();
-	m_UltralightMgr->UpdateViews(); //Need to update, because update interval could do another callback after destroying the view
 	WindowManager::DestroyAllWindows();
 }
 

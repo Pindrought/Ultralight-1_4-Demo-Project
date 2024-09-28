@@ -36,6 +36,7 @@ public:
 	int GetPosY() const;
 	ultralight::MouseEvent ToUltralightMouseEvent();
 	uint32_t GetWindowId() const;
+	string ToString() const;
 private:
 	Type m_Type = Type::UninitializedType;
 	Button m_Button = Button::UninitializedButton;

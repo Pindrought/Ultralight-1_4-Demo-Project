@@ -65,7 +65,7 @@ void UltralightManager::Shutdown()
 {
 	m_WindowIdToViewIdMap.clear();
 	m_WeakViewsMap.clear();
-	m_WeakViewsMap.clear();
+	m_WeakAcceleratedViewsMap.clear();
 	m_OwnedViewsMap.clear();
 	m_WindowIdToWindowPtrMap.clear();
 }
@@ -73,17 +73,16 @@ void UltralightManager::Shutdown()
 void UltralightManager::UpdateViews()
 {
 	//LOGINFO("Ultralight->Update()");
+	if (m_OwnedViewsMap.size() == 0)
+	{
+		//DebugBreak();
+	}
 	m_UltralightRenderer->Update();
 	//LOGINFO("Ultralight->Render() --> Ultralight->DrawCommandList()");
 	m_UltralightRenderer->Render();
 	//LOGINFO("GPUDriver->DrawCommandList() Start");
 	m_GPUDriver->DrawCommandList();
 	//LOGINFO("GPUDriver->DrawCommandList() Finished");
-	for (auto id : m_UltralightViewIdReferencesFlaggedForDeletion)
-	{
-		m_UltralightViewIdReferenceForLoadListener.erase(id);
-	}
-	m_UltralightViewIdReferencesFlaggedForDeletion.clear();
 }
 
 ul::Renderer* UltralightManager::GetRendererPtr()
@@ -230,7 +229,7 @@ void UltralightManager::DestroyView(WeakWrapper<UltralightView> pView)
 {
 	if (pView.expired()) //Has this already been destroyed? skip
 		return;
-	//CODENOTE[HIGH] - NEED TO REVIEW THE ORDER OF ALL OF THIS AND FIX IT
+	//CODENOTE[HIGH] - NEED TO REVIEW THE ORDER OF ALL OF THIS
 	if (pView->m_DestructionInitiated)
 	{
 		return;
@@ -265,6 +264,18 @@ void UltralightManager::DestroyView(WeakWrapper<UltralightView> pView)
 	m_WeakAcceleratedViewsMap.erase(pView->GetId());
 	m_WeakViewsMap.erase(pView->GetId());
 	m_OwnedViewsMap.erase(pView->GetId());
+
+	//CODENOTE[LOW]: Find a way to avoid doing multiple updates when destroying multiple views
+	LOGINFO("UltralightManager::DestroyView() m_UltralightRenderer->Update() start"); //Only doing the Update here to get outstanding window interval events out of the way
+	m_UltralightRenderer->Update(); //Crash occurs here if a select dropdown was interacted with
+	LOGINFO("UltralightManager::DestroyView() m_UltralightRenderer->Update() fin");
+
+	for (auto id : m_UltralightViewIdReferencesFlaggedForDeletion)
+	{
+		m_UltralightViewIdReferenceForLoadListener.erase(id); //This is the location the int for the id the CallEvent function references for the view is stored - wait to delete it until definitely no more events
+															  //Previously it was stored with the load listener, but that isn't possible anymore since load listener can be destructed while outstanding events exist
+	}
+	m_UltralightViewIdReferencesFlaggedForDeletion.clear();
 }
 
 void UltralightManager::DestroyAllViews()
@@ -376,6 +387,9 @@ bool UltralightManager::FireMouseEvent(MouseEvent* mouseEvent)
 {
 	if (mouseEvent->GetType() == MouseEvent::Type::MouseMoveRaw)
 		return false;
+
+	/*string msg = strfmt("FireMouseEvent %s", mouseEvent->ToString().c_str());
+	LOGINFO(msg.c_str());*/
 
 	int32_t windowId = mouseEvent->GetWindowId();
 	Engine* pEngine = Engine::GetInstance();
