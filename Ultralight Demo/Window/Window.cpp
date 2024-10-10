@@ -11,7 +11,7 @@ static IDPoolManager<int32_t> s_WindowsIDManager;
 
 Window::~Window()
 {
-	//CODENOTE[LOW] for some reason I don't know if this is even working sometimes
+	//JPNOTE[LOW] for some reason I don't know if this is even working sometimes
 	//registering a class is saying name already exists
 	//it's fine for now i'll just ignore that specific error there are more important issues
 	BOOL result = UnregisterClassA(m_WindowClassName.c_str(), GetModuleHandle(NULL));

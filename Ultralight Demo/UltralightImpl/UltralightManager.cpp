@@ -153,7 +153,6 @@ void UltralightManager::SetViewToWindow(int32_t viewId, int32_t windowId)
 	bool viewInserted = false;
 	for (auto listIter = viewList.begin(); listIter != viewList.end(); listIter++)
 	{
-		//CODENOTE[LOW] I am not sure why get() is necessary here, but I am too tired to worry about it right now.
 		if (listIter->get()->m_Position.z >= pView->m_Position.z)
 		{
 			viewList.insert(listIter, pView);
@@ -229,7 +228,7 @@ void UltralightManager::DestroyView(WeakWrapper<UltralightView> pView)
 {
 	if (pView.expired()) //Has this already been destroyed? skip
 		return;
-	//CODENOTE[HIGH] - NEED TO REVIEW THE ORDER OF ALL OF THIS
+	//JPNOTE[HIGH] - NEED TO REVIEW THE ORDER OF ALL OF THIS
 	if (pView->m_DestructionInitiated)
 	{
 		return;
@@ -265,10 +264,8 @@ void UltralightManager::DestroyView(WeakWrapper<UltralightView> pView)
 	m_WeakViewsMap.erase(pView->GetId());
 	m_OwnedViewsMap.erase(pView->GetId());
 
-	//CODENOTE[LOW]: Find a way to avoid doing multiple updates when destroying multiple views
-	LOGINFO("UltralightManager::DestroyView() m_UltralightRenderer->Update() start"); //Only doing the Update here to get outstanding window interval events out of the way
-	m_UltralightRenderer->Update(); //Crash occurs here if a select dropdown was interacted with
-	LOGINFO("UltralightManager::DestroyView() m_UltralightRenderer->Update() fin");
+	//JPNOTE[LOW]: Find a way to avoid doing multiple updates when destroying multiple views
+	m_UltralightRenderer->Update();
 
 	for (auto id : m_UltralightViewIdReferencesFlaggedForDeletion)
 	{
@@ -315,7 +312,7 @@ shared_ptr<UltralightManager> UltralightManager::GetInstanceShared()
 
 vector<WeakWrapper<UltralightView>> UltralightManager::GetViewsForWindow(int32_t windowId)
 {
-	//CODENOTE[LOW] Optimize this
+	//JPNOTE[LOW] Optimize this
 	//TODO: Error checking and optimize these unnecessary lookups
 	vector<WeakWrapper<UltralightView>> views;
 	auto windowIter = m_WindowIdToViewIdMap.find(windowId);
@@ -335,7 +332,6 @@ vector<WeakWrapper<UltralightView>> UltralightManager::GetViewsForWindow(int32_t
 
 WeakWrapper<UltralightView> UltralightManager::GetViewFromId(int32_t viewId)
 {
-	//CODENOTE[LOW] Error checking?
 	auto iter = m_OwnedViewsMap.find(viewId);
 	if (iter == m_OwnedViewsMap.end())
 	{

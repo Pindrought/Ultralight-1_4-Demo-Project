@@ -25,8 +25,6 @@ public:
 		DemoCubeDraw,
 		DemoGLTFViewer,
 		DemoMultipleCubesEmbedded,
-
-		DemoCrashTestSelect
 	};
 	DemoId m_SelectedDemo = DemoId::None;
 	WeakWrapper<Window> m_PrimaryWindow;
