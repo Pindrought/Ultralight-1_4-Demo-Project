@@ -59,6 +59,6 @@ shared_ptr<Engine> GenerateEngineInstanceForDemo(DemoSelector::DemoId demoId)
 	case DemoSelector::DemoId::DemoMultipleCubesEmbedded:
 		demoInstance = make_shared<DemoMultipleCubesEmbedded>();
 		break;
-
+	}
 	return demoInstance;
 }

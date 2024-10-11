@@ -65,7 +65,6 @@ void DemoGLTFViewer::OnPreRenderFrame()
 		return;
 	}
 	static float yaw = 0;
-	//I want it to turn 1 time per second
 	//1 full rotation = 2PI
 	//m_DeltaTime = time between frames in miliseconds
 	float secondsPerRotation = 5;
