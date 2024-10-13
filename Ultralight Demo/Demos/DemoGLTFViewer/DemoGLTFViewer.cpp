@@ -368,7 +368,6 @@ bool DemoGLTFViewer::LoadModel(string filePath)
 	float d2 = radius / sin(m_Camera->GetVerticalFOV() / 2);
 	//Multiplying the distance by 2 because it's possible for model to go off screen when rotating if it's not centered.
 	float distance = std::max(d1, d2) * 2;
-	//
 	DirectX::XMFLOAT3 camPos = aabb.GetCenter();
 	m_Camera->SetPosition({ camPos.x, camPos.y, distance });
 

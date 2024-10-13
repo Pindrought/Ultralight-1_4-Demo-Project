@@ -28,6 +28,10 @@ bool DemoBasic::Startup()
 	parms.SampleCount = 8;
 
 	m_GPUView = m_UltralightMgr->CreateUltralightView(parms);
+	if (m_GPUView.expired())
+	{
+		return false;
+	}
 	m_GPUView->LoadURL(url);
 	m_UltralightMgr->SetViewToWindow(m_GPUView->GetId(), m_WindowForGPUView->GetId());
 
@@ -52,9 +56,13 @@ bool DemoBasic::Startup()
 		parms.ForceMatchWindowDimensions = true;
 		parms.IsTransparent = true;
 
-		WeakWrapper<UltralightView> pView = m_UltralightMgr->CreateUltralightView(parms);
-		pView->LoadURL(url);
-		m_UltralightMgr->SetViewToWindow(pView->GetId(), m_WindowForCPUView->GetId());
+		m_CPUView = m_UltralightMgr->CreateUltralightView(parms);
+		if (m_CPUView.expired())
+		{
+			return false;
+		}
+		m_CPUView->LoadURL(url);
+		m_UltralightMgr->SetViewToWindow(m_CPUView->GetId(), m_WindowForCPUView->GetId());
 	}
 
 }
