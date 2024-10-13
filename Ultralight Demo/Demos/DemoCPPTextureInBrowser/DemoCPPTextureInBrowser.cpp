@@ -63,7 +63,6 @@ void DemoCPPTextureInBrowser::OnWindowDestroyStartCallback(int32_t windowId)
 
 void DemoCPPTextureInBrowser::OnWindowDestroyEndCallback(int32_t windowId)
 {
-
 	if (WindowManager::GetWindowCount() == 0)
 	{
 		SetRunning(false);
@@ -72,4 +71,10 @@ void DemoCPPTextureInBrowser::OnWindowDestroyEndCallback(int32_t windowId)
 
 void DemoCPPTextureInBrowser::OnWindowResizeCallback(Window* pWindow)
 {
+}
+
+void DemoCPPTextureInBrowser::OnShutdown()
+{
+	ul::ImageSourceProvider& provider = ul::ImageSourceProvider::instance();
+	provider.RemoveImageSource("AIBowser");
 }

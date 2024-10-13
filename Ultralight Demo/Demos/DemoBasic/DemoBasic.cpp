@@ -6,48 +6,55 @@ bool DemoBasic::Startup()
 {
 	string url = "http://www.google.com";
 	
+	//GPU Renderer Window/View
 	WindowCreationParameters windowParms;
 	windowParms.Width = 800;
 	windowParms.Height = 600;
 	windowParms.Style = WindowStyle::Resizable | WindowStyle::ExitButton | WindowStyle::MaximizeAvailable;
 	windowParms.Title = "GPU Renderer";
-	WeakWrapper<Window> pWindow = WindowManager::SpawnWindow(windowParms);
-	if (pWindow.expired())
+	m_WindowForGPUView = WindowManager::SpawnWindow(windowParms);
+	if (m_WindowForGPUView.expired())
 	{
-		FatalError("Failed to initialize primary window. Program must now abort.");
+		FatalError("Failed to initialize window for GPU view. Program must now abort.");
 		return false;
 	}
 
 	UltralightViewCreationParameters parms;
-	parms.Width = pWindow->GetWidth();
-	parms.Height = pWindow->GetHeight();
-	parms.IsAccelerated = true;
+	parms.Width = m_WindowForGPUView->GetWidth();
+	parms.Height = m_WindowForGPUView->GetHeight();
+	parms.IsAccelerated = true; //Use GPU Renderer
 	parms.ForceMatchWindowDimensions = true;
 	parms.IsTransparent = false;
 	parms.SampleCount = 8;
 
-	WeakWrapper<UltralightView> pView = m_UltralightMgr->CreateUltralightView(parms);
-	pView->LoadURL(url);
-	m_UltralightMgr->SetViewToWindow(pView->GetId(), pWindow->GetId());
+	m_GPUView = m_UltralightMgr->CreateUltralightView(parms);
+	m_GPUView->LoadURL(url);
+	m_UltralightMgr->SetViewToWindow(m_GPUView->GetId(), m_WindowForGPUView->GetId());
 
+	//CPU Renderer Window/View
 	{
 		WindowCreationParameters windowParms;
 		windowParms.Width = 800;
 		windowParms.Height = 600;
 		windowParms.Style = WindowStyle::Resizable | WindowStyle::ExitButton | WindowStyle::MaximizeAvailable;
 		windowParms.Title = "CPU Renderer";
-		WeakWrapper<Window> pWindow = WindowManager::SpawnWindow(windowParms);
+		m_WindowForCPUView = WindowManager::SpawnWindow(windowParms);
+		if (m_WindowForCPUView.expired())
+		{
+			FatalError("Failed to initialize window for CPU view. Program must now abort.");
+			return false;
+		}
 
 		UltralightViewCreationParameters parms;
-		parms.Width = pWindow->GetWidth();
-		parms.Height = pWindow->GetHeight();
-		parms.IsAccelerated = false;
+		parms.Width = m_WindowForCPUView->GetWidth();
+		parms.Height = m_WindowForCPUView->GetHeight();
+		parms.IsAccelerated = false; //Use CPU Renderer
 		parms.ForceMatchWindowDimensions = true;
 		parms.IsTransparent = true;
 
 		WeakWrapper<UltralightView> pView = m_UltralightMgr->CreateUltralightView(parms);
 		pView->LoadURL(url);
-		m_UltralightMgr->SetViewToWindow(pView->GetId(), pWindow->GetId());
+		m_UltralightMgr->SetViewToWindow(pView->GetId(), m_WindowForCPUView->GetId());
 	}
 
 }

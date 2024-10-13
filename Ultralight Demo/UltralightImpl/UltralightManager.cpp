@@ -72,17 +72,9 @@ void UltralightManager::Shutdown()
 
 void UltralightManager::UpdateViews()
 {
-	//LOGINFO("Ultralight->Update()");
-	if (m_OwnedViewsMap.size() == 0)
-	{
-		//DebugBreak();
-	}
 	m_UltralightRenderer->Update();
-	//LOGINFO("Ultralight->Render() --> Ultralight->DrawCommandList()");
 	m_UltralightRenderer->Render();
-	//LOGINFO("GPUDriver->DrawCommandList() Start");
 	m_GPUDriver->DrawCommandList();
-	//LOGINFO("GPUDriver->DrawCommandList() Finished");
 }
 
 ul::Renderer* UltralightManager::GetRendererPtr()
@@ -106,7 +98,7 @@ void UltralightManager::RemoveViewFromWindow(int32_t viewId, int32_t windowId)
 	auto viewIter = m_OwnedViewsMap.find(viewId);
 	if (viewIter != m_OwnedViewsMap.end())
 	{
-		viewIter->second->SetToWindow(-1);
+		viewIter->second->SetToWindow(-1); //Setting view's assigned window to -1 is same as setting it to not having a window.
 	}
 	Engine* pEngine = Engine::GetInstance();
 	assert(pEngine != nullptr);
@@ -125,14 +117,16 @@ void UltralightManager::RemoveViewFromWindow(int32_t viewId, int32_t windowId)
 
 void UltralightManager::SetViewToWindow(int32_t viewId, int32_t windowId)
 {
-	//TODO: Add error checking
 	auto viewIter = m_OwnedViewsMap.find(viewId);
 	if (viewIter == m_OwnedViewsMap.end())
 	{
+		string msg = strfmt("Attempted to set view %d to window %d. View %d does not exist.",
+							viewId, windowId, viewId);
+		FatalError(msg);
 		return; //This shouldn't happen doesn't make sense
 	}
 	auto pView = viewIter->second;
-	if (pView->m_WindowId != -1)
+	if (pView->m_WindowId != -1) //Is this view assigned to a window? If so, we need to remove it from that window...
 	{
 		RemoveViewFromWindow(viewId, pView->m_WindowId);
 	}
@@ -174,7 +168,16 @@ void UltralightManager::RegisterWindow(WeakWrapper<Window> pWindow)
 
 void UltralightManager::RemoveWindowId(int32_t windowId)
 {
-	//TODO: Add error checking
+	if (m_WindowIdToViewIdMap.find(windowId) == m_WindowIdToViewIdMap.end())
+	{
+		string msg = strfmt("Attempted to remove window with id [%d] from WindowIdToViewIdMap, but there is no window with this ID.", windowId);
+		FatalError(msg);
+	}
+	if (m_WindowIdToWindowPtrMap.find(windowId) == m_WindowIdToWindowPtrMap.end())
+	{
+		string msg = strfmt("Attempted to remove window with id [%d] from WindowIdToPtrMap, but there is no window with this ID.", windowId);
+		FatalError(msg);
+	}
 	m_WindowIdToViewIdMap.erase(windowId);
 	m_WindowIdToWindowPtrMap.erase(windowId);
 }
@@ -228,6 +231,7 @@ void UltralightManager::DestroyView(WeakWrapper<UltralightView> pView)
 {
 	if (pView.expired()) //Has this already been destroyed? skip
 		return;
+
 	//JPNOTE[HIGH] - NEED TO REVIEW THE ORDER OF ALL OF THIS
 	if (pView->m_DestructionInitiated)
 	{
@@ -359,7 +363,6 @@ void UltralightManager::RefreshViewDisplaysForAnimations()
 {
 	for (auto view : m_OwnedViewsMap)
 	{
-		//LOGINFO("Ultralight display refresh");
 		m_UltralightRenderer->RefreshDisplay(view.second->GetView()->display_id());
 	}
 }
@@ -415,56 +418,43 @@ bool UltralightManager::FireMouseEvent(MouseEvent* mouseEvent)
 			continue;
 		}
 
-		DirectX::XMFLOAT3 pos = pView->GetPosition();
-		Matrix worldMatrix = DirectX::XMMatrixScaling(pView->GetWidth(), pView->GetHeight(), 1.0f) *
-							 DirectX::XMMatrixTranslation(pos.x, pos.y, pos.z);
-		
-		Vector2 mouseCoords(mouseEvent->GetPosX(), mouseEvent->GetPosY());
-
-		worldMatrix = worldMatrix.Invert();
-
-		Vector2 result = result.Transform(mouseCoords, worldMatrix);
-		if (result.x >= 0 && result.x < 1 &&
-			result.y >= 0 && result.y < 1) //Was mouse event inside the rectangle of the html view?
+		MousePoint pixelCoords;
+		if (pView->IsMouseEventInsideThisView(mouseEvent, pixelCoords) == false)
 		{
-			if (mouseEvent->GetType() == MouseEvent::Type::MouseDown || mouseEvent->GetType() == MouseEvent::Type::MouseUp)
-			{
-				int x = result.x * pView->GetWidth();
-				int y = result.y * pView->GetHeight();
+			continue;
+		}
 
-				PixelColor c = pView->GetPixelColor(x, y);
-				if (c.rgba[3] == 0)
-				{
-					continue;
-				}
-			}
-
-			pView->FireMouseEvent(mouseEvent->ToUltralightMouseEvent());
-			switch (mouseEvent->GetType())
+		if (mouseEvent->GetType() == MouseEvent::Type::MouseDown || mouseEvent->GetType() == MouseEvent::Type::MouseUp)
+		{
+			PixelColor c = pView->GetPixelColor(pixelCoords.X, pixelCoords.Y);
+			if (c.rgba[3] == 0)
 			{
-			case (MouseEvent::Type::MouseDown):
-			{
-				if (pWindow->m_FocusedUltralightView != nullptr)
-				{
-					if (pWindow->m_FocusedUltralightView != pView)
-					{
-						pWindow->m_FocusedUltralightView->m_NativeView->Unfocus();
-					}
-				}
-				pWindow->m_FocusedUltralightView = pView;
-				pView->m_NativeView->Focus();
-				return true;
-			}
-			}
-			dispatchedToHtml = true;
-			//return true;
-			if (mouseEvent->GetType() != MouseEvent::Type::MouseMove)
-			{
-				return true;
+				continue;
 			}
 		}
-		else
+
+		pView->FireMouseEvent(mouseEvent->ToUltralightMouseEvent());
+		switch (mouseEvent->GetType())
 		{
+		case (MouseEvent::Type::MouseDown):
+		{
+			if (pWindow->m_FocusedUltralightView != nullptr)
+			{
+				if (pWindow->m_FocusedUltralightView != pView)
+				{
+					pWindow->m_FocusedUltralightView->m_NativeView->Unfocus();
+				}
+			}
+			pWindow->m_FocusedUltralightView = pView;
+			pView->m_NativeView->Focus();
+			return true;
+		}
+		}
+		dispatchedToHtml = true;
+
+		if (mouseEvent->GetType() != MouseEvent::Type::MouseMove)
+		{
+			return true;
 		}
 	}
 	if (mouseEvent->GetType() == MouseEvent::Type::MouseDown)

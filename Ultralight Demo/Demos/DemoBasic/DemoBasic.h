@@ -10,4 +10,9 @@ public:
 	void OnWindowDestroyStartCallback(int32_t windowId) override;
 	void OnWindowDestroyEndCallback(int32_t windowId) override;
 	void OnWindowResizeCallback(Window* pWindow) override;
+private:
+	WeakWrapper<Window> m_WindowForGPUView;
+	WeakWrapper<Window> m_WindowForCPUView;
+	WeakWrapper<UltralightView> m_GPUView;
+	WeakWrapper<UltralightView> m_CPUView;
 };

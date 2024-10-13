@@ -207,6 +207,29 @@ int32_t UltralightView::GetWindowId()
 	return m_WindowId;
 }
 
+bool UltralightView::IsMouseEventInsideThisView(MouseEvent* mouseEvent, MousePoint& outPixelCoords)
+{
+	outPixelCoords.X = 0;
+	outPixelCoords.Y = 0;
+	Matrix worldMatrix = DirectX::XMMatrixScaling(m_Width, m_Height, 1.0f) *
+						 DirectX::XMMatrixTranslation(m_Position.x, m_Position.y, m_Position.z);
+
+	Vector2 mouseCoords(mouseEvent->GetPosX(), mouseEvent->GetPosY());
+
+	//JPNOTE: Need to just store the world matrix/inversion for view - this should not be getting recalculated for every event...
+	worldMatrix = worldMatrix.Invert();
+
+	Vector2 result = result.Transform(mouseCoords, worldMatrix);
+	if (result.x >= 0 && result.x < 1 &&
+		result.y >= 0 && result.y < 1) //Was mouse event inside the rectangle of this html view?
+	{
+		outPixelCoords.X = result.x * m_Width;
+		outPixelCoords.Y = result.y * m_Height;
+		return true;
+	}
+	return false;
+}
+
 void UltralightView::FireKeyboardEvent(ul::KeyEvent keyboardEvent)
 {
 	m_NativeView->FireKeyEvent(keyboardEvent);

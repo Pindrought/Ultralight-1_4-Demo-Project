@@ -149,6 +149,17 @@ void DemoMultipleCubesEmbedded::OnWindowResizeCallback(Window* pWindow)
 {
 }
 
+void DemoMultipleCubesEmbedded::OnShutdown()
+{
+	ul::ImageSourceProvider& provider = ul::ImageSourceProvider::instance();
+	m_ImageSources.clear();
+	for (int i = 0; i < 4; i++)
+	{
+		string id = strfmt("CUBE_%d", i);
+		provider.RemoveImageSource(id.c_str());
+	}
+}
+
 shared_ptr<Entity> DemoMultipleCubesEmbedded::GenerateCubeEntity(MeshGenerator::MeshGenerationOption genOption, bool wireFrame)
 {
 	shared_ptr<Mesh> cubeMesh = MeshGenerator::GenerateCube(genOption);

@@ -13,6 +13,7 @@ public:
 	void OnWindowDestroyStartCallback(int32_t windowId) override;
 	void OnWindowDestroyEndCallback(int32_t windowId) override;
 	void OnWindowResizeCallback(Window* pWindow) override;
+	void OnShutdown() override;
 private:
 	shared_ptr<Texture> m_Texture = nullptr;
 };

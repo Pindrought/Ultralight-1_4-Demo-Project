@@ -9,7 +9,7 @@ bool DemoSelector::Startup()
 
 	WindowCreationParameters windowParms;
 	windowParms.Width = screenWidth - 100;
-	windowParms.Height = screenHeight - 100;
+	windowParms.Height = std::min(720, screenHeight);
 	windowParms.Style = WindowStyle::Resizable | WindowStyle::ExitButton | WindowStyle::MaximizeAvailable;
 	windowParms.Title = "Demo Selector";
 	m_PrimaryWindow = WindowManager::SpawnWindow(windowParms);

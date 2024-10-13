@@ -1,7 +1,6 @@
-# This is a work in progress. It is not complete.  <br/>
+# This is a demo framework project utilizing Ultralight version 1.4.  <br/>
 
 Please see the **Ultralight** pricing/licensing: https://ultralig.ht/pricing/  <br/>
 This project is not affiliated with Ultralight.  <br/>
-This project is missing features and will most likely contain bugs.  <br/>
-It is only currently made public for review/testing certain features.  <br/>
+This project should be in a stable state as of now. Please report issues in this repository.  <br/>
 This project requires DirectX 11 and is designed to run on Windows.

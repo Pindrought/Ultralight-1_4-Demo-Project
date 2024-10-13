@@ -5,6 +5,7 @@
 #include "ViewListeners/HtmlViewListener.h"
 #include "ViewListeners/HtmlViewLoadListener.h"
 #include "EZJSParm.h"
+#include "../Window/InputController/MousePoint.h"
 
 struct UltralightViewCreationParameters
 {
@@ -36,6 +37,7 @@ public:
 	uint32_t GetSampleCount() const;
 	PixelColor GetPixelColor(int x, int y);
 	int32_t GetWindowId();
+	bool IsMouseEventInsideThisView(MouseEvent* mouseEvent, MousePoint& outPixelCoords);
 	void FireKeyboardEvent(ul::KeyEvent keyboardEvent);
 	void FireMouseEvent(ul::MouseEvent mouseEvent);
 	void FireScrollEvent(ul::ScrollEvent scrollEvent);

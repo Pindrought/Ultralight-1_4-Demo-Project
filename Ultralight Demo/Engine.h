@@ -38,6 +38,7 @@ public:
 	void RenderFrame();
 	virtual void OnPreRenderULViews();
 	virtual void OnPostRenderULViews();
+	virtual void OnShutdown();
 	~Engine();
 protected:
 	static Engine* s_Instance; //There will only ever be one engine instance

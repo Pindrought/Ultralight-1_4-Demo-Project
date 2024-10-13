@@ -182,6 +182,7 @@ void Engine::SetRunning(bool running)
 
 Engine::~Engine()
 {
+	OnShutdown();
 	if (s_Instance == this)
 	{
 		s_Instance = nullptr;
@@ -295,5 +296,9 @@ void Engine::OnPreRenderULViews()
 }
 
 void Engine::OnPostRenderULViews()
+{
+}
+
+void Engine::OnShutdown()
 {
 }
