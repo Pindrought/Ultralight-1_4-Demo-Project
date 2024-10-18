@@ -12,23 +12,30 @@ bool DemoSelector::Startup()
 	windowParms.Height = std::min(720, screenHeight);
 	windowParms.Style = WindowStyle::Resizable | WindowStyle::ExitButton | WindowStyle::MaximizeAvailable;
 	windowParms.Title = "Demo Selector";
-	m_PrimaryWindow = WindowManager::SpawnWindow(windowParms);
-	if (m_PrimaryWindow.expired())
+	m_Window = WindowManager::SpawnWindow(windowParms);
+	if (m_Window.expired())
 	{
-		FatalError("Failed to initialize primary window. Program must now abort.");
+		FatalError("Failed to initialize window. Program must now abort.");
 		return false;
 	}
 
 	UltralightViewCreationParameters parms;
-	parms.Width = m_PrimaryWindow->GetWidth();
-	parms.Height = m_PrimaryWindow->GetHeight();
+	parms.Width = m_Window->GetWidth();
+	parms.Height = m_Window->GetHeight();
 	parms.IsAccelerated = false;
 	parms.ForceMatchWindowDimensions = true;
 	parms.IsTransparent = true;
 
-	WeakWrapper<UltralightView> pView = m_UltralightMgr->CreateUltralightView(parms);
-	pView->LoadURL("file:///Samples/DemoSelector/DemoSelector.html");
-	m_UltralightMgr->SetViewToWindow(pView->GetId(), m_PrimaryWindow->GetId());
+	m_View = m_UltralightMgr->CreateUltralightView(parms);
+	if (m_View.expired())
+	{
+		FatalError("Failed to initialize view. Program must now abort.");
+		return false;
+	}
+	m_View->LoadURL("file:///Samples/DemoSelector/DemoSelector.html");
+	m_UltralightMgr->SetViewToWindow(m_View->GetId(), m_Window->GetId());
+
+	return true;
 }
 
 EZJSParm DemoSelector::OnEventCallbackFromUltralight(int32_t viewId, string eventName, vector<EZJSParm> parameters)
@@ -92,7 +99,7 @@ EZJSParm DemoSelector::OnEventCallbackFromUltralight(int32_t viewId, string even
 		}
 		if (m_SelectedDemo != DemoId::None)
 		{
-			m_PrimaryWindow->Close();
+			m_Window->Close();
 		}
 	}
 	return EZJSParm();

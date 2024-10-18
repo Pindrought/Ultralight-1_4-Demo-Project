@@ -11,5 +11,6 @@ public:
 	void OnWindowDestroyEndCallback(int32_t windowId) override;
 	void OnWindowResizeCallback(Window* pWindow) override;
 private:
-	WeakWrapper<Window> m_PrimaryWindow;
+	WeakWrapper<Window> m_Window;
+	WeakWrapper<UltralightView> m_View;
 };

@@ -12,4 +12,5 @@ public:
 	void OnWindowResizeCallback(Window* pWindow) override;
 private:
 	vector<WeakWrapper<Window>> m_Windows;
+	vector<WeakWrapper<UltralightView>> m_Views;
 };

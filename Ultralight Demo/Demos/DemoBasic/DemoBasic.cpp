@@ -65,6 +65,7 @@ bool DemoBasic::Startup()
 		m_UltralightMgr->SetViewToWindow(m_CPUView->GetId(), m_WindowForCPUView->GetId());
 	}
 
+	return true;
 }
 
 EZJSParm DemoBasic::OnEventCallbackFromUltralight(int32_t viewId, string eventName, vector<EZJSParm> parameters)

@@ -9,23 +9,30 @@ bool DemoBorderlessResizableMovable::Startup()
 	windowParms.Height = 600;
 	windowParms.Style = WindowStyle::Resizable | WindowStyle::NoBorder;
 	windowParms.Title = "Default Title";
-	WeakWrapper<Window> pWindow = WindowManager::SpawnWindow(windowParms);
-	if (pWindow.expired())
+	m_Window = WindowManager::SpawnWindow(windowParms);
+	if (m_Window.expired())
 	{
-		FatalError("Failed to initialize primary window. Program must now abort.");
+		FatalError("Failed to initialize window. Program must now abort.");
 		return false;
 	}
 
 	UltralightViewCreationParameters parms;
-	parms.Width = pWindow->GetWidth();
-	parms.Height = pWindow->GetHeight();
+	parms.Width = m_Window->GetWidth();
+	parms.Height = m_Window->GetHeight();
 	parms.IsAccelerated = false;
 	parms.ForceMatchWindowDimensions = true;
 	parms.IsTransparent = true;
 
-	WeakWrapper<UltralightView> pView = m_UltralightMgr->CreateUltralightView(parms);
-	pView->LoadURL("file:///Samples/BorderlessWindow/BorderlessWindow.html");
-	m_UltralightMgr->SetViewToWindow(pView->GetId(), pWindow->GetId());
+	WeakWrapper<UltralightView> m_View = m_UltralightMgr->CreateUltralightView(parms);
+	if (m_View.expired())
+	{
+		FatalError("Failed to initialize view. Program must now abort.");
+		return false;
+	}
+	m_View->LoadURL("file:///Samples/BorderlessWindow/BorderlessWindow.html");
+	m_UltralightMgr->SetViewToWindow(m_View->GetId(), m_Window->GetId());
+
+	return true;
 }
 
 bool DemoBorderlessResizableMovable::ProcessInput()
@@ -135,6 +142,7 @@ EZJSParm DemoBorderlessResizableMovable::OnEventCallbackFromUltralight(int32_t v
 		auto pView = m_UltralightMgr->GetViewFromId(viewId);
 		int32_t windowId = pView->GetWindowId();
 		WeakWrapper<Window> pWindow = WindowManager::GetWindow(windowId);
+		assert(!pWindow.expired());
 		if (pWindow->IsWindowMaximized() == false)
 		{
 			//pWindow->StartDrag();

@@ -24,7 +24,7 @@ public:
 	virtual bool InitializeUltralight();
 	bool IsRunning();
 	void ProcessWindowsMessages();
-	virtual bool Startup();
+	virtual bool Startup() = 0;
 	bool Tick();
 	virtual bool TickStart() { return true;  };
 	virtual bool ProcessInput();
@@ -38,7 +38,6 @@ public:
 	void RenderFrame();
 	virtual void OnPreRenderULViews();
 	virtual void OnPostRenderULViews();
-	virtual void OnShutdown();
 	~Engine();
 protected:
 	static Engine* s_Instance; //There will only ever be one engine instance

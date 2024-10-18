@@ -15,8 +15,11 @@ public:
 	void OnWindowDestroyEndCallback(int32_t windowId) override;
 	void OnWindowResizeCallback(Window* pWindow) override;
 	void OnPostRenderULViews() override; //This is where we draw our C++ texture into the render target
+private:
 
-	WeakWrapper<Window> m_PrimaryWindow;
+	WeakWrapper<Window> m_Window;
+	WeakWrapper<UltralightView> m_View;
+
 	struct DivRectData
 	{
 		float X = 0;

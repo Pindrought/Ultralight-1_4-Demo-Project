@@ -89,7 +89,6 @@ bool DemoMultipleCubesEmbedded::Startup()
 																					   rt->GetHeight(),
 																					   reservedTextureId,
 																					   bounds);
-
 			ul::ImageSourceProvider& provider = ul::ImageSourceProvider::instance();
 			string id = strfmt("CUBE_%d", i);
 			provider.AddImageSource(id.c_str(), imgSource);
@@ -149,15 +148,19 @@ void DemoMultipleCubesEmbedded::OnWindowResizeCallback(Window* pWindow)
 {
 }
 
-void DemoMultipleCubesEmbedded::OnShutdown()
+DemoMultipleCubesEmbedded::~DemoMultipleCubesEmbedded()
 {
 	ul::ImageSourceProvider& provider = ul::ImageSourceProvider::instance();
-	m_ImageSources.clear();
-	for (int i = 0; i < 4; i++)
+	IGPUDriverD3D11* pDriver = m_UltralightMgr->GetGPUDriver();
+
+	for (int i = 0; i < m_ImageSources.size(); i++)
 	{
+		pDriver->DestroyTexture(m_ImageSources[i]->texture_id());
 		string id = strfmt("CUBE_%d", i);
 		provider.RemoveImageSource(id.c_str());
 	}
+
+	m_ImageSources.clear();
 }
 
 shared_ptr<Entity> DemoMultipleCubesEmbedded::GenerateCubeEntity(MeshGenerator::MeshGenerationOption genOption, bool wireFrame)

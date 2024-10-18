@@ -22,7 +22,7 @@ namespace EZGLTF
 			std::vector<JointWeightsVec4> JointWeights;
 			shared_ptr<Material> Material;
 		};
-
+		
 		struct MeshData
 		{
 			string Name = "";

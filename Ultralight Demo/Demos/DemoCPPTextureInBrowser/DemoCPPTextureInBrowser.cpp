@@ -8,10 +8,10 @@ bool DemoCPPTextureInBrowser::Startup()
 	windowParms.Height = 600;
 	windowParms.Style = WindowStyle::Resizable | WindowStyle::ExitButton | WindowStyle::MaximizeAvailable;
 	windowParms.Title = "C++ Texture In Browser Demo";
-	WeakWrapper<Window> pWindow = WindowManager::SpawnWindow(windowParms);
-	if (pWindow.expired())
+	m_Window = WindowManager::SpawnWindow(windowParms);
+	if (m_Window.expired())
 	{
-		FatalError("Failed to initialize primary window. Program must now abort.");
+		FatalError("Failed to initialize window. Program must now abort.");
 		return false;
 	}
 
@@ -38,14 +38,19 @@ bool DemoCPPTextureInBrowser::Startup()
 	provider.AddImageSource("AIBowser", imgSource);
 
 	UltralightViewCreationParameters parms;
-	parms.Width = pWindow->GetWidth();
-	parms.Height = pWindow->GetHeight();
+	parms.Width = m_Window->GetWidth();
+	parms.Height = m_Window->GetHeight();
 	parms.IsAccelerated = true;
 	parms.ForceMatchWindowDimensions = true;
 	parms.IsTransparent = true;
-	WeakWrapper<UltralightView> pView = m_UltralightMgr->CreateUltralightView(parms);
-	pView->LoadURL("file:///Samples/CPPTextureInBrowser/CPPTextureInBrowser.html");
-	m_UltralightMgr->SetViewToWindow(pView->GetId(), pWindow->GetId());
+	m_View = m_UltralightMgr->CreateUltralightView(parms);
+	if (m_View.expired())
+	{
+		FatalError("Failed to initialize view. Program must now abort.");
+		return false;
+	}
+	m_View->LoadURL("file:///Samples/CPPTextureInBrowser/CPPTextureInBrowser.html");
+	m_UltralightMgr->SetViewToWindow(m_View->GetId(), m_Window->GetId());
 
 	return true;
 }
@@ -73,8 +78,14 @@ void DemoCPPTextureInBrowser::OnWindowResizeCallback(Window* pWindow)
 {
 }
 
-void DemoCPPTextureInBrowser::OnShutdown()
+DemoCPPTextureInBrowser::~DemoCPPTextureInBrowser()
 {
 	ul::ImageSourceProvider& provider = ul::ImageSourceProvider::instance();
-	provider.RemoveImageSource("AIBowser");
+	ul::RefPtr<ul::ImageSource> imgSrc = provider.GetImageSource("AIBowser");
+	if (imgSrc.get() != nullptr)
+	{
+		IGPUDriverD3D11* pDriver = m_UltralightMgr->GetGPUDriver();
+		pDriver->DestroyTexture(imgSrc->texture_id());
+		provider.RemoveImageSource("AIBowser");
+	}
 }

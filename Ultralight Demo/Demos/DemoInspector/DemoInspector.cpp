@@ -26,7 +26,11 @@ bool DemoInspector::Startup()
 	mainViewParms.IsTransparent = true;
 
 	m_MainView = m_UltralightMgr->CreateUltralightView(mainViewParms);
-	assert(!m_MainView.expired());
+	if (m_MainView.expired())
+	{
+		FatalError("Failed to initialize view. Program must now abort.");
+		return false;
+	}
 	m_MainView->LoadURL("http://www.google.com");
 	m_UltralightMgr->SetViewToWindow(m_MainView->GetId(), m_MainWindow->GetId());
 
@@ -53,11 +57,15 @@ bool DemoInspector::Startup()
 	inspectorViewParms.InspectionTarget = m_MainView;
 
 	m_InspectorView = m_UltralightMgr->CreateUltralightView(inspectorViewParms);
+	if (m_InspectorView.expired())
+	{
+		FatalError("Failed to initialize inspector view. Program must now abort.");
+		return false;
+	}
 	//Note that m_UltralightMgr->CreateUltralightView will call CreateLocalInspectorView on the inspection target when that parameter is passed into the creation parms.
 	m_UltralightMgr->SetViewToWindow(m_InspectorView->GetId(), m_InspectorWindow->GetId());
 
 	return true;
-
 }
 
 EZJSParm DemoInspector::OnEventCallbackFromUltralight(int32_t viewId, string eventName, vector<EZJSParm> parameters)
@@ -71,28 +79,6 @@ void DemoInspector::OnWindowDestroyStartCallback(int32_t windowId)
 	m_UltralightMgr->DestroyView(m_InspectorView); //Regardless of which window is destroyed first
 	m_UltralightMgr->DestroyView(m_MainView);      //Going to try to delete inspector view then main view
 	WindowManager::DestroyAllWindows();
-	//pWindow->DestroyAllViewsLinkedToThisWindow();
-	/*if (!m_MainWindow.expired())
-	{
-		if (m_MainWindow->GetId() == windowId)
-		{
-			WindowManager::DestroyWindow(windowId);
-			if (!m_InspectorWindow.expired())
-			{
-				m_InspectorWindow->Close();
-			}
-		}
-	}
-	if (!m_InspectorWindow.expired())
-	{
-		if (m_InspectorWindow->GetId() == windowId)
-		{
-			if (!m_MainWindow.expired())
-			{
-				m_MainWindow->Close();
-			}
-		}
-	}*/
 }
 
 void DemoInspector::OnWindowDestroyEndCallback(int32_t windowId)

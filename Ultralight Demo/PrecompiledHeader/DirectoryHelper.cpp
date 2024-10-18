@@ -40,10 +40,34 @@ std::vector<std::string> DirectoryHelper::GetListOfDrives()
 {
 	std::vector<std::string> arrayOfDrives;
 	char* szDrives = new char[MAX_PATH]();
-	if (GetLogicalDriveStringsA(MAX_PATH, szDrives));
-	for (int i = 0; i < 100; i += 4)
-		if (szDrives[i] != (char)0)
-			arrayOfDrives.push_back(std::string{ szDrives[i],szDrives[i + 1],szDrives[i + 2] });
+	DWORD numChars = GetLogicalDriveStringsA(MAX_PATH, szDrives);
+	if (numChars == 0)
+	{
+		assert("No drives found from DirectoryHelper::GetListOfDrives()" && false);
+		return {};
+	}
+	if (numChars > MAX_PATH) //Sanity check
+	{
+		assert("DirectoryHelper::GetListOfDrives() numChars > MAX_PATH - Shouldn't be possible?" && false);
+		return {};
+	}
+
+	string driveName = "";
+	for (int i = 0; i < numChars; i++)
+	{
+		if (szDrives[i] == (char)0)
+		{
+			if (driveName != "")
+			{
+				arrayOfDrives.push_back(driveName);
+				driveName = "";
+			}
+		}
+		else
+		{
+			driveName += szDrives[i];
+		}
+	}
 	delete[] szDrives;
 	return arrayOfDrives;
 }

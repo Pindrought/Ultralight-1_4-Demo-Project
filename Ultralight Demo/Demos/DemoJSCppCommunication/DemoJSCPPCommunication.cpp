@@ -29,6 +29,8 @@ bool DemoJSCPPCommunication::Startup()
 	WeakWrapper<UltralightView> pView = m_UltralightMgr->CreateUltralightView(parms);
 	pView->LoadURL("file:///Samples/JSCPPCommunication/JSCPPCommunication.html");
 	m_UltralightMgr->SetViewToWindow(pView->GetId(), m_PrimaryWindow->GetId());
+
+	return true;
 }
 
 EZJSParm DemoJSCPPCommunication::OnEventCallbackFromUltralight(int32_t viewId, string eventName, vector<EZJSParm> parameters)

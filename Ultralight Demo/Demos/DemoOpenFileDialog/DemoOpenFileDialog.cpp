@@ -29,6 +29,8 @@ bool DemoOpenFileDialog::Startup()
 	m_UltralightMgr->SetViewToWindow(m_PrimaryView->GetId(), m_PrimaryWindow->GetId());
 
 	m_LastDirectoryAccessed = DirectoryHelper::GetExecutableDirectoryA();
+
+	return true;
 }
 
 EZJSParm DemoOpenFileDialog::OnEventCallbackFromUltralight(int32_t viewId, string eventName, vector<EZJSParm> parameters)

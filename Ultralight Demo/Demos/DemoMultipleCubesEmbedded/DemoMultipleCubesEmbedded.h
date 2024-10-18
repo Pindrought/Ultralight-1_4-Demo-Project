@@ -14,7 +14,7 @@ public:
 	void OnWindowDestroyStartCallback(int32_t windowId) override;
 	void OnWindowDestroyEndCallback(int32_t windowId) override;
 	void OnWindowResizeCallback(Window* pWindow) override;
-	void OnShutdown() override;
+	~DemoMultipleCubesEmbedded();
 private:
 	shared_ptr<Entity> GenerateCubeEntity(MeshGenerator::MeshGenerationOption genOption = MeshGenerator::MeshGenerationOption::DEFAULT, bool wireFrame = false);
 	vector<shared_ptr<Scene>> m_Scenes;

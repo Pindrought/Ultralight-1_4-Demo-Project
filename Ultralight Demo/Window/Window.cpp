@@ -751,9 +751,6 @@ bool Window::ResizeSwapChainAndRenderTargetContainer()
 
 int32_t Window::GetAvailableWindowId()
 {
-
-	//Technically it is possible for this to overflow if you create 2,147,486,647 windows while the application is open.
-	//You could create a reserve pool to store available id's once a window gets destroyed to reuse them and replace this function with that.
 	int32_t id = s_WindowsIDManager.GetNextId();
 	return id;
 }

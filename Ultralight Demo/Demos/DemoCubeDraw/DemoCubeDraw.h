@@ -19,4 +19,6 @@ private:
 	shared_ptr<Camera> m_Camera = nullptr;
 	shared_ptr<Scene> m_Scene = nullptr;
 	shared_ptr<Entity> m_CubeEntity = nullptr;
+	WeakWrapper<Window> m_Window;
+	WeakWrapper<UltralightView> m_View;
 };

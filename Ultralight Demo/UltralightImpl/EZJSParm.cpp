@@ -298,6 +298,8 @@ std::string EZJSParm::ToString()
 		break;
 	}
 	}
+	assert("EZJSParm::ToString() invalid object." && false);
+	return "??";
 }
 
 vector<JSValueRef> BuildJSValueRefParms(JSContextRef inContext, 

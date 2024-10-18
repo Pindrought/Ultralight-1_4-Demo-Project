@@ -10,10 +10,10 @@ bool DemoCubeDraw::Startup()
 	windowParms.Height = 600;
 	windowParms.Style = WindowStyle::Resizable | WindowStyle::ExitButton | WindowStyle::MaximizeAvailable;
 	windowParms.Title = "Demo Cube Draw";
-	WeakWrapper<Window> pWindow = WindowManager::SpawnWindow(windowParms);
-	if (pWindow.expired())
+	m_Window = WindowManager::SpawnWindow(windowParms);
+	if (m_Window.expired())
 	{
-		FatalError("Failed to initialize primary window. Program must now abort.");
+		FatalError("Failed to initialize window. Program must now abort.");
 		return false;
 	}
 
@@ -23,10 +23,14 @@ bool DemoCubeDraw::Startup()
 	parms.IsAccelerated = true;
 	parms.IsTransparent = true;
 	parms.SampleCount = 8;
-	WeakWrapper<UltralightView> pView = m_UltralightMgr->CreateUltralightView(parms);
-	pView->LoadURL("file:///Samples/CubeDraw/CubeDraw.html");
-	m_UltralightMgr->SetViewToWindow(pView->GetId(), pWindow->GetId());
-
+	m_View = m_UltralightMgr->CreateUltralightView(parms);
+	if (m_View.expired())
+	{
+		FatalError("Failed to initialize view. Program must now abort.");
+		return false;
+	}
+	m_View->LoadURL("file:///Samples/CubeDraw/CubeDraw.html");
+	m_UltralightMgr->SetViewToWindow(m_View->GetId(), m_Window->GetId());
 
 	m_Scene = make_shared<Scene>();
 
@@ -36,7 +40,7 @@ bool DemoCubeDraw::Startup()
 	m_Camera->SetPosition({ 0, 0, 5 });
 	m_Camera->SetScene(m_Scene);
 	
-	WeakWrapper<RenderTargetContainer> pRenderTarget = pWindow->GetRenderTargetContainer();
+	WeakWrapper<RenderTargetContainer> pRenderTarget = m_Window->GetRenderTargetContainer();
 	assert(!pRenderTarget.expired());
 	pRenderTarget->SetCamera(m_Camera);
 
@@ -54,7 +58,6 @@ bool DemoCubeDraw::Startup()
 void DemoCubeDraw::OnPreRenderFrame()
 {
 	static float yaw = 0;
-	//I want it to turn 1 time per second
 	//1 full rotation = 2PI
 	//m_DeltaTime = time between frames in miliseconds
 	float secondsPerRotation = 5;

@@ -27,5 +27,7 @@ public:
 		DemoMultipleCubesEmbedded,
 	};
 	DemoId m_SelectedDemo = DemoId::None;
-	WeakWrapper<Window> m_PrimaryWindow;
+private:
+	WeakWrapper<Window> m_Window;
+	WeakWrapper<UltralightView> m_View;
 };

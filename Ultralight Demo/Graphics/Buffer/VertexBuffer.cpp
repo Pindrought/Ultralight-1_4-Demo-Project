@@ -42,7 +42,7 @@ bool VertexBuffer<T>::Initialize(std::vector<T> data)
 
 	if (data.size() == 0) //if empty buffer 
 	{
-		return E_FAIL;
+		return false;
 	}
 	else
 	{

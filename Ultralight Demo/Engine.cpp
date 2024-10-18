@@ -86,32 +86,6 @@ void Engine::ProcessWindowsMessages()
 	}
 }
 
-bool Engine::Startup()
-{
-	WindowCreationParameters windowParms;
-	windowParms.Width = 800;
-	windowParms.Height = 600;
-	windowParms.Style = WindowStyle::Resizable | WindowStyle::ExitButton | WindowStyle::MaximizeAvailable;
-	windowParms.Title = "Default Title";
-	WeakWrapper<Window> pWindow = WindowManager::SpawnWindow(windowParms);
-	if (pWindow.expired())
-	{
-		FatalError("Failed to initialize primary window. Program must now abort.");
-		return false;
-	}
-
-	UltralightViewCreationParameters parms;
-	parms.Width = pWindow->GetWidth();
-	parms.Height = pWindow->GetHeight();
-	parms.IsAccelerated = false;
-	parms.ForceMatchWindowDimensions = true;
-	parms.IsTransparent = true;
-
-	WeakWrapper<UltralightView> pView = m_UltralightMgr->CreateUltralightView(parms);
-	pView->LoadURL("http://www.google.com");
-	m_UltralightMgr->SetViewToWindow(pView->GetId(), pWindow->GetId());
-}
-
 bool Engine::Tick()
 {
 	m_DeltaTime = m_FrameTimer.GetMilisecondsElapsed();
@@ -182,7 +156,6 @@ void Engine::SetRunning(bool running)
 
 Engine::~Engine()
 {
-	OnShutdown();
 	if (s_Instance == this)
 	{
 		s_Instance = nullptr;
@@ -296,9 +269,5 @@ void Engine::OnPreRenderULViews()
 }
 
 void Engine::OnPostRenderULViews()
-{
-}
-
-void Engine::OnShutdown()
 {
 }

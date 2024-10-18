@@ -21,4 +21,7 @@ public:
 		POINT DragStartWindowPosition;
 	};
 	WindowDragInfo m_WindowDragInfo;
+private:
+	WeakWrapper<Window> m_Window;
+	WeakWrapper<UltralightView> m_View;
 };

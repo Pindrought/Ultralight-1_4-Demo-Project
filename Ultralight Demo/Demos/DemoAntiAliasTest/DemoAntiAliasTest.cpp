@@ -38,9 +38,15 @@ bool DemoAntiAliasTest::Startup()
 
 		parms.SampleCount = sampleCount;
 		WeakWrapper<UltralightView> pView = m_UltralightMgr->CreateUltralightView(parms);
+		if (pView.expired())
+		{
+			FatalError("Failed to initialize view. Program must now abort.");
+			return false;
+		}
 		pView->LoadURL("file:///Samples/AntiAliasTest/AntiAliasTest.html");
 		m_UltralightMgr->SetViewToWindow(pView->GetId(), pWindow->GetId());
 		m_Windows.push_back(pWindow);
+		m_Views.push_back(pView);
 	}
 
 	//This is all to just reposition the windows so they are not stacked on top of each other
@@ -67,7 +73,7 @@ bool DemoAntiAliasTest::Startup()
 		m_Windows[i]->SetPosition(screenCenterX + xOffset,
 								  screenCenterY + yOffset);
 	}
-
+	return true;
 }
 
 EZJSParm DemoAntiAliasTest::OnEventCallbackFromUltralight(int32_t viewId, string eventName, vector<EZJSParm> parameters)

@@ -28,6 +28,11 @@ bool DemoGLTFViewer::Startup()
 	parms.SampleCount = 8;
 	parms.ForceMatchWindowDimensions = true;
 	m_PrimaryView = m_UltralightMgr->CreateUltralightView(parms);
+	if (m_PrimaryView.expired())
+	{
+		FatalError("Failed to initialize primary view. Program must now abort.");
+		return false;
+	}
 	m_PrimaryView->LoadURL("file:///Samples/GLTFViewer/GLTFViewer.html");
 	m_UltralightMgr->SetViewToWindow(m_PrimaryView->GetId(), m_PrimaryWindow->GetId());
 
