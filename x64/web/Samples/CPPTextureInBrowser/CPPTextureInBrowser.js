@@ -7,7 +7,7 @@ if (typeof(CallEvent) == 'undefined') {
 function CreateImgForCPPTexture(textureAlias) {
     let div = document.getElementById('div_cppTextureContainer')
     var img = document.createElement("img");
-    
+
     img.setAttribute('src', textureAlias + ".imgsrc");
     img.setAttribute('alt', 'na');
     img.onclick = function() {
