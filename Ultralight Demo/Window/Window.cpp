@@ -253,11 +253,12 @@ WindowStyle Window::GetStyle() const
 
 bool Window::ToggleClickthrough(bool clickthrough)
 {
+	m_ClickThroughEnabled = clickthrough;
 	LONG_PTR currentStyle = GetWindowLongPtr(m_HWND, GWL_EXSTYLE);
 	if (clickthrough) //Enable click through
 	{
 		//currentStyle |= WS_EX_TRANSPARENT;
-		currentStyle |= (WS_EX_COMPOSITED | WS_EX_LAYERED | WS_EX_TRANSPARENT | WS_EX_TOPMOST);
+		currentStyle |= (WS_EX_LAYERED | WS_EX_TRANSPARENT | WS_EX_TOPMOST);
 	}
 	else //Disable click through
 	{
@@ -265,7 +266,12 @@ bool Window::ToggleClickthrough(bool clickthrough)
 		currentStyle &= removeStyle;
 	}
 	if (SetWindowLongPtr(m_HWND, GWL_EXSTYLE, currentStyle) == 0)
+	{
+		int error = GetLastError();
+		string msg = strfmt("Error [%d]\n", error);
+		OutputDebugStringA(msg.c_str());
 		return false;
+	}
 	return true;
 }
 
@@ -278,6 +284,16 @@ void Window::StartDrag()
 void Window::StopDrag()
 {
 	SendMessageW(m_HWND, WM_NCLBUTTONUP, HTCAPTION, 0);
+}
+
+RECT Window::GetRect()
+{
+	RECT rect{ 0 };
+	if (!GetWindowRect(m_HWND, &rect))
+	{
+		FatalError("Window::GetRect() failed.");
+	}
+	return rect;
 }
 
 IDXGISwapChain1* Window::GetSwapChainPtr()
@@ -453,10 +469,12 @@ LRESULT Window::WindowProcA(HWND hwnd,
 	{
 		int32_t width = LOWORD(lParam);
 		int32_t height = HIWORD(lParam);
-		if (width >= 32 && height >= 32 &&
-			width != m_Width ||
-			height != m_Height)
+		LOGINFO(strfmt("WM_SIZE [%s] [%d, %d] -- [%d, %d]", m_Title.c_str(), width, height, m_Width, m_Height).c_str());
+
+		if ((width >= 32 && height >= 32) &&
+			(width != m_Width || height != m_Height))
 		{
+			LOGINFO(strfmt("WM_SIZE [%d] [%d] [%d]\n", width, height, m_Id).c_str());
 			m_Width = LOWORD(lParam);
 			m_Height = HIWORD(lParam);
 			if (ResizeSwapChainAndRenderTargetContainer())
@@ -497,7 +515,29 @@ void Window::SetPosition(int x, int y, int width, int height)
 	{
 		flags = SWP_NOSIZE;
 	}
-	SetWindowPos(m_HWND, NULL, x, y, m_Width, m_Height, flags);
+	if (flags == 0)
+	{
+		RECT r = { 0 };
+		r.left = x;
+		r.top = y;
+		r.right = r.left + width;
+		r.bottom = r.top + height;
+		DWORD style = GetWindowStyle(m_HWND);
+		DWORD exstyle = GetWindowExStyle(m_HWND);
+
+		BOOL result = AdjustWindowRectEx(&r, style, FALSE, exstyle);
+		if (result == 0) //If adjustwindowrect fails...
+		{
+			CriticalError("AdjustWindowRect failed. That is not good.");
+		}
+		width = r.right - r.left;
+		height = r.bottom - r.top;
+		//x = r.left;
+		//y = r.top;
+		/*x = r.left;
+		y = r.top;*/
+	}
+	SetWindowPos(m_HWND, NULL, x, y, width, height, flags);
 }
 
 void Window::Maximize()
@@ -545,6 +585,11 @@ void Window::DestroyAllViewsLinkedToThisWindow()
 	{
 		pUltralightMgr->DestroyView(view);
 	}
+}
+
+bool Window::IsClickthroughEnabled()
+{
+	return m_ClickThroughEnabled;
 }
 
 bool Window::InitializeSwapchain()
@@ -711,6 +756,7 @@ bool Window::RegisterWindowClass()
 	wc.lpszMenuName = NULL; //Pointer to a null terminated character string for the menu. We are not using a menu yet, so this will be NULL.
 	wc.lpszClassName = m_WindowClassName.c_str(); //Pointer to null terminated string of our class name for this window.
 	wc.cbSize = sizeof(WNDCLASSEXA); //Need to fill in the size of our struct for cbSize
+	LOGINFO(strfmt("Registering window class [%s] for window [%s]", m_WindowClassName.c_str(), m_Title.c_str()).c_str());
 	ATOM result = RegisterClassExA(&wc); // Register the class so that it is usable.
 	if (result == 0 && GetLastError() != ERROR_CLASS_ALREADY_EXISTS)
 	{

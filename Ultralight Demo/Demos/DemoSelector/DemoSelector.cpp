@@ -97,6 +97,10 @@ EZJSParm DemoSelector::OnEventCallbackFromUltralight(int32_t viewId, string even
 		{
 			m_SelectedDemo = DemoId::DemoMultipleCubesEmbedded;
 		}
+		if (demoName == "DemoScreenShareHelper")
+		{
+			m_SelectedDemo = DemoId::DemoScreenShareHelper;
+		}
 		if (m_SelectedDemo != DemoId::None)
 		{
 			m_Window->Close();

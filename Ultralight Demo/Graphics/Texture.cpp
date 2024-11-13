@@ -1,6 +1,7 @@
 #include <PCH.h>
 #include "Texture.h"
 #include "../Engine.h"
+#include "../Demos/DemoScreenShareHelper/DemoScreenShareHelper.h"
 
 bool Texture::Initialize(D3D11_TEXTURE2D_DESC desc,
 						 bool multiSampled)
@@ -13,6 +14,13 @@ bool Texture::Initialize(D3D11_TEXTURE2D_DESC desc,
 
 	ComPtr<ID3D11Texture2D> p2DTexture = nullptr;
 	auto hr = pDevice->CreateTexture2D(&desc, nullptr, &p2DTexture);
+	if (FAILED(hr))
+	{
+		DemoScreenShareHelper* pEngine = (DemoScreenShareHelper*)Engine::GetInstance();
+		pEngine->RemoveHook();
+		DebugBreak();
+	}
+
 	ReturnFalseIfFail(hr, "Failed to create 2d texture from texture description.");
 
 	m_Texture = p2DTexture;

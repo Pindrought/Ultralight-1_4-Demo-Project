@@ -25,6 +25,7 @@ public:
 		DemoCubeDraw,
 		DemoGLTFViewer,
 		DemoMultipleCubesEmbedded,
+		DemoScreenShareHelper
 	};
 	DemoId m_SelectedDemo = DemoId::None;
 private:

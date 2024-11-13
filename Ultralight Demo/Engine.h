@@ -46,7 +46,7 @@ protected:
 	shared_ptr<UltralightManager> m_UltralightMgr;
 	bool m_IsRunning = false;
 	bool m_VSync = true;
-	float m_DeltaTime = 0; //Delta time between each frame - calculated at the start of each tick
+	float m_DeltaTime = 0; //Delta time between each frame - calculated at the start of each tick (in miliseconds)
 	vector<shared_ptr<RenderTargetContainer>> m_OffScreenRenderTargetContainers;
 private:
 	Timer m_FrameTimer;

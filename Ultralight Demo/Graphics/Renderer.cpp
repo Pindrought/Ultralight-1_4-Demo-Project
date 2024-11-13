@@ -373,6 +373,33 @@ void Renderer::DrawSprite(Texture* pTexture, float x, float y, float z, float wi
 	pContext->DrawIndexed(m_QuadMeshForUltralightView.GetIndexCount(), 0, 0);
 }
 
+void Renderer::DrawMesh2D(Mesh2DRenderData& meshData)
+{
+	assert(meshData.PipelineState != nullptr);
+	ActivatePipelineState(meshData.PipelineState);
+
+	DirectX::XMStoreFloat4x4(&m_CB_PerDrawData_2D.m_Data.ModelMatrix, meshData.TransformMatrix);
+
+	if (!m_CB_PerDrawData_2D.ApplyChanges())
+	{
+		ErrorHandler::LogCriticalError("Failed to update the per draw data 2d constant buffer.");
+	}
+
+	ID3D11DeviceContext* pContext = m_D3D->m_Context.Get();
+
+	ID3D11ShaderResourceView* pResourceView = meshData.Texture->GetTextureResourceView();
+	pContext->PSSetShaderResources(0, 1, &pResourceView);
+
+	Mesh2D& mesh = meshData.Mesh2D;
+	//Just going to reuse the same quad used for Ultralight views here since it's same setup
+	pContext->IASetIndexBuffer(mesh.GetIndexBuffer(), DXGI_FORMAT::DXGI_FORMAT_R32_UINT, 0);
+	ID3D11Buffer* pVertexBuffer = mesh.GetVertexBuffer();
+	const uint32_t stride = mesh.GetStride();
+	const uint32_t offset = 0;
+	pContext->IASetVertexBuffers(0, 1, &pVertexBuffer, &stride, &offset);
+	pContext->DrawIndexed(mesh.GetIndexCount(), 0, 0);
+}
+
 bool Renderer::RenderEntity(Entity* pEntity)
 {
 	if (pEntity->IsVisible() == false)

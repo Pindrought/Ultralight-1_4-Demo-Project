@@ -5,6 +5,16 @@
 #include "Buffer/ConstantBuffer.h"
 #include "Renderable/Mesh2D.h"
 
+//This should be put somewhere else but for now it's here
+//JPNOTE[LOW] Move this somewhere else
+struct Mesh2DRenderData
+{
+	shared_ptr<PipelineState> PipelineState = nullptr;
+	Mesh2D Mesh2D;
+	Matrix TransformMatrix = Matrix::Identity;
+	shared_ptr<Texture> Texture = nullptr;
+};
+
 class Renderer
 {
 public:
@@ -20,6 +30,7 @@ public:
 	void RenderUltralightView(UltralightView* pUltralightView);
 	bool RenderSceneInRenderTargetContainer(WeakWrapper<RenderTargetContainer> pRenderTargetContainer);
 	void DrawSprite(Texture* pTexture, float x, float y, float z, float width, float height);
+	void DrawMesh2D(Mesh2DRenderData& meshData);
 	bool RenderEntity(Entity* pEntity);
 	~Renderer();
 private:

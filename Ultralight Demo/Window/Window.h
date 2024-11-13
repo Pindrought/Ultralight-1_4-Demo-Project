@@ -34,6 +34,7 @@ public:
 	bool ToggleClickthrough(bool clickthrough);
 	void StartDrag();
 	void StopDrag();
+	RECT GetRect();
 	IDXGISwapChain1* GetSwapChainPtr();
 	WeakWrapper<RenderTargetContainer> GetRenderTargetContainer();
 	LRESULT WindowProcA(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam); //This probably shouldn't be public since it should not be called outside of Window.cpp, but I don't have a great solution to hide this.
@@ -46,6 +47,7 @@ public:
 	void Hide();
 	void Close();
 	void DestroyAllViewsLinkedToThisWindow();
+	bool IsClickthroughEnabled();
 private:
 	bool InitializeSwapchain();
 	bool InitializeRenderTargetContainer();

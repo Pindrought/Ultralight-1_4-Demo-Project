@@ -13,6 +13,8 @@
 #include "DemoCubeDraw/DemoCubeDraw.h"
 #include "DemoGLTFViewer/DemoGLTFViewer.h"
 #include "DemoMultipleCubesEmbedded/DemoMultipleCubesEmbedded.h"
+#include "DemoScreenShareHelper/DemoScreenShareHelper.h"
+
 #include "DemoSelector/DemoSelector.h"
 
 shared_ptr<Engine> GenerateEngineInstanceForDemo(DemoSelector::DemoId demoId)
@@ -59,6 +61,8 @@ shared_ptr<Engine> GenerateEngineInstanceForDemo(DemoSelector::DemoId demoId)
 	case DemoSelector::DemoId::DemoMultipleCubesEmbedded:
 		demoInstance = make_shared<DemoMultipleCubesEmbedded>();
 		break;
+	case DemoSelector::DemoId::DemoScreenShareHelper:
+		demoInstance = make_shared<DemoScreenShareHelper>();
 	}
 	return demoInstance;
 }
