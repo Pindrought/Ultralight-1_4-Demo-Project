@@ -22,47 +22,58 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance,
 
 	while (true)
 	{
-		DemoSelector::DemoId demoId = DemoSelector::DemoId::None;
+		DemoScreenShareHelper engine;
+		if (engine.Initialize())
 		{
-			DemoSelector engine;
-			if (engine.Initialize())
+			while (engine.IsRunning())
 			{
-
-				while (engine.IsRunning())
-				{
-					engine.ProcessWindowsMessages();
-					engine.Tick();
-					engine.RenderFrame();
-				}
-			}
-			else
-			{
-				FatalError("Error occurred starting up demo selector demo. Application must close.");
-			}
-			demoId = engine.m_SelectedDemo;
-		}
-
-
-		shared_ptr<Engine> demoInstance = GenerateEngineInstanceForDemo(demoId);
-
-		if (demoInstance == nullptr) //No demo was selected if this is nullptr, so we exit
-		{
-			break;
-		}
-
-		if (demoInstance->Initialize())
-		{
-			while (demoInstance->IsRunning())
-			{
-				demoInstance->ProcessWindowsMessages();
-				demoInstance->Tick();
-				demoInstance->RenderFrame();
+				engine.ProcessWindowsMessages();
+				engine.Tick();
+				engine.RenderFrame();
 			}
 		}
-		else
-		{
-			FatalError("Error starting demo. Application must close.");
-		}
+		break;
+		//DemoSelector::DemoId demoId = DemoSelector::DemoId::None;
+		//{
+		//	DemoSelector engine;
+		//	if (engine.Initialize())
+		//	{
+
+		//		while (engine.IsRunning())
+		//		{
+		//			engine.ProcessWindowsMessages();
+		//			engine.Tick();
+		//			engine.RenderFrame();
+		//		}
+		//	}
+		//	else
+		//	{
+		//		FatalError("Error occurred starting up demo selector demo. Application must close.");
+		//	}
+		//	demoId = engine.m_SelectedDemo;
+		//}
+
+
+		//shared_ptr<Engine> demoInstance = GenerateEngineInstanceForDemo(demoId);
+
+		//if (demoInstance == nullptr) //No demo was selected if this is nullptr, so we exit
+		//{
+		//	break;
+		//}
+
+		//if (demoInstance->Initialize())
+		//{
+		//	while (demoInstance->IsRunning())
+		//	{
+		//		demoInstance->ProcessWindowsMessages();
+		//		demoInstance->Tick();
+		//		demoInstance->RenderFrame();
+		//	}
+		//}
+		//else
+		//{
+		//	FatalError("Error starting demo. Application must close.");
+		//}
 
 	}
 

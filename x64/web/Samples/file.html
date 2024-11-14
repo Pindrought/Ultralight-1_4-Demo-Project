@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flex Center Example</title>
+    <style>
+        /* Set the fixed width and height for body */
+        body {
+            width: 400px;
+            height: 60px;
+            margin: 0;
+        }
+
+        /* Flex container settings */
+        .flex-container {
+            display: flex;
+            justify-content: center; /* Center horizontally */
+            align-items: center;     /* Center vertically */
+            height: 100%;            /* Full height of the body */
+            width: 100%;             /* Full width of the body */
+        }
+
+        /* Style for the p tag */
+        p {
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="flex-container">
+        <p>Hello World</p>
+    </div>
+</body>
+</html>

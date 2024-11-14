@@ -4,8 +4,9 @@
 
 bool DemoBasic::Startup()
 {
-	string url = "http://www.google.com";
-	
+	//string url = "http://www.google.com";
+	string url = "file:///Samples/file.html";
+
 	//GPU Renderer Window/View
 	WindowCreationParameters windowParms;
 	windowParms.Width = 800;
@@ -54,7 +55,7 @@ bool DemoBasic::Startup()
 		parms.Height = m_WindowForCPUView->GetHeight();
 		parms.IsAccelerated = false; //Use CPU Renderer
 		parms.ForceMatchWindowDimensions = true;
-		parms.IsTransparent = true;
+		parms.IsTransparent = false;
 
 		m_CPUView = m_UltralightMgr->CreateUltralightView(parms);
 		if (m_CPUView.expired())
