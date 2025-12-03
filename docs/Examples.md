@@ -65,12 +65,12 @@ This demo shows **JS ↔ C++ communication** using an **Ultralight view**:
 
 ---
 
-## Demo #6: DemoOpenfileDialog
+## Demo #6: DemoOpenFileDialog
 
 This demo creates a window with a button that spawns a **new window containing an OpenFileDialog**.  
 The UI is built in HTML, and data is passed between the windows using **JavaScript ↔ C++ communication**.
 
-![DemoOpenfileDialog](images/DemoOpenfileDialog.png)
+![DemoOpenFileDialog](images/DemoOpenFileDialog.png)
 
 ---
 
@@ -118,7 +118,7 @@ This demo allows users to **load ASCII-format GLTF files** and view them in 3D, 
 
 ## Demo #12: DemoCPPTextureInBrowser
 
-This demo demonstrates using the **ImageSource API** to draw a **C++ DirectX 11 texture directly into an `<img>`** element inside an Ultralight web view.
+This demo demonstrates using the **ImageSource API** to draw a **C++ DirectX 11 texture directly into an `<img>`** element inside an Ultralight web view. This is the recommended method of embedding a DirectX11 texture in an ultralight view.
 
 ![DemoCPPTextureInBrowser](images/DemoCPPTextureInBrowser.png)
 
