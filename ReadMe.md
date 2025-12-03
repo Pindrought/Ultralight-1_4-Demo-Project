@@ -1,6 +1,7 @@
-# Ultralight 1.4 Demo
-[Ultralight pricing/licensing](https://ultralig.ht/pricing/)
+[Click here to view Ultralight pricing/licensing](https://ultralig.ht/pricing/)
 > ⚠️ This project is **not affiliated with Ultralight**.
+
+# Ultralight 1.4 Demo
 
 A **C++ demo framework** showcasing multiple Ultralight 1.4 examples, including GPU/CPU rendering, multi-window management, JS ↔ C++ communication, and advanced UI features.
 
