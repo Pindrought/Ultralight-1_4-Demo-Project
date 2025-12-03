@@ -11,7 +11,7 @@ bool DemoJSCPPCommunication::Startup()
 	windowParms.Width = screenWidth - 100;
 	windowParms.Height = screenHeight - 100;
 	windowParms.Style = WindowStyle::Resizable | WindowStyle::ExitButton | WindowStyle::MaximizeAvailable;
-	windowParms.Title = "Default Title - Primary Window";
+	windowParms.Title = "Demo JS<-> C++ Communication";
 	m_PrimaryWindow = WindowManager::SpawnWindow(windowParms);
 	if (m_PrimaryWindow.expired())
 	{

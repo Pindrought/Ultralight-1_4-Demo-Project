@@ -9,7 +9,7 @@ bool DemoMultipleCubesEmbedded::Startup()
 	windowParms.Width = 800;
 	windowParms.Height = 600;
 	windowParms.Style = WindowStyle::Resizable | WindowStyle::ExitButton | WindowStyle::MaximizeAvailable;
-	windowParms.Title = "Demo Cube Draw";
+	windowParms.Title = "Demo Multiple Cubes Embedded";
 	WeakWrapper<Window> pWindow = WindowManager::SpawnWindow(windowParms);
 	if (pWindow.expired())
 	{
