@@ -1,21 +1,131 @@
 # Examples Documentation
 
-## Demos
-There are many different demos in this project. To access a demo in the application, simply click the button with the name of the Demo.
+This document provides an overview of the various demos included in this project. Each demo demonstrates different features of the application.
 
-![Demo Overview Image](images/img_demos_overview.png)
+---
 
-## #1 -> DemoBasic
-This demo opens two windows that load google.com One window is using the GPU renderer implementation and the other uses CPU rendering.
+## Demos Overview
 
-![DemoBasic Image](images/DemoBasic.png)
+There are multiple demos available in this project. To access a demo in the application, click the button with the corresponding demo name.
 
-## #2 -> DemoBorderlessResizable
-This demo creates a borderless resizable window with the option to double click to maximize/restore on the custom title bar. The title bar is an HTML view.
+![Demos Overview](images/img_demos_overview.png)
 
-![DemoBorderlessResizable Image](images/DemoBorderlessResizable.png)
+---
 
-## #3 -> DemoBorderlessResizableMovable
-This demo is the same as the **DemoBorderlessResizable** demo, but with the addition of being able to drag the window by clicking on the title bar.
+## Demo #1: DemoBasic
 
-![DemoBorderlessResizableMovable Image](images/DemoBorderlessResizableMovable.png)
+This demo opens **two windows** that load `google.com`.  
+
+- **GPU Renderer**: One window uses GPU rendering.  
+- **CPU Renderer**: The other window uses CPU rendering.
+
+![DemoBasic](images/DemoBasic.png)
+
+---
+
+## Demo #2: DemoBorderlessResizable
+
+This demo creates a **borderless, resizable window** with a **custom title bar**.  
+
+- Double-clicking the title bar maximizes/restores the window.  
+- The title bar is rendered using an HTML view.
+
+![DemoBorderlessResizable](images/DemoBorderlessResizable.png)
+
+---
+
+## Demo #3: DemoBorderlessResizableMovable
+
+This demo extends **DemoBorderlessResizable** with **window dragging functionality**.  
+
+- Click and drag the title bar to move the window around the screen.
+
+![DemoBorderlessResizableMovable](images/DemoBorderlessResizableMovable.png)
+
+---
+
+## Demo #4: DemoInspector
+
+This demo demonstrates using **multiple windows**:
+
+- One window loads `google.com`.  
+- Another window opens an **inspector view** for debugging or inspecting UI elements.
+
+![DemoInspector](images/DemoInspector.png)
+
+---
+
+## Demo #5: DemoJSCPPCommunication
+
+This demo shows **JS ↔ C++ communication** using an **Ultralight view**:  
+
+- Multiple examples of passing data between JavaScript and C++ are included.  
+
+![DemoJSCPPCommunication](images/DemoJSCPPCommunication.png)
+
+---
+
+## Demo #6: DemoOpenfileDialog
+
+This demo creates a window with a button that spawns a **new window containing an OpenFileDialog**.  
+The UI is built in HTML, and data is passed between the windows using **JavaScript ↔ C++ communication**.
+
+![DemoOpenfileDialog](images/DemoOpenfileDialog.png)
+
+---
+
+## Demo #7: DemoTransparent
+
+This demo demonstrates creating a **fully transparent window** with an image rendered inside.
+
+![DemoTransparent](images/DemoTransparent.png)
+
+---
+
+## Demo #8: DemoAntiAliasTest
+
+This demo opens up to **four windows** to demonstrate **MSAA (Multi-Sample Anti-Aliasing) levels** using the GPU renderer.  
+- MSAA levels 1, 2, 4, and 8 are displayed if supported by the active GPU.
+
+![DemoAntiAliasTest](images/DemoAntiAliasTest.png)
+
+---
+
+## Demo #9: DemoOverlayedCPPTexture
+
+This demo retrieves the bounds of a `<div>` and draws a **C++ texture** over the approximate area.  
+> Note: This method is **not recommended**; it was used prior to the introduction of the ImageSource API.
+
+![DemoOverlayedCPPTexture](images/DemoOverlayedCPPTexture.png)
+
+---
+
+## Demo #10: DemoCubeDraw
+
+This demo features an **HTML view with interactive buttons** to modify how a cube is rendered directly to the window's render target using **DirectX 11**.
+
+![DemoCubeDraw](images/DemoCubeDraw.png)
+
+---
+
+## Demo #11: DemoGLTFViewer
+
+This demo allows users to **load ASCII-format GLTF files** and view them in 3D, including all available **animations**.
+
+![DemoGLTFViewer](images/DemoGLTFViewer.png)
+
+---
+
+## Demo #12: DemoCPPTextureInBrowser
+
+This demo demonstrates using the **ImageSource API** to draw a **C++ DirectX 11 texture directly into an `<img>`** element inside an Ultralight web view.
+
+![DemoCPPTextureInBrowser](images/DemoCPPTextureInBrowser.png)
+
+---
+
+## Demo #13: DemoMultipleCubesEmbedded
+
+This demo extends the **ImageSource API usage** by drawing textures associated with render targets into multiple `<img>` elements in an Ultralight web view, showcasing **multiple cubes rendered simultaneously**.
+
+![DemoMultipleCubesEmbedded](images/DemoMultipleCubesEmbedded.png)
